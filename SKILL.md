@@ -32,8 +32,15 @@ When invoked as `/report [flags] [content]`, parse flags and route:
 | `--theme <name>` | Override theme. Valid: `corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`. |
 | `--template <file>` | Use a custom HTML template file. Read it and inject rendered content into placeholders. |
 | `--output <filename>` | Save HTML to this filename instead of the default. |
+| `--export-image [mode]` | After generating HTML, also export to image via `scripts/export-image.py`. Mode: `im` (default), `mobile`, `desktop`, `all`. Requires: `pip install playwright && playwright install chromium`. |
 | (no flags, text given) | One-step: generate IR internally (do not save it), immediately render to HTML. |
 | (no flags, no text, IR in context) | Detect IR in context (starts with `---`), render directly to HTML. |
+
+**`--export-image` usage:** When this flag is present, after saving the HTML file run:
+```
+python <skill-dir>/scripts/export-image.py <output.html> --mode <mode>
+```
+Report the image path(s) to the user. If playwright is not installed, print the install instructions and skip — do not error out.
 
 **Default output filename:** `report-<YYYY-MM-DD>-<slug>.html`
 
@@ -450,13 +457,13 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       <button class="edit-toggle" id="edit-toggle" title="Edit mode (E)">✏ Edit</button>
 
       <!-- Export (always present) -->
-      <!-- lang:en labels: "↓ Export" / "🖨 Print / PDF" / "🖥 Save PNG (Desktop)" / "📱 Save PNG (Mobile)" / "💬 IM Share Image" -->
+      <!-- lang:en labels: "↓ Export" / "🖨 Print / PDF" / "🖥 Save PNG (Desktop)" / "📱 Save PNG (Mobile)" / "💬 IM Image" -->
       <!-- lang:zh labels: "↓ 导出"  / "🖨 打印 / PDF"  / "🖥 保存图片（桌面）"    / "📱 保存图片（手机）"  / "💬 IM 分享长图"   -->
       <div class="export-menu" id="export-menu">
         <button class="export-item" onclick="window.print()">[🖨 Print / PDF|🖨 打印 / PDF]</button>
         <button class="export-item" id="export-png-desktop">[🖥 Save PNG (Desktop)|🖥 保存图片（桌面）]</button>
         <button class="export-item" id="export-png-mobile">[📱 Save PNG (Mobile)|📱 保存图片（手机）]</button>
-        <button class="export-item" id="export-im-share">[💬 IM Share Image|💬 IM 分享长图]</button>
+        <button class="export-item" id="export-im-share">[💬 IM Image|💬 IM 长图]</button>
       </div>
       <button class="export-btn" id="export-btn" title="Export">[↓ Export|↓ 导出]</button>
 

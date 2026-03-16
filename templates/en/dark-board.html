@@ -207,7 +207,7 @@
     <button class="export-item" onclick="window.print()">🖨 Print / PDF</button>
     <button class="export-item" id="export-png-desktop">🖥 Save PNG (Desktop)</button>
     <button class="export-item" id="export-png-mobile">📱 Save PNG (Mobile)</button>
-    <button class="export-item" id="export-im-share">💬 IM Share Image</button>
+    <button class="export-item" id="export-im-share">💬 IM Image</button>
   </div>
   <button class="export-btn" id="export-btn" title="Export">↓ Export</button>
 
@@ -623,7 +623,7 @@
         }, filename('-mobile', 'jpg'), true);
       });
 
-      /* IM Share: 800px wide JPEG — WeChat / Feishu / DingTalk optimised */
+      /* IM Share: 800px wide JPEG — IM long image format */
       pngIM && pngIM.addEventListener('click', () => {
         const el = document.querySelector('.report-wrapper') || document.documentElement;
         capture(el, {
