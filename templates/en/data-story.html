@@ -97,7 +97,17 @@
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       .toc-toggle, .toc-sidebar, .edit-hotzone, .edit-toggle,
       .export-btn, .export-menu { display: none !important; }
-      section[data-section] { break-inside: avoid; }
+      /* Granular page-break rules — avoid blank pages */
+      h2 { break-after: avoid; }
+      .kpi-grid { break-inside: avoid; }
+      .kpi-card { break-inside: avoid; }
+      .callout { break-inside: avoid; }
+      .timeline { break-inside: avoid; }
+      .timeline-item { break-inside: avoid; }
+      .table-wrapper { break-inside: avoid; }
+      [data-component="chart"] { break-inside: avoid; }
+      canvas { max-height: 320px !important; width: 100% !important; }
+      .diagram-wrapper { break-inside: avoid; }
     }
   </style>
 </head>
@@ -124,7 +134,8 @@
 
   <div class="export-menu" id="export-menu">
     <button class="export-item" onclick="window.print()">🖨 Print / PDF</button>
-    <button class="export-item" id="export-png-btn">📷 Save PNG</button>
+    <button class="export-item" id="export-png-desktop">🖥 Save PNG (Desktop)</button>
+    <button class="export-item" id="export-png-mobile">📱 Save PNG (Mobile)</button>
   </div>
   <button class="export-btn" id="export-btn" title="Export">↓ Export</button>
 
@@ -346,42 +357,63 @@
 
   <script>
     (function() {
-      const exportBtn  = document.getElementById('export-btn');
-      const exportMenu = document.getElementById('export-menu');
-      const pngBtn     = document.getElementById('export-png-btn');
+      const exportBtn    = document.getElementById('export-btn');
+      const exportMenu   = document.getElementById('export-menu');
+      const pngDesktop   = document.getElementById('export-png-desktop');
+      const pngMobile    = document.getElementById('export-png-mobile');
       if (!exportBtn || !exportMenu) return;
+      const LABEL = exportBtn.textContent;
 
-      exportBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        exportMenu.classList.toggle('open');
-      });
+      exportBtn.addEventListener('click', e => { e.stopPropagation(); exportMenu.classList.toggle('open'); });
       document.addEventListener('click', e => {
         if (!exportBtn.contains(e.target) && !exportMenu.contains(e.target))
           exportMenu.classList.remove('open');
       });
 
-      function doCapture() {
+      function withLib(fn) {
         exportMenu.classList.remove('open');
-        exportBtn.textContent = '…';
-        html2canvas(document.body, { scale: 2, useCORS: true, allowTaint: true }).then(canvas => {
-          canvas.toBlob(blob => {
-            const a = Object.assign(document.createElement('a'), {
-              href: URL.createObjectURL(blob),
-              download: (document.title || 'report') + '.png'
-            });
-            a.click(); URL.revokeObjectURL(a.href);
-            exportBtn.textContent = '↓ Export';
-          }, 'image/png');
-        });
-      }
-
-      pngBtn.addEventListener('click', () => {
-        if (window.html2canvas) { doCapture(); return; }
+        exportBtn.style.visibility = 'hidden';   /* hide btn during capture */
+        if (window.html2canvas) { fn(); return; }
         const s = document.createElement('script');
         s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1/dist/html2canvas.min.js';
-        s.onload = doCapture;
-        document.head.appendChild(s);
-      });
+        s.onload = fn; document.head.appendChild(s);
+      }
+      function restore() { exportBtn.style.visibility = ''; exportBtn.textContent = LABEL; }
+      function download(canvas, suffix) {
+        canvas.toBlob(blob => {
+          const a = Object.assign(document.createElement('a'), {
+            href: URL.createObjectURL(blob),
+            download: (document.title || 'report') + suffix + '.png'
+          });
+          a.click(); URL.revokeObjectURL(a.href); restore();
+        }, 'image/png');
+      }
+
+      /* Desktop: full-page, 2× */
+      pngDesktop && pngDesktop.addEventListener('click', () => withLib(() => {
+        exportBtn.textContent = '…';
+        html2canvas(document.documentElement, {
+          scale: 2, useCORS: true, allowTaint: true,
+          scrollX: 0, scrollY: 0,
+          width: document.documentElement.scrollWidth,
+          height: document.documentElement.scrollHeight,
+          windowWidth: document.documentElement.scrollWidth,
+          windowHeight: document.documentElement.scrollHeight
+        }).then(c => download(c, ''));
+      }));
+
+      /* Mobile: report-wrapper only, scaled to 1170px wide (≈ 3× iPhone width) */
+      pngMobile && pngMobile.addEventListener('click', () => withLib(() => {
+        exportBtn.textContent = '…';
+        const el = document.querySelector('.report-wrapper') || document.documentElement;
+        const scale = Math.min(3, 1170 / el.offsetWidth);
+        html2canvas(el, {
+          scale, useCORS: true, allowTaint: true,
+          scrollX: 0, scrollY: 0,
+          width: el.scrollWidth,
+          height: el.scrollHeight
+        }).then(c => download(c, '-mobile'));
+      }));
     })();
   </script>
 </body>

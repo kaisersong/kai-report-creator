@@ -87,5 +87,8 @@ body.edit-mode [contenteditable]:focus { outline: 2px solid var(--primary); }
 @media print {
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   .toc-toggle, .toc-sidebar, .edit-hotzone, .edit-toggle, .export-btn, .export-menu { display: none !important; }
-  section[data-section] { break-inside: avoid; }
+  h2 { break-after: avoid; }
+  .kpi-grid, .kpi-card, .callout, .timeline, .timeline-item,
+  .table-wrapper, [data-component="chart"], .diagram-wrapper { break-inside: avoid; }
+  canvas { max-height: 320px !important; width: 100% !important; }
 }

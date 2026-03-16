@@ -422,11 +422,12 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       <button class="edit-toggle" id="edit-toggle" title="Edit mode (E)">✏ Edit</button>
 
       <!-- Export (always present) -->
-      <!-- lang:zh → button label "↓ 导出", items "🖨 打印 / PDF" and "📷 保存图片" -->
-      <!-- lang:en → button label "↓ Export", items "🖨 Print / PDF" and "📷 Save PNG" -->
+      <!-- lang:en labels: "↓ Export" / "🖨 Print / PDF" / "🖥 Save PNG (Desktop)" / "📱 Save PNG (Mobile)" -->
+      <!-- lang:zh labels: "↓ 导出"  / "🖨 打印 / PDF"  / "🖥 保存图片（桌面）"    / "📱 保存图片（手机）"  -->
       <div class="export-menu" id="export-menu">
         <button class="export-item" onclick="window.print()">[🖨 Print / PDF|🖨 打印 / PDF]</button>
-        <button class="export-item" id="export-png-btn">[📷 Save PNG|📷 保存图片]</button>
+        <button class="export-item" id="export-png-desktop">[🖥 Save PNG (Desktop)|🖥 保存图片（桌面）]</button>
+        <button class="export-item" id="export-png-mobile">[📱 Save PNG (Mobile)|📱 保存图片（手机）]</button>
       </div>
       <button class="export-btn" id="export-btn" title="Export">[↓ Export|↓ 导出]</button>
 
@@ -593,36 +594,64 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       </script>
 
       <script>
-        // Export: Print/PDF via window.print(), PNG via html2canvas (lazy CDN load)
+        // Export: Print/PDF via window.print(); PNG via html2canvas (lazy CDN)
+        // Desktop PNG: full-page at 2× scale
+        // Mobile PNG: .report-wrapper only, scaled to 1170px wide (≈ 3× iPhone width)
         (function() {
           const exportBtn  = document.getElementById('export-btn');
           const exportMenu = document.getElementById('export-menu');
-          const pngBtn     = document.getElementById('export-png-btn');
+          const pngDesktop = document.getElementById('export-png-desktop');
+          const pngMobile  = document.getElementById('export-png-mobile');
           if (!exportBtn || !exportMenu) return;
+          const LABEL = exportBtn.textContent;
+
           exportBtn.addEventListener('click', e => { e.stopPropagation(); exportMenu.classList.toggle('open'); });
           document.addEventListener('click', e => {
             if (!exportBtn.contains(e.target) && !exportMenu.contains(e.target))
               exportMenu.classList.remove('open');
           });
-          function doCapture() {
-            exportMenu.classList.remove('open'); exportBtn.textContent = '…';
-            html2canvas(document.body, { scale: 2, useCORS: true, allowTaint: true }).then(canvas => {
-              canvas.toBlob(blob => {
-                const a = Object.assign(document.createElement('a'), {
-                  href: URL.createObjectURL(blob),
-                  download: (document.title || 'report') + '.png'
-                });
-                a.click(); URL.revokeObjectURL(a.href);
-                exportBtn.textContent = '[↓ Export|↓ 导出]';
-              }, 'image/png');
-            });
-          }
-          pngBtn.addEventListener('click', () => {
-            if (window.html2canvas) { doCapture(); return; }
+
+          function withLib(fn) {
+            exportMenu.classList.remove('open');
+            exportBtn.style.visibility = 'hidden';
+            if (window.html2canvas) { fn(); return; }
             const s = document.createElement('script');
             s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1/dist/html2canvas.min.js';
-            s.onload = doCapture; document.head.appendChild(s);
-          });
+            s.onload = fn; document.head.appendChild(s);
+          }
+          function restore() { exportBtn.style.visibility = ''; exportBtn.textContent = LABEL; }
+          function download(canvas, suffix) {
+            canvas.toBlob(blob => {
+              const a = Object.assign(document.createElement('a'), {
+                href: URL.createObjectURL(blob),
+                download: (document.title || 'report') + suffix + '.png'
+              });
+              a.click(); URL.revokeObjectURL(a.href); restore();
+            }, 'image/png');
+          }
+
+          pngDesktop && pngDesktop.addEventListener('click', () => withLib(() => {
+            exportBtn.textContent = '…';
+            html2canvas(document.documentElement, {
+              scale: 2, useCORS: true, allowTaint: true,
+              scrollX: 0, scrollY: 0,
+              width: document.documentElement.scrollWidth,
+              height: document.documentElement.scrollHeight,
+              windowWidth: document.documentElement.scrollWidth,
+              windowHeight: document.documentElement.scrollHeight
+            }).then(c => download(c, ''));
+          }));
+
+          pngMobile && pngMobile.addEventListener('click', () => withLib(() => {
+            exportBtn.textContent = '…';
+            const el = document.querySelector('.report-wrapper') || document.documentElement;
+            const scale = Math.min(3, 1170 / el.offsetWidth);
+            html2canvas(el, {
+              scale, useCORS: true, allowTaint: true,
+              scrollX: 0, scrollY: 0,
+              width: el.scrollWidth, height: el.scrollHeight
+            }).then(c => download(c, '-mobile'));
+          }));
         })();
       </script>
 
