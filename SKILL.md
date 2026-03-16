@@ -206,3 +206,281 @@ When the user runs `/report --themes`, write the following HTML verbatim to `rep
         </div>
       </div>
     </div></body></html>
+
+## Component Rendering Rules
+
+When rendering IR to HTML, apply these rules per block type. Each component must be wrapped with `data-component` attribute for AI readability.
+
+### Plain Markdown (default)
+
+Convert using standard Markdown rules. Wrap each `##` section in:
+
+    <section data-section="[heading text]" data-summary="[one sentence summary]">
+      <h2 id="section-[slug]">[heading text]</h2>
+      [section content]
+    </section>
+
+For `###` headings: `<h3 id="section-[slug]">[heading text]</h3>`
+
+### :::kpi
+
+Each list item format: `- Label: Value TrendSymbol`
+Trend: `↑` = positive (green), `↓` = negative (red), `→` = neutral (gray)
+
+Extract the numeric part of Value into `data-target-value`, set `data-prefix` and `data-suffix`.
+
+    <div data-component="kpi" class="kpi-grid">
+      <div class="kpi-card fade-in-up">
+        <div class="kpi-label">总营收</div>
+        <div class="kpi-value" data-target-value="2450" data-prefix="¥" data-suffix="万">¥2,450万</div>
+        <div class="kpi-trend kpi-trend--up">↑12%</div>
+      </div>
+    </div>
+
+### :::chart
+
+Choose library: Chart.js for bar/line/pie/scatter; ECharts for radar/funnel/heatmap/multi-axis. If any chart in report needs ECharts, use ECharts for ALL charts. Never load both libraries.
+
+    <div data-component="chart" data-type="bar" data-raw='{"labels":[...],"datasets":[...]}' class="fade-in-up">
+      <canvas id="chart-[unique-id]"></canvas>
+      <script>
+        new Chart(document.getElementById('chart-[unique-id]'), {
+          type: 'bar',
+          data: { labels: [...], datasets: [{ label: '...', data: [...], backgroundColor: 'rgba(26,86,219,0.8)' }] },
+          options: { responsive: true, plugins: { legend: { position: 'top' } } }
+        });
+      </script>
+    </div>
+
+Use theme's `--primary` color for chart colors. Add `<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>` in `<head>` (or inline if `--bundle`).
+
+### :::table
+
+Body is a Markdown table. Convert to HTML:
+
+    <div data-component="table" class="table-wrapper fade-in-up">
+      <table class="report-table">
+        <thead><tr><th>Col1</th>...</tr></thead>
+        <tbody><tr><td>Val</td>...</tr></tbody>
+      </table>
+    </div>
+
+### :::list
+
+    <div data-component="list" class="report-list">
+      <ul class="styled-list">  <!-- or <ol> if style=ordered -->
+        <li>Item</li>
+      </ul>
+    </div>
+
+### :::image
+
+    <figure data-component="image" class="report-image report-image--[layout]">
+      <img src="[src]" alt="[alt]" loading="lazy">
+      <figcaption>[caption]</figcaption>
+    </figure>
+
+layout=left: float left, max-width 40%, text wraps right.
+layout=right: float right, max-width 40%, text wraps left.
+layout=full (default): full width, centered.
+
+### :::timeline
+
+Each item: `- Date: Description` or `- Label: Description`
+
+    <div data-component="timeline" class="timeline fade-in-up">
+      <div class="timeline-item">
+        <div class="timeline-date">2024-07</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">启动项目</div>
+      </div>
+    </div>
+
+### :::diagram
+
+Generate inline SVG. All SVGs must be self-contained (no external refs). Wrap in:
+
+    <div data-component="diagram" data-type="[type]" class="diagram-wrapper fade-in-up">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 [w] [h]">
+        <!-- generated SVG -->
+      </svg>
+    </div>
+
+**type=sequence:** Draw vertical lifelines for each actor, horizontal arrows for each step. Actors as columns at top with labels, steps numbered on left, arrows with labels between lifelines.
+
+**type=flowchart:** Draw nodes as shapes (circle=oval, diamond=rhombus, rect=rectangle). Connect with directed arrows. Use edge labels where provided.
+
+**type=tree:** Top-down tree with root at top, children below, connected by lines.
+
+**type=mindmap:** Radial layout, center node in middle, branches radiating out with items as leaf nodes.
+
+### :::code
+
+    <div data-component="code" class="code-wrapper">
+      <div class="code-title">[title if provided]</div>
+      <pre><code class="language-[lang]">[HTML-escaped code content]</code></pre>
+    </div>
+
+Add `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github.min.css">` and `<script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/highlight.min.js"></script>` + `<script>hljs.highlightAll();</script>` in head (or inline if --bundle).
+
+For dark-tech theme use `github-dark.min.css` instead of `github.min.css`.
+
+### :::callout
+
+    <div data-component="callout" class="callout callout--[type] fade-in-up">
+      <span class="callout-icon">[icon or default]</span>
+      <div class="callout-body">[content]</div>
+    </div>
+
+Default icons: note→ℹ️, tip→💡, warning→⚠️, danger→🚫
+
+### Custom Blocks
+
+For each `:::tag-name` matching a key in frontmatter `custom_blocks`:
+1. Get the HTML template string from `custom_blocks.[tag-name]`
+2. Parse block body as YAML to get field values
+3. Replace `{{field}}` with the value
+4. Replace `{{content}}` with any non-YAML plain text lines in the block
+5. For `{{#each list}}...{{this}}...{{/each}}`, iterate the array and repeat the inner template
+6. Wrap result in: `<div data-component="custom" data-tag="[tag-name]">[expanded HTML]</div>`
+
+## Theme CSS
+
+When generating HTML, embed the selected theme's CSS verbatim in `<style>` inside `<head>`, followed by shared component CSS. Apply `theme_overrides` by appending CSS variable overrides after the theme block.
+
+### Theme: corporate-blue
+
+    :root {
+      --primary: #1A56DB; --primary-light: #E3EDFF; --accent: #1C64F2;
+      --bg: #FFFFFF; --surface: #F9FAFB; --text: #111928; --text-muted: #6B7280;
+      --border: #E5E7EB; --success: #057A55; --warning: #B45309; --danger: #E02424;
+      --font-sans: 'Inter', 'PingFang SC', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace; --radius: 8px;
+    }
+    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.7; }
+    h1 { font-size: 2.25rem; font-weight: 700; color: var(--primary); border-bottom: 3px solid var(--primary); padding-bottom: .5rem; margin-bottom: 1.5rem; }
+    h2 { font-size: 1.5rem; font-weight: 600; color: var(--text); border-left: 4px solid var(--primary); padding-left: .75rem; margin-top: 2.5rem; }
+    h3 { font-size: 1.15rem; font-weight: 600; color: var(--text); margin-top: 1.5rem; }
+    p { margin: .75rem 0; } a { color: var(--primary); }
+    strong { font-weight: 700; } blockquote { border-left: 3px solid var(--border); margin: 1rem 0; padding: .5rem 1rem; color: var(--text-muted); }
+
+### Theme: minimal
+
+    :root {
+      --primary: #111827; --primary-light: #F3F4F6; --accent: #6B7280;
+      --bg: #FFFFFF; --surface: #F9FAFB; --text: #374151; --text-muted: #9CA3AF;
+      --border: #E5E7EB; --success: #065F46; --warning: #92400E; --danger: #991B1B;
+      --font-sans: 'Georgia', 'Noto Serif SC', serif;
+      --font-mono: 'Courier New', monospace; --radius: 4px;
+    }
+    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.85; }
+    h1 { font-size: 2rem; font-weight: 700; color: var(--primary); letter-spacing: -.02em; margin-bottom: 1.5rem; }
+    h2 { font-size: 1.35rem; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: .4rem; margin-top: 2.5rem; }
+    h3 { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-top: 1.5rem; }
+    p { margin: .85rem 0; } a { color: var(--primary); text-decoration: underline; }
+    strong { font-weight: 700; } blockquote { border-left: 2px solid var(--border); margin: 1rem 0; padding: .5rem 1.25rem; font-style: italic; color: var(--text-muted); }
+
+### Theme: dark-tech
+
+    :root {
+      --primary: #818CF8; --primary-light: #312E81; --accent: #A78BFA;
+      --bg: #0F172A; --surface: #1E293B; --text: #E2E8F0; --text-muted: #94A3B8;
+      --border: #334155; --success: #34D399; --warning: #FCD34D; --danger: #F87171;
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace; --radius: 6px;
+    }
+    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.7; }
+    h1 { font-size: 2rem; font-weight: 700; color: var(--primary); font-family: var(--font-mono); margin-bottom: 1.5rem; }
+    h2 { font-size: 1.4rem; font-weight: 600; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: .4rem; margin-top: 2.5rem; font-family: var(--font-mono); }
+    h3 { font-size: 1.1rem; font-weight: 600; color: var(--accent); margin-top: 1.5rem; }
+    p { margin: .75rem 0; } a { color: var(--primary); }
+    strong { font-weight: 700; color: var(--accent); } blockquote { border-left: 2px solid var(--border); margin: 1rem 0; padding: .5rem 1rem; color: var(--text-muted); font-family: var(--font-mono); font-size: .9rem; }
+
+### Theme: warm-editorial
+
+    :root {
+      --primary: #B45309; --primary-light: #FEF3C7; --accent: #D97706;
+      --bg: #FFFBEB; --surface: #FEF9EE; --text: #1C1917; --text-muted: #78716C;
+      --border: #E7E5E4; --success: #166534; --warning: #92400E; --danger: #991B1B;
+      --font-sans: 'Merriweather', 'Noto Serif SC', Georgia, serif;
+      --font-mono: 'Courier New', monospace; --radius: 4px;
+    }
+    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.9; }
+    h1 { font-size: 2.25rem; font-weight: 700; color: var(--primary); border-bottom: 2px solid var(--primary-light); padding-bottom: .5rem; margin-bottom: 1.5rem; }
+    h2 { font-size: 1.4rem; font-weight: 700; color: var(--text); margin-top: 2.5rem; }
+    h3 { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-top: 1.5rem; }
+    p { margin: .85rem 0; } a { color: var(--primary); text-decoration: underline; }
+    strong { font-weight: 700; } blockquote { border-left: 3px solid var(--accent); margin: 1rem 0; padding: .75rem 1.25rem; background: var(--primary-light); border-radius: var(--radius); }
+
+### Shared Component CSS (append after theme CSS for all themes)
+
+    /* Layout */
+    *, *::before, *::after { box-sizing: border-box; }
+    .report-wrapper { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+    @media (min-width: 1100px) { .report-wrapper { padding: 2.5rem 3rem; } }
+    .report-meta { color: var(--text-muted); font-size: .9rem; margin-top: -.5rem; margin-bottom: 2rem; }
+
+    /* KPI */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+    .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; text-align: center; }
+    .kpi-label { font-size: .78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .4rem; }
+    .kpi-value { font-size: 1.9rem; font-weight: 700; color: var(--primary); line-height: 1.2; }
+    .kpi-trend { font-size: .85rem; margin-top: .3rem; }
+    .kpi-trend--up { color: var(--success); } .kpi-trend--down { color: var(--danger); } .kpi-trend--neutral { color: var(--text-muted); }
+
+    /* Tables */
+    .table-wrapper { overflow-x: auto; margin: 1.5rem 0; }
+    .report-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    .report-table th { background: var(--surface); border-bottom: 2px solid var(--primary); padding: .7rem 1rem; text-align: left; font-weight: 600; }
+    .report-table td { padding: .6rem 1rem; border-bottom: 1px solid var(--border); }
+    .report-table tr:hover td { background: var(--surface); }
+
+    /* Callout */
+    .callout { display: flex; gap: .75rem; padding: .9rem 1.1rem; border-radius: var(--radius); margin: 1rem 0; border-left: 4px solid; align-items: flex-start; }
+    .callout--note { background: #EFF6FF; border-color: #3B82F6; }
+    .callout--tip { background: #F0FDF4; border-color: #22C55E; }
+    .callout--warning { background: #FFFBEB; border-color: #F59E0B; }
+    .callout--danger { background: #FEF2F2; border-color: #EF4444; }
+    .callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+    .callout-body { line-height: 1.6; font-size: .93rem; }
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 2rem; margin: 1.5rem 0; }
+    .timeline::before { content: ''; position: absolute; left: .45rem; top: 0; bottom: 0; width: 2px; background: var(--border); }
+    .timeline-item { position: relative; margin-bottom: 1.4rem; }
+    .timeline-dot { position: absolute; left: -1.65rem; top: .3rem; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid var(--bg); }
+    .timeline-date { font-size: .78rem; color: var(--text-muted); margin-bottom: .15rem; font-weight: 600; }
+    .timeline-content { color: var(--text); line-height: 1.6; }
+
+    /* Image */
+    .report-image { margin: 1.5rem 0; } .report-image img { max-width: 100%; border-radius: var(--radius); }
+    .report-image figcaption { font-size: .82rem; color: var(--text-muted); text-align: center; margin-top: .4rem; }
+    .report-image--left { float: left; max-width: 40%; margin-right: 1.5rem; margin-bottom: .5rem; }
+    .report-image--right { float: right; max-width: 40%; margin-left: 1.5rem; margin-bottom: .5rem; }
+    .report-image--full { width: 100%; display: block; }
+    .clearfix::after { content: ''; display: table; clear: both; }
+
+    /* Code */
+    .code-wrapper { margin: 1.5rem 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+    .code-title { background: var(--surface); padding: .35rem 1rem; font-size: .78rem; color: var(--text-muted); font-family: var(--font-mono); border-bottom: 1px solid var(--border); }
+    .code-wrapper pre { margin: 0; overflow-x: auto; }
+
+    /* List */
+    .report-list { margin: 1rem 0; }
+    .styled-list { padding-left: 1.5rem; line-height: 1.8; }
+    .styled-list li { margin-bottom: .25rem; }
+
+    /* Diagram */
+    .diagram-wrapper { margin: 1.5rem 0; overflow-x: auto; text-align: center; }
+    .diagram-wrapper svg { max-width: 100%; height: auto; }
+
+    /* Chart */
+    [data-component="chart"] { margin: 1.5rem 0; }
+
+    /* Animations */
+    .fade-in-up { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
+    .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+    body.no-animations .fade-in-up { opacity: 1; transform: none; transition: none; }
+
+    /* Theme override variables (appended after theme block when theme_overrides is set) */
+    /* :root { --primary: [override_value]; ... } */
