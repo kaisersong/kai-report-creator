@@ -1,0 +1,14 @@
+/* Theme: corporate-blue — Professional · Business */
+:root {
+  --primary: #1A56DB; --primary-light: #E3EDFF; --accent: #1C64F2;
+  --bg: #FFFFFF; --surface: #F9FAFB; --text: #111928; --text-muted: #6B7280;
+  --border: #E5E7EB; --success: #057A55; --warning: #B45309; --danger: #E02424;
+  --font-sans: 'Inter', 'PingFang SC', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace; --radius: 8px;
+}
+body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.55; }
+h1 { font-size: 2.25rem; font-weight: 700; color: var(--primary); border-bottom: 3px solid var(--primary); padding-bottom: .5rem; margin-bottom: 1.5rem; }
+h2 { font-size: 1.5rem; font-weight: 600; color: var(--text); border-left: 4px solid var(--primary); padding-left: .75rem; margin-top: 1.75rem; }
+h3 { font-size: 1.15rem; font-weight: 600; color: var(--text); margin-top: 1.1rem; }
+p { margin: .5rem 0; } a { color: var(--primary); }
+strong { font-weight: 700; } blockquote { border-left: 3px solid var(--border); margin: .75rem 0; padding: .5rem 1rem; color: var(--text-muted); }
