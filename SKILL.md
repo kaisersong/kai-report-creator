@@ -24,10 +24,10 @@ When invoked as `/report [flags] [content]`, parse flags and route:
 |------|--------|
 | `--plan "topic"` | Generate a `.report.md` IR file only. Do NOT generate HTML. Save as `report-<slug>.report.md`. |
 | `--generate [file]` | Read the specified `.report.md` file (or IR from context if no file given), render to HTML. |
-| `--themes` | Output `report-themes-preview.html` showing all 4 built-in themes. Do not generate a report. |
+| `--themes` | Output `report-themes-preview.html` showing all 5 built-in themes. Do not generate a report. |
 | `--bundle` | Generate HTML with all CDN libraries inlined. Overrides `charts: cdn` in frontmatter. |
 | `--from <file>` | If file's first line is `---`, treat as IR and render directly. Otherwise treat as raw content, generate IR first then render. If ambiguous, ask user to confirm. |
-| `--theme <name>` | Override theme. Valid: `corporate-blue`, `minimal`, `dark-tech`, `warm-editorial`. |
+| `--theme <name>` | Override theme. Valid: `corporate-blue`, `minimal`, `dark-tech`, `warm-editorial`, `dark-board`. |
 | `--template <file>` | Use a custom HTML template file. Read it and inject rendered content into placeholders. |
 | `--output <filename>` | Save HTML to this filename instead of the default. |
 | (no flags, text given) | One-step: generate IR internally (do not save it), immediately render to HTML. |
@@ -202,6 +202,21 @@ When the user runs `/report --themes`, write the following HTML verbatim to `rep
               <div class="mini-kpi-item" style="background:#FEF9EE;border:1px solid #E7E5E4"><div class="mini-kpi-label" style="color:#78716C">Shares</div><div class="mini-kpi-value" style="color:#B45309">890</div><div class="mini-kpi-trend" style="color:#166534">↑</div></div>
             </div>
             <p class="mini-p">This issue's read-through rate of 64% far exceeds the 42% industry average. Curated content strategy is working.</p>
+          </div>
+        </div>
+        <div class="card" style="background:#161B22;border:1px solid #30363D">
+          <div class="card-header" style="background:#0D1117;color:#E6EDF3;border-bottom:1px solid #30363D">
+            <div><h2 style="color:#58A6FF">dark-board</h2><div class="desc" style="color:#8B949E">Dark Board · Architecture</div></div>
+            <div class="swatches"><div class="swatch" style="background:#58A6FF;border-color:#58A6FF"></div><div class="swatch" style="background:#3FB950;border-color:#3FB950"></div><div class="swatch" style="background:#BC8CFF;border-color:#BC8CFF"></div><div class="swatch" style="background:#D29922;border-color:#D29922"></div></div>
+          </div>
+          <div class="card-body" style="background:#161B22;font-family:Inter,system-ui;color:#E6EDF3;padding:1rem 1.5rem">
+            <div class="mini-h2" style="color:#58A6FF;border-left:3px solid #58A6FF;padding-left:.6rem;margin-bottom:.6rem">System Health</div>
+            <div class="mini-kpi">
+              <div class="mini-kpi-item" style="background:#0D1117;border:1px solid #3FB950;border-top:2px solid #3FB950"><div class="mini-kpi-label" style="color:#8B949E">API</div><div class="mini-kpi-value" style="color:#3FB950">99.9%</div><div class="mini-kpi-trend" style="color:#3FB950">↑</div></div>
+              <div class="mini-kpi-item" style="background:#0D1117;border:1px solid #D29922;border-top:2px solid #D29922"><div class="mini-kpi-label" style="color:#8B949E">P99</div><div class="mini-kpi-value" style="color:#D29922">142ms</div><div class="mini-kpi-trend" style="color:#8B949E">→</div></div>
+              <div class="mini-kpi-item" style="background:#0D1117;border:1px solid #BC8CFF;border-top:2px solid #BC8CFF"><div class="mini-kpi-label" style="color:#8B949E">Deploy</div><div class="mini-kpi-value" style="color:#BC8CFF">v3.1</div><div class="mini-kpi-trend" style="color:#3FB950">new</div></div>
+            </div>
+            <p class="mini-p" style="color:#8B949E">All services nominal. v3.1 deployed across all regions with zero downtime.</p>
           </div>
         </div>
       </div>
@@ -384,12 +399,12 @@ When generating HTML, embed the selected theme's CSS verbatim in `<style>` insid
       --font-sans: 'Inter', 'PingFang SC', system-ui, sans-serif;
       --font-mono: 'JetBrains Mono', monospace; --radius: 8px;
     }
-    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.7; }
+    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.55; }
     h1 { font-size: 2.25rem; font-weight: 700; color: var(--primary); border-bottom: 3px solid var(--primary); padding-bottom: .5rem; margin-bottom: 1.5rem; }
-    h2 { font-size: 1.5rem; font-weight: 600; color: var(--text); border-left: 4px solid var(--primary); padding-left: .75rem; margin-top: 2.5rem; }
-    h3 { font-size: 1.15rem; font-weight: 600; color: var(--text); margin-top: 1.5rem; }
-    p { margin: .75rem 0; } a { color: var(--primary); }
-    strong { font-weight: 700; } blockquote { border-left: 3px solid var(--border); margin: 1rem 0; padding: .5rem 1rem; color: var(--text-muted); }
+    h2 { font-size: 1.5rem; font-weight: 600; color: var(--text); border-left: 4px solid var(--primary); padding-left: .75rem; margin-top: 1.75rem; }
+    h3 { font-size: 1.15rem; font-weight: 600; color: var(--text); margin-top: 1.1rem; }
+    p { margin: .5rem 0; } a { color: var(--primary); }
+    strong { font-weight: 700; } blockquote { border-left: 3px solid var(--border); margin: .75rem 0; padding: .5rem 1rem; color: var(--text-muted); }
 
 ### Theme: minimal
 
@@ -400,12 +415,12 @@ When generating HTML, embed the selected theme's CSS verbatim in `<style>` insid
       --font-sans: 'Georgia', 'Noto Serif SC', serif;
       --font-mono: 'Courier New', monospace; --radius: 4px;
     }
-    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.85; }
+    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.6; }
     h1 { font-size: 2rem; font-weight: 700; color: var(--primary); letter-spacing: -.02em; margin-bottom: 1.5rem; }
-    h2 { font-size: 1.35rem; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: .4rem; margin-top: 2.5rem; }
-    h3 { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-top: 1.5rem; }
-    p { margin: .85rem 0; } a { color: var(--primary); text-decoration: underline; }
-    strong { font-weight: 700; } blockquote { border-left: 2px solid var(--border); margin: 1rem 0; padding: .5rem 1.25rem; font-style: italic; color: var(--text-muted); }
+    h2 { font-size: 1.35rem; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: .4rem; margin-top: 1.75rem; }
+    h3 { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-top: 1.1rem; }
+    p { margin: .6rem 0; } a { color: var(--primary); text-decoration: underline; }
+    strong { font-weight: 700; } blockquote { border-left: 2px solid var(--border); margin: .75rem 0; padding: .5rem 1.25rem; font-style: italic; color: var(--text-muted); }
 
 ### Theme: dark-tech
 
@@ -416,12 +431,12 @@ When generating HTML, embed the selected theme's CSS verbatim in `<style>` insid
       --font-sans: 'Inter', system-ui, sans-serif;
       --font-mono: 'JetBrains Mono', 'Fira Code', monospace; --radius: 6px;
     }
-    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.7; }
+    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.55; }
     h1 { font-size: 2rem; font-weight: 700; color: var(--primary); font-family: var(--font-mono); margin-bottom: 1.5rem; }
-    h2 { font-size: 1.4rem; font-weight: 600; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: .4rem; margin-top: 2.5rem; font-family: var(--font-mono); }
-    h3 { font-size: 1.1rem; font-weight: 600; color: var(--accent); margin-top: 1.5rem; }
-    p { margin: .75rem 0; } a { color: var(--primary); }
-    strong { font-weight: 700; color: var(--accent); } blockquote { border-left: 2px solid var(--border); margin: 1rem 0; padding: .5rem 1rem; color: var(--text-muted); font-family: var(--font-mono); font-size: .9rem; }
+    h2 { font-size: 1.4rem; font-weight: 600; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: .4rem; margin-top: 1.75rem; font-family: var(--font-mono); }
+    h3 { font-size: 1.1rem; font-weight: 600; color: var(--accent); margin-top: 1.1rem; }
+    p { margin: .5rem 0; } a { color: var(--primary); }
+    strong { font-weight: 700; color: var(--accent); } blockquote { border-left: 2px solid var(--border); margin: .75rem 0; padding: .5rem 1rem; color: var(--text-muted); font-family: var(--font-mono); font-size: .9rem; }
 
 ### Theme: warm-editorial
 
@@ -432,38 +447,72 @@ When generating HTML, embed the selected theme's CSS verbatim in `<style>` insid
       --font-sans: 'Merriweather', 'Noto Serif SC', Georgia, serif;
       --font-mono: 'Courier New', monospace; --radius: 4px;
     }
-    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.9; }
+    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.65; }
     h1 { font-size: 2.25rem; font-weight: 700; color: var(--primary); border-bottom: 2px solid var(--primary-light); padding-bottom: .5rem; margin-bottom: 1.5rem; }
-    h2 { font-size: 1.4rem; font-weight: 700; color: var(--text); margin-top: 2.5rem; }
-    h3 { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-top: 1.5rem; }
-    p { margin: .85rem 0; } a { color: var(--primary); text-decoration: underline; }
-    strong { font-weight: 700; } blockquote { border-left: 3px solid var(--accent); margin: 1rem 0; padding: .75rem 1.25rem; background: var(--primary-light); border-radius: var(--radius); }
+    h2 { font-size: 1.4rem; font-weight: 700; color: var(--text); margin-top: 1.75rem; }
+    h3 { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-top: 1.1rem; }
+    p { margin: .6rem 0; } a { color: var(--primary); text-decoration: underline; }
+    strong { font-weight: 700; } blockquote { border-left: 3px solid var(--accent); margin: .75rem 0; padding: .75rem 1.25rem; background: var(--primary-light); border-radius: var(--radius); }
+
+### Theme: dark-board
+
+    :root {
+      --primary: #58A6FF; --primary-light: #1C2D40; --accent: #79C0FF;
+      --bg: #0D1117; --surface: #161B22; --text: #E6EDF3; --text-muted: #8B949E;
+      --border: #30363D; --success: #3FB950; --warning: #D29922; --danger: #F85149;
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace; --radius: 6px;
+      --accent-1: #58A6FF; --accent-2: #3FB950; --accent-3: #D29922;
+      --accent-4: #BC8CFF; --accent-5: #79C0FF; --accent-6: #F85149;
+    }
+    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.55; }
+    h1 { font-size: 1.9rem; font-weight: 700; color: var(--primary); margin-bottom: 1.25rem; padding-bottom: .4rem; border-bottom: 1px solid var(--border); }
+    h2 { font-size: 1.3rem; font-weight: 600; color: var(--text); margin-top: 0; margin-bottom: .75rem; }
+    h3 { font-size: 1.05rem; font-weight: 600; color: var(--accent); margin-top: .9rem; }
+    p { margin: .5rem 0; } a { color: var(--primary); }
+    strong { font-weight: 700; color: var(--accent); } blockquote { border-left: 2px solid var(--border); margin: .75rem 0; padding: .4rem .9rem; color: var(--text-muted); font-family: var(--font-mono); font-size: .88rem; }
+    /* Board layout: each section rendered as a panel with per-section colored top border */
+    section[data-section] { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--section-accent, var(--primary)); border-radius: var(--radius); padding: 1rem 1.25rem; margin: .75rem 0; }
+    section[data-section] h2 { border-left: 3px solid var(--section-accent, var(--primary)); padding-left: .6rem; color: var(--section-accent, var(--primary)); }
+    section[data-section]:nth-child(6n+1) { --section-accent: var(--accent-1); }
+    section[data-section]:nth-child(6n+2) { --section-accent: var(--accent-2); }
+    section[data-section]:nth-child(6n+3) { --section-accent: var(--accent-3); }
+    section[data-section]:nth-child(6n+4) { --section-accent: var(--accent-4); }
+    section[data-section]:nth-child(6n+5) { --section-accent: var(--accent-5); }
+    section[data-section]:nth-child(6n) { --section-accent: var(--accent-6); }
+
+**dark-board post-shared CSS override** (for dark-board theme, append these AFTER the shared component CSS block in `<style>`):
+
+    /* Dense KPI grid for board layout */
+    .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: .6rem; margin: .75rem 0; }
+    .kpi-card { padding: .75rem .6rem; }
+    /* Use github-dark.min.css for code blocks (same as dark-tech) */
 
 ### Shared Component CSS (append after theme CSS for all themes)
 
     /* Layout */
     *, *::before, *::after { box-sizing: border-box; }
-    .report-wrapper { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .report-wrapper { max-width: 920px; margin: 0 auto; padding: 2rem 1.5rem; }
     @media (min-width: 1100px) { .report-wrapper { padding: 2.5rem 3rem; } }
-    .report-meta { color: var(--text-muted); font-size: .9rem; margin-top: -.5rem; margin-bottom: 2rem; }
+    .report-meta { color: var(--text-muted); font-size: .9rem; margin-top: -.5rem; margin-bottom: 1.5rem; }
 
     /* KPI */
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-    .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; text-align: center; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .75rem; margin: 1.1rem 0; }
+    .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .9rem; text-align: center; }
     .kpi-label { font-size: .78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .4rem; }
     .kpi-value { font-size: 1.9rem; font-weight: 700; color: var(--primary); line-height: 1.2; }
     .kpi-trend { font-size: .85rem; margin-top: .3rem; }
     .kpi-trend--up { color: var(--success); } .kpi-trend--down { color: var(--danger); } .kpi-trend--neutral { color: var(--text-muted); }
 
     /* Tables */
-    .table-wrapper { overflow-x: auto; margin: 1.5rem 0; }
+    .table-wrapper { overflow-x: auto; margin: 1.1rem 0; }
     .report-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
     .report-table th { background: var(--surface); border-bottom: 2px solid var(--primary); padding: .7rem 1rem; text-align: left; font-weight: 600; }
     .report-table td { padding: .6rem 1rem; border-bottom: 1px solid var(--border); }
     .report-table tr:hover td { background: var(--surface); }
 
     /* Callout */
-    .callout { display: flex; gap: .75rem; padding: .9rem 1.1rem; border-radius: var(--radius); margin: 1rem 0; border-left: 4px solid; align-items: flex-start; }
+    .callout { display: flex; gap: .75rem; padding: .9rem 1.1rem; border-radius: var(--radius); margin: .75rem 0; border-left: 4px solid; align-items: flex-start; }
     .callout--note { background: #EFF6FF; border-color: #3B82F6; }
     .callout--tip { background: #F0FDF4; border-color: #22C55E; }
     .callout--warning { background: #FFFBEB; border-color: #F59E0B; }
@@ -472,15 +521,15 @@ When generating HTML, embed the selected theme's CSS verbatim in `<style>` insid
     .callout-body { line-height: 1.6; font-size: .93rem; }
 
     /* Timeline */
-    .timeline { position: relative; padding-left: 2rem; margin: 1.5rem 0; }
+    .timeline { position: relative; padding-left: 2rem; margin: 1.1rem 0; }
     .timeline::before { content: ''; position: absolute; left: .45rem; top: 0; bottom: 0; width: 2px; background: var(--border); }
-    .timeline-item { position: relative; margin-bottom: 1.4rem; }
+    .timeline-item { position: relative; margin-bottom: 1rem; }
     .timeline-dot { position: absolute; left: -1.65rem; top: .3rem; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid var(--bg); }
     .timeline-date { font-size: .78rem; color: var(--text-muted); margin-bottom: .15rem; font-weight: 600; }
     .timeline-content { color: var(--text); line-height: 1.6; }
 
     /* Image */
-    .report-image { margin: 1.5rem 0; } .report-image img { max-width: 100%; border-radius: var(--radius); }
+    .report-image { margin: 1.1rem 0; } .report-image img { max-width: 100%; border-radius: var(--radius); }
     .report-image figcaption { font-size: .82rem; color: var(--text-muted); text-align: center; margin-top: .4rem; }
     .report-image--left { float: left; max-width: 40%; margin-right: 1.5rem; margin-bottom: .5rem; }
     .report-image--right { float: right; max-width: 40%; margin-left: 1.5rem; margin-bottom: .5rem; }
@@ -488,21 +537,21 @@ When generating HTML, embed the selected theme's CSS verbatim in `<style>` insid
     .clearfix::after { content: ''; display: table; clear: both; }
 
     /* Code */
-    .code-wrapper { margin: 1.5rem 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+    .code-wrapper { margin: 1.1rem 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
     .code-title { background: var(--surface); padding: .35rem 1rem; font-size: .78rem; color: var(--text-muted); font-family: var(--font-mono); border-bottom: 1px solid var(--border); }
     .code-wrapper pre { margin: 0; overflow-x: auto; }
 
     /* List */
-    .report-list { margin: 1rem 0; }
+    .report-list { margin: .75rem 0; }
     .styled-list { padding-left: 1.5rem; line-height: 1.8; }
     .styled-list li { margin-bottom: .25rem; }
 
     /* Diagram */
-    .diagram-wrapper { margin: 1.5rem 0; text-align: center; }
+    .diagram-wrapper { margin: 1.1rem 0; text-align: center; }
     .diagram-wrapper svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 
     /* Chart */
-    [data-component="chart"] { margin: 1.5rem 0; }
+    [data-component="chart"] { margin: 1.1rem 0; }
 
     /* Animations */
     .fade-in-up { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
