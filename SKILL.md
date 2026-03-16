@@ -537,11 +537,15 @@ When generating the final HTML report, produce a complete self-contained HTML fi
 
         /* [Paste the shared component CSS here] */
 
-        /* Sticky TOC */
+        /* Floating TOC overlay — default collapsed on all screen sizes */
         .toc-sidebar {
-          position: fixed; top: 0; left: 0; width: 220px; height: 100vh;
+          position: fixed; top: 0; left: 0; width: 240px; height: 100vh;
           overflow-y: auto; padding: 1.5rem 1rem; background: var(--surface);
-          border-right: 1px solid var(--border); font-size: .83rem; z-index: 10;
+          border-right: 1px solid var(--border); font-size: .83rem; z-index: 100;
+          transform: translateX(-100%); transition: transform .28s ease;
+        }
+        .toc-sidebar.open {
+          transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,.18);
         }
         .toc-sidebar h4 {
           font-size: .72rem; text-transform: uppercase; letter-spacing: .08em;
@@ -554,21 +558,21 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         }
         .toc-sidebar a:hover, .toc-sidebar a.active { color: var(--primary); background: var(--primary-light); }
         .toc-sidebar a.toc-h3 { padding-left: 1.1rem; font-size: .78rem; opacity: .85; }
-        .main-with-toc { margin-left: 240px; }
+        .main-with-toc { margin-left: 0; }
         .toc-toggle {
-          display: none; position: fixed; top: .75rem; left: .75rem; z-index: 20;
+          position: fixed; top: .75rem; left: .75rem; z-index: 200;
           background: var(--primary); color: #fff; border: none; border-radius: 6px;
           padding: .45rem .7rem; cursor: pointer; font-size: 1rem; line-height: 1;
           box-shadow: 0 2px 8px rgba(0,0,0,.2);
         }
+        .toc-backdrop {
+          display: none; position: fixed; inset: 0; background: rgba(0,0,0,.3); z-index: 90;
+        }
+        .toc-backdrop.visible { display: block; }
         @media (max-width: 768px) {
-          .toc-sidebar { transform: translateX(-100%); transition: transform .28s ease; }
-          .toc-sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,.15); }
-          .main-with-toc { margin-left: 0; }
-          .toc-toggle { display: block; }
           .report-wrapper { padding: 1.5rem 1rem; }
         }
-        body.no-toc .toc-sidebar, body.no-toc .toc-toggle { display: none; }
+        body.no-toc .toc-sidebar, body.no-toc .toc-toggle, body.no-toc .toc-backdrop { display: none; }
         body.no-toc .main-with-toc { margin-left: 0; }
       </style>
     </head>
@@ -589,9 +593,10 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       }
       </script>
 
-      <!-- Sticky TOC (omit entirely if toc:false) -->
-      <button class="toc-toggle" onclick="document.querySelector('.toc-sidebar').classList.toggle('open')" aria-label="目录">☰</button>
-      <nav class="toc-sidebar" aria-label="报告目录">
+      <!-- Floating TOC (omit entirely if toc:false) -->
+      <button class="toc-toggle" id="toc-toggle-btn" aria-label="目录" aria-expanded="false">☰</button>
+      <div class="toc-backdrop" id="toc-backdrop"></div>
+      <nav class="toc-sidebar" id="toc-sidebar" aria-label="报告目录">
         <h4>目录</h4>
         <!-- Generate one <a> per ## heading and one per ### heading in the report -->
         <!-- For ## heading "核心指标": -->
@@ -659,6 +664,26 @@ When generating the final HTML report, produce a complete self-contained HTML fi
             });
           }, { threshold: 0.3 });
           document.querySelectorAll('.kpi-value[data-target-value]').forEach(el => kpiObserver.observe(el));
+        }
+
+        // TOC toggle — floating overlay, default collapsed
+        const tocBtn = document.getElementById('toc-toggle-btn');
+        const tocSidebar = document.getElementById('toc-sidebar');
+        const tocBackdrop = document.getElementById('toc-backdrop');
+        if (tocBtn && tocSidebar) {
+          function openToc() {
+            tocSidebar.classList.add('open');
+            tocBackdrop.classList.add('visible');
+            tocBtn.setAttribute('aria-expanded', 'true');
+          }
+          function closeToc() {
+            tocSidebar.classList.remove('open');
+            tocBackdrop.classList.remove('visible');
+            tocBtn.setAttribute('aria-expanded', 'false');
+          }
+          tocBtn.addEventListener('click', () => tocSidebar.classList.contains('open') ? closeToc() : openToc());
+          tocBackdrop.addEventListener('click', closeToc);
+          document.querySelectorAll('.toc-sidebar a').forEach(a => a.addEventListener('click', closeToc));
         }
 
         // TOC active state tracking
