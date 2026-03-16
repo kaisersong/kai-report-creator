@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to create a report, business summary, data dashboard, research doc, or formatted HTML output from notes, data, or a URL. Triggers: /report, --plan, --generate, --themes, --from, --bundle, or any mention of "HTML report", "KPI dashboard", "generate report".
-version: 1.1.0
+version: 1.1.1
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
