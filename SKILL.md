@@ -484,3 +484,219 @@ When generating HTML, embed the selected theme's CSS verbatim in `<style>` insid
 
     /* Theme override variables (appended after theme block when theme_overrides is set) */
     /* :root { --primary: [override_value]; ... } */
+
+## HTML Shell Template
+
+When generating the final HTML report, produce a complete self-contained HTML file using this structure. Replace all `[...]` placeholders with actual content.
+
+    <!DOCTYPE html>
+    <html lang="[lang]">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>[title]</title>
+
+      <!-- CDN libraries (add only what's needed; omit if --bundle, inline instead) -->
+      <!-- If any :::chart blocks present AND using Chart.js: -->
+      <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script> -->
+      <!-- If any :::chart blocks present AND using ECharts: -->
+      <!-- <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script> -->
+      <!-- If any :::code blocks present: -->
+      <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github.min.css"> -->
+      <!-- (use github-dark.min.css for dark-tech theme) -->
+      <!-- <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/highlight.min.js"></script> -->
+      <!-- <script>document.addEventListener('DOMContentLoaded', () => hljs.highlightAll());</script> -->
+
+      <style>
+        /* [Paste the selected theme CSS here, e.g., the corporate-blue block] */
+
+        /* [Paste the shared component CSS here] */
+
+        /* Sticky TOC */
+        .toc-sidebar {
+          position: fixed; top: 0; left: 0; width: 220px; height: 100vh;
+          overflow-y: auto; padding: 1.5rem 1rem; background: var(--surface);
+          border-right: 1px solid var(--border); font-size: .83rem; z-index: 10;
+        }
+        .toc-sidebar h4 {
+          font-size: .72rem; text-transform: uppercase; letter-spacing: .08em;
+          color: var(--text-muted); margin: 0 0 .75rem; font-weight: 600;
+        }
+        .toc-sidebar a {
+          display: block; color: var(--text-muted); text-decoration: none;
+          padding: .28rem .5rem; border-radius: 4px; margin-bottom: 1px; transition: all .18s;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .toc-sidebar a:hover, .toc-sidebar a.active { color: var(--primary); background: var(--primary-light); }
+        .toc-sidebar a.toc-h3 { padding-left: 1.1rem; font-size: .78rem; opacity: .85; }
+        .main-with-toc { margin-left: 240px; }
+        .toc-toggle {
+          display: none; position: fixed; top: .75rem; left: .75rem; z-index: 20;
+          background: var(--primary); color: #fff; border: none; border-radius: 6px;
+          padding: .45rem .7rem; cursor: pointer; font-size: 1rem; line-height: 1;
+          box-shadow: 0 2px 8px rgba(0,0,0,.2);
+        }
+        @media (max-width: 768px) {
+          .toc-sidebar { transform: translateX(-100%); transition: transform .28s ease; }
+          .toc-sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,.15); }
+          .main-with-toc { margin-left: 0; }
+          .toc-toggle { display: block; }
+          .report-wrapper { padding: 1.5rem 1rem; }
+        }
+        body.no-toc .toc-sidebar, body.no-toc .toc-toggle { display: none; }
+        body.no-toc .main-with-toc { margin-left: 0; }
+      </style>
+    </head>
+    <body class="[add 'no-toc' if toc:false] [add 'no-animations' if animations:false]">
+
+      <!-- AI Readability Layer 1: Report Summary JSON -->
+      <!-- Always present, even if not visible to humans -->
+      <script type="application/json" id="report-summary">
+      {
+        "title": "[title]",
+        "author": "[author or empty string]",
+        "date": "[date]",
+        "abstract": "[abstract from frontmatter, or auto-generate a 1-sentence summary of the report content]",
+        "sections": ["[heading of section 1]", "[heading of section 2]", "..."],
+        "kpis": [
+          {"label": "[label]", "value": "[display value]", "trend": "[trend text or empty]"}
+        ]
+      }
+      </script>
+
+      <!-- Sticky TOC (omit entirely if toc:false) -->
+      <button class="toc-toggle" onclick="document.querySelector('.toc-sidebar').classList.toggle('open')" aria-label="目录">☰</button>
+      <nav class="toc-sidebar" aria-label="报告目录">
+        <h4>目录</h4>
+        <!-- Generate one <a> per ## heading and one per ### heading in the report -->
+        <!-- For ## heading "核心指标": -->
+        <!-- <a href="#section-he-xin-zhi-biao" data-section="核心指标">核心指标</a> -->
+        <!-- For ### heading: add class="toc-h3" -->
+        [TOC links generated from all ## and ### headings in the IR]
+      </nav>
+
+      <div class="main-with-toc">
+        <div class="report-wrapper">
+
+          <!-- Report title and meta -->
+          <h1>[title]</h1>
+          [if author or date: <p class="report-meta">[author] · [date]</p>]
+
+          <!-- AI Readability Layer 2: Section annotations are on each <section> element -->
+          <!-- Rendered sections — each ## becomes: -->
+          <!-- <section data-section="[heading]" data-summary="[1-sentence summary]"> -->
+          <!--   <h2 id="section-[slug]">[heading]</h2> -->
+          <!--   [section content] -->
+          <!-- </section> -->
+
+          [All rendered section content here]
+
+        </div>
+      </div>
+
+      <script>
+        // Scroll-triggered fade-in animations
+        if (!document.body.classList.contains('no-animations')) {
+          const fadeObserver = new IntersectionObserver(
+            entries => entries.forEach(e => {
+              if (e.isIntersecting) { e.target.classList.add('visible'); fadeObserver.unobserve(e.target); }
+            }),
+            { threshold: 0.08 }
+          );
+          document.querySelectorAll('.fade-in-up').forEach(el => fadeObserver.observe(el));
+
+          // KPI counter animation
+          const kpiObserver = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+              if (!e.isIntersecting) return;
+              const el = e.target;
+              const target = parseFloat(el.dataset.targetValue);
+              if (isNaN(target)) return;
+              const prefix = el.dataset.prefix || '';
+              const suffix = el.dataset.suffix || '';
+              const isFloat = String(target).includes('.');
+              const decimals = isFloat ? String(target).split('.')[1].length : 0;
+              let startTime = null;
+              const duration = 1200;
+              const animate = ts => {
+                if (!startTime) startTime = ts;
+                const progress = Math.min((ts - startTime) / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 3);
+                const current = isFloat
+                  ? (ease * target).toFixed(decimals)
+                  : Math.floor(ease * target).toLocaleString();
+                el.textContent = prefix + current + suffix;
+                if (progress < 1) requestAnimationFrame(animate);
+                else el.textContent = prefix + (isFloat ? target.toFixed(decimals) : target.toLocaleString()) + suffix;
+              };
+              requestAnimationFrame(animate);
+              kpiObserver.unobserve(el);
+            });
+          }, { threshold: 0.3 });
+          document.querySelectorAll('.kpi-value[data-target-value]').forEach(el => kpiObserver.observe(el));
+        }
+
+        // TOC active state tracking
+        const tocLinks = document.querySelectorAll('.toc-sidebar a[data-section]');
+        if (tocLinks.length) {
+          const sectionObserver = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+              const id = e.target.dataset.section;
+              const link = document.querySelector(`.toc-sidebar a[data-section="${CSS.escape(id)}"]`);
+              if (link) link.classList.toggle('active', e.isIntersecting);
+            });
+          }, { rootMargin: '-10% 0px -60% 0px' });
+          document.querySelectorAll('section[data-section]').forEach(s => sectionObserver.observe(s));
+        }
+      </script>
+
+    </body>
+    </html>
+
+## TOC Link Generation Rule
+
+For each `##` heading with text `[heading]`, slug = heading lowercased with spaces/non-ASCII replaced by hyphens:
+
+    <a href="#section-[slug]" data-section="[heading]">[heading]</a>
+
+For `###` heading, same but add `class="toc-h3"`:
+
+    <a href="#section-[slug]" data-section="[heading]" class="toc-h3">[heading]</a>
+
+Add `id="section-[slug]"` to the corresponding `<section>` or `<h3>` elements.
+
+## Theme Override Injection
+
+If `theme_overrides` is set in frontmatter, append CSS variable overrides after the theme CSS block:
+
+    :root {
+      [--primary: value if primary_color set]
+      [--font-sans: value if font_family set]
+    }
+    [if logo set: .report-wrapper::before { content: ''; display: block; background: url([logo]) no-repeat left center; background-size: contain; height: 48px; margin-bottom: 1.5rem; }]
+
+## Custom Template Mode
+
+If `template:` is set in frontmatter:
+1. Read the template file
+2. Replace these placeholders:
+   - `{{report.body}}` → all rendered section content HTML
+   - `{{report.title}}` → title value
+   - `{{report.author}}` → author value
+   - `{{report.date}}` → date value
+   - `{{report.abstract}}` → abstract value
+   - `{{report.theme_css}}` → selected theme CSS + shared component CSS
+   - `{{report.summary_json}}` → the complete `<script type="application/json" id="report-summary">...</script>` block (including the script tags)
+3. Output the result as the HTML file
+
+## --generate Mode
+
+When the user runs `/report --generate [file]`:
+1. If a file is specified, read it with the Read tool. If no file given, look for IR in context (starts with `---`).
+2. Parse the frontmatter to get metadata and settings.
+3. Select the appropriate theme CSS.
+4. Render all components according to Component Rendering Rules.
+5. Apply chart library selection rule.
+6. Build the HTML shell with TOC, AI summary, animations.
+7. Write to `[output_filename].html` using the Write tool.
+8. Tell the user the file path and a 1-sentence summary of the report.
