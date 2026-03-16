@@ -732,6 +732,9 @@ const sectionObserver = new IntersectionObserver(entries => {
 }, { rootMargin: '-10% 0px -60% 0px' });
 document.querySelectorAll('section[data-section]').forEach(s => sectionObserver.observe(s));
 
+// Auto-reveal in headless/screenshot environments
+if (navigator.webdriver) { document.body.classList.add('no-animations'); }
+
 /* ── fade-in-up animation ── */
 const fadeObserver = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); fadeObserver.unobserve(e.target); } });

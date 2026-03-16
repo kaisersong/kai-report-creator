@@ -789,6 +789,9 @@ func Handler(version string, deps map[string]func() error) http.HandlerFunc {
       });
     });
 
+    // Auto-reveal in headless/screenshot environments
+    if (navigator.webdriver) { document.body.classList.add('no-animations'); }
+
     // ── Fade-in-up IntersectionObserver ──
     (function() {
       var items = document.querySelectorAll('.fade-in-up');

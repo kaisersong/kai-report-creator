@@ -701,6 +701,9 @@ print(summary)
     });
 
     // ── Intersection Observer: fade-in-up ─────────────────────────────
+    // Auto-reveal in headless/screenshot environments (Playwright, Puppeteer, etc.)
+    if (navigator.webdriver) { document.body.classList.add('no-animations'); }
+
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
       { threshold: 0.12 }

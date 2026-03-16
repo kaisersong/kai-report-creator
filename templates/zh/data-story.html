@@ -319,6 +319,9 @@
 </div>
 
 <script>
+  // Auto-reveal in headless/screenshot environments
+  if (navigator.webdriver) { document.body.classList.add('no-animations'); }
+
   if (!document.body.classList.contains('no-animations')) {
     const fadeObs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); fadeObs.unobserve(e.target); } }), { threshold: 0.08 });
     document.querySelectorAll('.fade-in-up').forEach(el => fadeObs.observe(el));

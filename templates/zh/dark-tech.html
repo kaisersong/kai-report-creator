@@ -750,6 +750,9 @@ LIMIT 10;
       });
     });
 
+    // Auto-reveal in headless/screenshot environments
+    if (navigator.webdriver) { document.body.classList.add('no-animations'); }
+
     // ── Fade-in-up on scroll ──
     (function() {
       var items = document.querySelectorAll('.fade-in-up');

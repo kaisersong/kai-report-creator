@@ -366,6 +366,9 @@
   </div>
 
   <script>
+    // Auto-reveal in headless/screenshot environments
+    if (navigator.webdriver) { document.body.classList.add('no-animations'); }
+
     if (!document.body.classList.contains('no-animations')) {
       const fadeObserver = new IntersectionObserver(
         entries => entries.forEach(e => {
