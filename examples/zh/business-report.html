@@ -76,8 +76,8 @@
     .styled-list li { margin-bottom: .25rem; }
 
     /* Diagram */
-    .diagram-wrapper { margin: 1.5rem 0; overflow-x: auto; text-align: center; }
-    .diagram-wrapper svg { max-width: 100%; height: auto; }
+    .diagram-wrapper { margin: 1.5rem 0; text-align: center; }
+    .diagram-wrapper svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 
     /* Chart */
     [data-component="chart"] { margin: 1.5rem 0; }
@@ -392,7 +392,7 @@
         if (locked) openToc(); else scheduleClose();
       });
       document.querySelectorAll('.toc-sidebar a').forEach(a => a.addEventListener('click', () => {
-        locked = false; tocBtn.classList.remove('locked'); scheduleClose();
+        if (!locked) scheduleClose();
       }));
     }
 

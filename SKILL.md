@@ -327,6 +327,8 @@ Generate inline SVG. All SVGs must be self-contained (no external refs). Wrap in
       </svg>
     </div>
 
+**viewBox height rule:** Always add 30px of bottom padding beyond the last drawn element's bottom edge. For example, if the lowest element ends at y=346, set viewBox height to 376. This prevents content clipping.
+
 **type=sequence:** Draw vertical lifelines for each actor, horizontal arrows for each step. Actors as columns at top with labels, steps numbered on left, arrows with labels between lifelines.
 Sizing: width = 180 × (actor count), height = 80 + 50 × (step count).
 
@@ -496,8 +498,8 @@ When generating HTML, embed the selected theme's CSS verbatim in `<style>` insid
     .styled-list li { margin-bottom: .25rem; }
 
     /* Diagram */
-    .diagram-wrapper { margin: 1.5rem 0; overflow-x: auto; text-align: center; }
-    .diagram-wrapper svg { max-width: 100%; height: auto; }
+    .diagram-wrapper { margin: 1.5rem 0; text-align: center; }
+    .diagram-wrapper svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 
     /* Chart */
     [data-component="chart"] { margin: 1.5rem 0; }
@@ -691,7 +693,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
             if (locked) openToc(); else scheduleClose();
           });
           document.querySelectorAll('.toc-sidebar a').forEach(a => a.addEventListener('click', () => {
-            locked = false; tocBtn.classList.remove('locked'); scheduleClose();
+            if (!locked) scheduleClose();
           }));
         }
 

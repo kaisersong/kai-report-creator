@@ -94,8 +94,8 @@
     .styled-list li { margin-bottom: .25rem; }
 
     /* Diagram */
-    .diagram-wrapper { margin: 1.5rem 0; overflow-x: auto; text-align: center; }
-    .diagram-wrapper svg { max-width: 100%; height: auto; }
+    .diagram-wrapper { margin: 1.5rem 0; text-align: center; }
+    .diagram-wrapper svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 
     /* Chart */
     [data-component="chart"] { margin: 1.5rem 0; }
@@ -434,7 +434,7 @@
       <p>整体采用微服务架构，通过 API 网关统一入口，负载均衡层将流量分发至无状态业务服务，核心数据存储使用主从 PostgreSQL + Redis 缓存集群。</p>
 
       <div class="diagram-wrapper fade-in-up" data-component="diagram" data-summary="系统架构流程图">
-        <svg viewBox="0 0 760 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="系统架构图"
+        <svg viewBox="0 0 760 382" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="系统架构图"
              style="font-family: var(--font-sans); max-width: 100%;">
 
           <!-- ── Defs: arrowhead ── -->
@@ -722,9 +722,9 @@ if (tocBtn && tocSidebar) {
     tocBtn.classList.toggle('locked', locked);
     if (locked) openToc(); else scheduleClose();
   });
-  document.querySelectorAll('.toc-sidebar a').forEach(a =>
-    a.addEventListener('click', () => { locked = false; tocBtn.classList.remove('locked'); scheduleClose(); })
-  );
+  document.querySelectorAll('.toc-sidebar a').forEach(a => a.addEventListener('click', () => {
+    if (!locked) scheduleClose();
+  }));
 }
 
 /* ── TOC active section highlight ── */

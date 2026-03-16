@@ -385,7 +385,7 @@
         if (locked) openToc(); else scheduleClose();
       });
       document.querySelectorAll('.toc-sidebar a').forEach(a => a.addEventListener('click', () => {
-        locked = false; tocBtn.classList.remove('locked'); scheduleClose();
+        if (!locked) scheduleClose();
       }));
     }
 

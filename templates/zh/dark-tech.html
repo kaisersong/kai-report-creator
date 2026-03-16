@@ -91,8 +91,8 @@
     .styled-list li { margin-bottom: .25rem; }
 
     /* Diagram */
-    .diagram-wrapper { margin: 1.5rem 0; overflow-x: auto; text-align: center; }
-    .diagram-wrapper svg { max-width: 100%; height: auto; }
+    .diagram-wrapper { margin: 1.5rem 0; text-align: center; }
+    .diagram-wrapper svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 
     /* Chart */
     [data-component="chart"] { margin: 1.5rem 0; }
@@ -443,7 +443,7 @@
         <p>下图展示核心请求路径的服务依赖拓扑，箭头表示同步 gRPC/HTTP 调用方向。</p>
 
         <div class="diagram-wrapper fade-in-up">
-          <svg viewBox="0 0 780 340" width="780" height="340" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace" font-size="13">
+          <svg viewBox="0 0 780 344" width="780" height="344" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace" font-size="13">
             <defs>
               <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
                 <path d="M0,0 L0,6 L8,3 z" fill="#818CF8"/>

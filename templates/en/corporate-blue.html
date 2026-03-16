@@ -94,8 +94,8 @@
     .styled-list li { margin-bottom: .25rem; }
 
     /* Diagram */
-    .diagram-wrapper { margin: 1.5rem 0; overflow-x: auto; text-align: center; }
-    .diagram-wrapper svg { max-width: 100%; height: auto; }
+    .diagram-wrapper { margin: 1.5rem 0; text-align: center; }
+    .diagram-wrapper svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 
     /* Chart */
     [data-component="chart"] { margin: 1.5rem 0; }
@@ -418,7 +418,7 @@
       <p>The platform uses a microservices architecture. A single API Gateway handles all inbound traffic (auth, rate-limiting, routing), a load balancer distributes requests across stateless services, and data is persisted in a primary-replica PostgreSQL cluster with Redis for caching.</p>
 
       <div class="diagram-wrapper fade-in-up" data-component="diagram" data-summary="System architecture flowchart">
-        <svg viewBox="0 0 760 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="System Architecture Diagram"
+        <svg viewBox="0 0 760 390" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="System Architecture Diagram"
              style="font-family: var(--font-sans); max-width: 100%;">
 
           <!-- ── Defs: arrowhead ── -->
@@ -705,9 +705,9 @@ if (tocBtn && tocSidebar) {
     tocBtn.classList.toggle('locked', locked);
     if (locked) openToc(); else scheduleClose();
   });
-  document.querySelectorAll('.toc-sidebar a').forEach(a =>
-    a.addEventListener('click', () => { locked = false; tocBtn.classList.remove('locked'); scheduleClose(); })
-  );
+  document.querySelectorAll('.toc-sidebar a').forEach(a => a.addEventListener('click', () => {
+    if (!locked) scheduleClose();
+  }));
 }
 
 /* ── TOC active section highlight ── */
