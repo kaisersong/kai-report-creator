@@ -137,6 +137,36 @@
     body.edit-mode [contenteditable] { outline: 1px dashed var(--border); border-radius: 2px; cursor: text; }
     body.edit-mode [contenteditable]:hover { outline-color: var(--primary); }
     body.edit-mode [contenteditable]:focus { outline: 2px solid var(--primary); }
+
+    /* ── Export ── */
+    .export-btn {
+      position: fixed; bottom: 16px; right: 16px; z-index: 10001;
+      background: var(--primary); color: #fff; border: none; border-radius: 6px;
+      padding: .45rem .9rem; font-size: .82rem; cursor: pointer; font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2); font-family: var(--font-sans, system-ui);
+      letter-spacing: .02em;
+    }
+    .export-menu {
+      position: fixed; bottom: 52px; right: 16px; z-index: 10001;
+      background: var(--surface, #fff); border: 1px solid var(--border, #e5e7eb);
+      border-radius: 6px; overflow: hidden; display: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,.15); min-width: 148px;
+    }
+    .export-menu.open { display: block; }
+    .export-item {
+      display: block; width: 100%; padding: .55rem 1rem; font-size: .84rem;
+      background: none; border: none; cursor: pointer; text-align: left;
+      color: var(--text, #111); font-family: var(--font-sans, system-ui);
+      white-space: nowrap; border-bottom: 1px solid var(--border, #e5e7eb);
+    }
+    .export-item:last-child { border-bottom: none; }
+    .export-item:hover { background: var(--primary-light, #e3edff); }
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .toc-toggle, .toc-sidebar, .edit-hotzone, .edit-toggle,
+      .export-btn, .export-menu { display: none !important; }
+      section[data-section] { break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
@@ -888,6 +918,47 @@ window.addEventListener('load', () => {
           });
           a.click(); URL.revokeObjectURL(a.href);
         }
+      });
+    })();
+  </script>
+
+  <script>
+    (function() {
+      const exportBtn  = document.getElementById('export-btn');
+      const exportMenu = document.getElementById('export-menu');
+      const pngBtn     = document.getElementById('export-png-btn');
+      if (!exportBtn || !exportMenu) return;
+
+      exportBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        exportMenu.classList.toggle('open');
+      });
+      document.addEventListener('click', e => {
+        if (!exportBtn.contains(e.target) && !exportMenu.contains(e.target))
+          exportMenu.classList.remove('open');
+      });
+
+      function doCapture() {
+        exportMenu.classList.remove('open');
+        exportBtn.textContent = '…';
+        html2canvas(document.body, { scale: 2, useCORS: true, allowTaint: true }).then(canvas => {
+          canvas.toBlob(blob => {
+            const a = Object.assign(document.createElement('a'), {
+              href: URL.createObjectURL(blob),
+              download: (document.title || 'report') + '.png'
+            });
+            a.click(); URL.revokeObjectURL(a.href);
+            exportBtn.textContent = '↓ Export';
+          }, 'image/png');
+        });
+      }
+
+      pngBtn.addEventListener('click', () => {
+        if (window.html2canvas) { doCapture(); return; }
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1/dist/html2canvas.min.js';
+        s.onload = doCapture;
+        document.head.appendChild(s);
       });
     })();
   </script>

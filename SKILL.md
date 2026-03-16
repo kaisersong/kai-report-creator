@@ -421,6 +421,15 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       <div class="edit-hotzone" id="edit-hotzone"></div>
       <button class="edit-toggle" id="edit-toggle" title="Edit mode (E)">✏ Edit</button>
 
+      <!-- Export (always present) -->
+      <!-- lang:zh → button label "↓ 导出", items "🖨 打印 / PDF" and "📷 保存图片" -->
+      <!-- lang:en → button label "↓ Export", items "🖨 Print / PDF" and "📷 Save PNG" -->
+      <div class="export-menu" id="export-menu">
+        <button class="export-item" onclick="window.print()">[🖨 Print / PDF|🖨 打印 / PDF]</button>
+        <button class="export-item" id="export-png-btn">[📷 Save PNG|📷 保存图片]</button>
+      </div>
+      <button class="export-btn" id="export-btn" title="Export">[↓ Export|↓ 导出]</button>
+
       <!-- Floating TOC (omit entirely if toc:false) -->
       <!-- TOC label localization: lang:en → aria-label="Contents" / "Table of Contents" / <h4>Contents</h4> -->
       <!--                         lang:zh → aria-label="目录" / "报告目录" / <h4>目录</h4> -->
@@ -579,6 +588,40 @@ When generating the final HTML report, produce a complete self-contained HTML fi
               });
               a.click(); URL.revokeObjectURL(a.href);
             }
+          });
+        })();
+      </script>
+
+      <script>
+        // Export: Print/PDF via window.print(), PNG via html2canvas (lazy CDN load)
+        (function() {
+          const exportBtn  = document.getElementById('export-btn');
+          const exportMenu = document.getElementById('export-menu');
+          const pngBtn     = document.getElementById('export-png-btn');
+          if (!exportBtn || !exportMenu) return;
+          exportBtn.addEventListener('click', e => { e.stopPropagation(); exportMenu.classList.toggle('open'); });
+          document.addEventListener('click', e => {
+            if (!exportBtn.contains(e.target) && !exportMenu.contains(e.target))
+              exportMenu.classList.remove('open');
+          });
+          function doCapture() {
+            exportMenu.classList.remove('open'); exportBtn.textContent = '…';
+            html2canvas(document.body, { scale: 2, useCORS: true, allowTaint: true }).then(canvas => {
+              canvas.toBlob(blob => {
+                const a = Object.assign(document.createElement('a'), {
+                  href: URL.createObjectURL(blob),
+                  download: (document.title || 'report') + '.png'
+                });
+                a.click(); URL.revokeObjectURL(a.href);
+                exportBtn.textContent = '[↓ Export|↓ 导出]';
+              }, 'image/png');
+            });
+          }
+          pngBtn.addEventListener('click', () => {
+            if (window.html2canvas) { doCapture(); return; }
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1/dist/html2canvas.min.js';
+            s.onload = doCapture; document.head.appendChild(s);
           });
         })();
       </script>
