@@ -558,6 +558,15 @@ When generating HTML, embed the selected theme's CSS verbatim in `<style>` insid
     .fade-in-up.visible { opacity: 1; transform: translateY(0); }
     body.no-animations .fade-in-up { opacity: 1; transform: none; transition: none; }
 
+    /* Edit mode */
+    .edit-hotzone { position: fixed; bottom: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+    .edit-toggle { position: fixed; bottom: 16px; left: 16px; background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: .45rem .9rem; font-size: .82rem; cursor: pointer; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .25s ease, background .2s ease; z-index: 10001; box-shadow: 0 2px 8px rgba(0,0,0,.25); letter-spacing: .02em; }
+    .edit-toggle.show { opacity: 1; pointer-events: auto; }
+    .edit-toggle.active { opacity: 1; pointer-events: auto; background: var(--success); }
+    body.edit-mode [contenteditable] { outline: 1px dashed var(--border); border-radius: 2px; cursor: text; }
+    body.edit-mode [contenteditable]:hover { outline-color: var(--primary); }
+    body.edit-mode [contenteditable]:focus { outline: 2px solid var(--primary); }
+
     /* Theme override variables (appended after theme block when theme_overrides is set) */
     /* :root { --primary: [override_value]; ... } */
 
@@ -640,6 +649,10 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         ]
       }
       </script>
+
+      <!-- Edit mode (always present) -->
+      <div class="edit-hotzone" id="edit-hotzone"></div>
+      <button class="edit-toggle" id="edit-toggle" title="Edit mode (E)">✏ Edit</button>
 
       <!-- Floating TOC (omit entirely if toc:false) -->
       <!-- TOC label localization: lang:en → aria-label="Contents" / "Table of Contents" / <h4>Contents</h4> -->
@@ -758,6 +771,49 @@ When generating the final HTML report, produce a complete self-contained HTML fi
           }, { rootMargin: '-10% 0px -60% 0px' });
           document.querySelectorAll('section[data-section]').forEach(s => sectionObserver.observe(s));
         }
+      </script>
+
+      <script>
+        // Edit mode: hover bottom-left hotzone to reveal button, click to toggle
+        (function() {
+          const hotzone = document.getElementById('edit-hotzone');
+          const toggle  = document.getElementById('edit-toggle');
+          if (!hotzone || !toggle) return;
+          let active = false, hideTimer;
+          function showBtn() { clearTimeout(hideTimer); toggle.classList.add('show'); }
+          function schedHide() { hideTimer = setTimeout(() => { if (!active) toggle.classList.remove('show'); }, 400); }
+          hotzone.addEventListener('mouseenter', showBtn);
+          hotzone.addEventListener('mouseleave', schedHide);
+          toggle.addEventListener('mouseenter', showBtn);
+          toggle.addEventListener('mouseleave', schedHide);
+          function enterEdit() {
+            active = true; toggle.classList.add('active', 'show'); toggle.textContent = '✓ Done';
+            document.body.classList.add('edit-mode');
+            document.querySelectorAll('h1,h2,h3,p,li,td,th,figcaption').forEach(el => el.setAttribute('contenteditable', 'true'));
+          }
+          function exitEdit() {
+            active = false; toggle.classList.remove('active'); toggle.textContent = '✏ Edit';
+            document.body.classList.remove('edit-mode');
+            document.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            schedHide();
+          }
+          hotzone.addEventListener('click', () => active ? exitEdit() : enterEdit());
+          toggle.addEventListener('click', () => active ? exitEdit() : enterEdit());
+          document.addEventListener('keydown', e => {
+            if ((e.key === 'e' || e.key === 'E') && !document.activeElement.getAttribute('contenteditable')) {
+              active ? exitEdit() : enterEdit();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+              e.preventDefault();
+              const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+              const a = Object.assign(document.createElement('a'), {
+                href: URL.createObjectURL(new Blob([html], {type: 'text/html'})),
+                download: location.pathname.split('/').pop() || 'report.html'
+              });
+              a.click(); URL.revokeObjectURL(a.href);
+            }
+          });
+        })();
       </script>
 
     </body>
