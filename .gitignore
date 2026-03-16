@@ -1,3 +1,6 @@
 .DS_Store
 *.html
-!templates/*.html
+!templates/zh/*.html
+!templates/en/*.html
+!examples/zh/*.html
+!examples/en/*.html

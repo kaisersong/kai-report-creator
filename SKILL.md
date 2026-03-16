@@ -11,7 +11,7 @@ Generate beautiful, single-file HTML reports with mixed text, charts, KPIs, time
 ## Core Principles
 
 1. **Zero Dependencies** — Single HTML files with all CSS/JS inline or from CDN. No npm, no build tools.
-2. **User Provides Data, AI Provides Structure** — Never fabricate numbers or facts. Use placeholder text (`[数据待填写]`) if data is missing.
+2. **User Provides Data, AI Provides Structure** — Never fabricate numbers or facts. Use placeholder text (`[INSERT VALUE]`) if data is missing.
 3. **Progressive Disclosure for AI** — Output HTML embeds a 3-layer machine-readable structure (summary JSON → section annotations → component raw data) so downstream AI agents can read reports efficiently.
 4. **Mobile Responsive** — Reports render correctly on both desktop and mobile.
 5. **Plan Before Generate** — For complex reports, `--plan` creates a `.report.md` IR file first; `--generate` renders it to HTML.
@@ -103,7 +103,7 @@ When the user runs `/report --plan "topic"`:
    - Complete frontmatter with all relevant fields filled in
    - At least 3–5 sections with `##` headings
    - A mix of component types (kpi, chart, table, timeline, callout, etc.)
-   - Placeholder values for data: use `[数据待填写]` or `[INSERT VALUE]` — **never fabricate numbers**
+   - Placeholder values for data: use `[INSERT VALUE]` — **never fabricate numbers**
    - Comments for fields the user should customize
 3. Save to `report-<slug>.report.md` using the Write tool.
 4. Tell the user:
@@ -118,7 +118,7 @@ When the user runs `/report --plan "topic"`:
 When the user runs `/report --themes`, write the following HTML verbatim to `report-themes-preview.html`, then tell the user the file path and ask them to open it in a browser:
 
     <!DOCTYPE html>
-    <html lang="zh"><head><meta charset="UTF-8">
+    <html lang="en"><head><meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>report-creator — Theme Previews</title>
     <style>
@@ -146,62 +146,62 @@ When the user runs `/report --themes`, write the following HTML verbatim to `rep
       <div class="grid">
         <div class="card" style="background:#fff">
           <div class="card-header" style="background:#1A56DB;color:#fff">
-            <div><h2 style="color:#fff">corporate-blue</h2><div class="desc">企业蓝 · 正式商务</div></div>
+            <div><h2 style="color:#fff">corporate-blue</h2><div class="desc">Professional · Business</div></div>
             <div class="swatches"><div class="swatch" style="background:#1A56DB"></div><div class="swatch" style="background:#E3EDFF;border-color:#1A56DB"></div><div class="swatch" style="background:#111928"></div></div>
           </div>
           <div class="card-body" style="font-family:Inter,system-ui,sans-serif;color:#111928">
-            <div class="mini-h2" style="border-left:4px solid #1A56DB;padding-left:.6rem">Q3 核心指标</div>
+            <div class="mini-h2" style="border-left:4px solid #1A56DB;padding-left:.6rem">Q3 Core Metrics</div>
             <div class="mini-kpi">
-              <div class="mini-kpi-item" style="background:#E3EDFF"><div class="mini-kpi-label">营收</div><div class="mini-kpi-value" style="color:#1A56DB">¥2,450万</div><div class="mini-kpi-trend" style="color:#057A55">↑12%</div></div>
-              <div class="mini-kpi-item" style="background:#E3EDFF"><div class="mini-kpi-label">新客户</div><div class="mini-kpi-value" style="color:#1A56DB">183</div><div class="mini-kpi-trend" style="color:#057A55">↑8%</div></div>
-              <div class="mini-kpi-item" style="background:#E3EDFF"><div class="mini-kpi-label">完成率</div><div class="mini-kpi-value" style="color:#1A56DB">108%</div><div class="mini-kpi-trend" style="color:#6B7280">→</div></div>
+              <div class="mini-kpi-item" style="background:#E3EDFF"><div class="mini-kpi-label">Revenue</div><div class="mini-kpi-value" style="color:#1A56DB">$2.45M</div><div class="mini-kpi-trend" style="color:#057A55">↑12%</div></div>
+              <div class="mini-kpi-item" style="background:#E3EDFF"><div class="mini-kpi-label">New Clients</div><div class="mini-kpi-value" style="color:#1A56DB">183</div><div class="mini-kpi-trend" style="color:#057A55">↑8%</div></div>
+              <div class="mini-kpi-item" style="background:#E3EDFF"><div class="mini-kpi-label">Achievement</div><div class="mini-kpi-value" style="color:#1A56DB">108%</div><div class="mini-kpi-trend" style="color:#6B7280">→</div></div>
             </div>
-            <p class="mini-p">华南区超额完成目标 115%，全年最佳表现。建议 Q4 扩大该区域销售团队编制。</p>
+            <p class="mini-p">South region exceeded target at 115%, best performance of the year. Recommend expanding team headcount in Q4.</p>
           </div>
         </div>
         <div class="card" style="background:#fff;border:1px solid #E5E7EB">
           <div class="card-header" style="background:#F9FAFB;color:#111827;border-bottom:1px solid #E5E7EB">
-            <div><h2 style="color:#111827">minimal</h2><div class="desc" style="color:#6B7280">极简白 · 研究报告</div></div>
+            <div><h2 style="color:#111827">minimal</h2><div class="desc" style="color:#6B7280">Academic · Research</div></div>
             <div class="swatches"><div class="swatch" style="background:#111827;border-color:#111827"></div><div class="swatch" style="background:#F3F4F6;border-color:#9CA3AF"></div><div class="swatch" style="background:#6B7280;border-color:#6B7280"></div></div>
           </div>
           <div class="card-body" style="font-family:Georgia,serif;color:#374151">
-            <div class="mini-h2" style="border-bottom:1px solid #E5E7EB;padding-bottom:.35rem">核心发现</div>
+            <div class="mini-h2" style="border-bottom:1px solid #E5E7EB;padding-bottom:.35rem">Key Findings</div>
             <div class="mini-kpi">
-              <div class="mini-kpi-item" style="background:#F3F4F6"><div class="mini-kpi-label" style="color:#9CA3AF">样本量</div><div class="mini-kpi-value" style="color:#111827">1,200</div><div class="mini-kpi-trend" style="color:#9CA3AF">人</div></div>
-              <div class="mini-kpi-item" style="background:#F3F4F6"><div class="mini-kpi-label" style="color:#9CA3AF">满意度</div><div class="mini-kpi-value" style="color:#111827">78%</div><div class="mini-kpi-trend" style="color:#065F46">↑</div></div>
-              <div class="mini-kpi-item" style="background:#F3F4F6"><div class="mini-kpi-label" style="color:#9CA3AF">产品数</div><div class="mini-kpi-value" style="color:#111827">6</div><div class="mini-kpi-trend" style="color:#9CA3AF">款</div></div>
+              <div class="mini-kpi-item" style="background:#F3F4F6"><div class="mini-kpi-label" style="color:#9CA3AF">Sample</div><div class="mini-kpi-value" style="color:#111827">1,200</div><div class="mini-kpi-trend" style="color:#9CA3AF">ppl</div></div>
+              <div class="mini-kpi-item" style="background:#F3F4F6"><div class="mini-kpi-label" style="color:#9CA3AF">Satisfaction</div><div class="mini-kpi-value" style="color:#111827">78%</div><div class="mini-kpi-trend" style="color:#065F46">↑</div></div>
+              <div class="mini-kpi-item" style="background:#F3F4F6"><div class="mini-kpi-label" style="color:#9CA3AF">Products</div><div class="mini-kpi-value" style="color:#111827">6</div><div class="mini-kpi-trend" style="color:#9CA3AF">items</div></div>
             </div>
-            <p class="mini-p">78% 的用户表示 AI 助手使日常编码效率提升 30% 以上，企业用户对本地部署需求强烈。</p>
+            <p class="mini-p">78% of users report AI assistants improve daily coding efficiency by 30%+. Enterprise demand for on-premise deployment is strong.</p>
           </div>
         </div>
         <div class="card">
           <div class="card-header" style="background:#1E1B4B;color:#E2E8F0">
-            <div><h2 style="color:#818CF8;font-family:monospace">dark-tech</h2><div class="desc" style="color:#94A3B8">深色科技 · 技术文档</div></div>
+            <div><h2 style="color:#818CF8;font-family:monospace">dark-tech</h2><div class="desc" style="color:#94A3B8">Dark Tech · Docs</div></div>
             <div class="swatches"><div class="swatch" style="background:#818CF8"></div><div class="swatch" style="background:#1E1B4B;border-color:#818CF8"></div><div class="swatch" style="background:#A78BFA"></div></div>
           </div>
           <div class="card-body" style="background:#0F172A;font-family:Inter,system-ui;color:#E2E8F0">
-            <div class="mini-h2" style="color:#818CF8;font-family:monospace;border-bottom:1px solid #334155;padding-bottom:.35rem">系统状态</div>
+            <div class="mini-h2" style="color:#818CF8;font-family:monospace;border-bottom:1px solid #334155;padding-bottom:.35rem">System Status</div>
             <div class="mini-kpi">
-              <div class="mini-kpi-item" style="background:#1E293B;border:1px solid #334155"><div class="mini-kpi-label" style="color:#94A3B8">延迟</div><div class="mini-kpi-value" style="color:#818CF8">12ms</div><div class="mini-kpi-trend" style="color:#34D399">↓优</div></div>
-              <div class="mini-kpi-item" style="background:#1E293B;border:1px solid #334155"><div class="mini-kpi-label" style="color:#94A3B8">可用性</div><div class="mini-kpi-value" style="color:#818CF8">99.9%</div><div class="mini-kpi-trend" style="color:#34D399">↑</div></div>
-              <div class="mini-kpi-item" style="background:#1E293B;border:1px solid #334155"><div class="mini-kpi-label" style="color:#94A3B8">部署</div><div class="mini-kpi-value" style="color:#818CF8">v2.4</div><div class="mini-kpi-trend" style="color:#94A3B8">稳定</div></div>
+              <div class="mini-kpi-item" style="background:#1E293B;border:1px solid #334155"><div class="mini-kpi-label" style="color:#94A3B8">Latency</div><div class="mini-kpi-value" style="color:#818CF8">12ms</div><div class="mini-kpi-trend" style="color:#34D399">↓ good</div></div>
+              <div class="mini-kpi-item" style="background:#1E293B;border:1px solid #334155"><div class="mini-kpi-label" style="color:#94A3B8">Uptime</div><div class="mini-kpi-value" style="color:#818CF8">99.9%</div><div class="mini-kpi-trend" style="color:#34D399">↑</div></div>
+              <div class="mini-kpi-item" style="background:#1E293B;border:1px solid #334155"><div class="mini-kpi-label" style="color:#94A3B8">Deploy</div><div class="mini-kpi-value" style="color:#818CF8">v2.4</div><div class="mini-kpi-trend" style="color:#94A3B8">Stable</div></div>
             </div>
-            <p class="mini-p" style="color:#94A3B8">当前版本已部署至生产环境，所有健康检查通过，无异常告警。</p>
+            <p class="mini-p" style="color:#94A3B8">Current version deployed to production. All health checks passing, no active alerts.</p>
           </div>
         </div>
         <div class="card" style="background:#FFFBEB;border:1px solid #E7E5E4">
           <div class="card-header" style="background:#FEF3C7;color:#1C1917;border-bottom:1px solid #E7E5E4">
-            <div><h2 style="color:#B45309">warm-editorial</h2><div class="desc" style="color:#78716C">暖色编辑 · 内容输出</div></div>
+            <div><h2 style="color:#B45309">warm-editorial</h2><div class="desc" style="color:#78716C">Editorial · Content</div></div>
             <div class="swatches"><div class="swatch" style="background:#B45309;border-color:#B45309"></div><div class="swatch" style="background:#FEF3C7;border-color:#D97706"></div><div class="swatch" style="background:#1C1917;border-color:#1C1917"></div></div>
           </div>
           <div class="card-body" style="font-family:Georgia,serif;color:#1C1917">
-            <div class="mini-h2" style="color:#1C1917">行业洞察</div>
+            <div class="mini-h2" style="color:#1C1917">Industry Insights</div>
             <div class="mini-kpi">
-              <div class="mini-kpi-item" style="background:#FEF9EE;border:1px solid #E7E5E4"><div class="mini-kpi-label" style="color:#78716C">读者数</div><div class="mini-kpi-value" style="color:#B45309">12,400</div><div class="mini-kpi-trend" style="color:#166534">↑18%</div></div>
-              <div class="mini-kpi-item" style="background:#FEF9EE;border:1px solid #E7E5E4"><div class="mini-kpi-label" style="color:#78716C">完读率</div><div class="mini-kpi-value" style="color:#B45309">64%</div><div class="mini-kpi-trend" style="color:#166534">↑</div></div>
-              <div class="mini-kpi-item" style="background:#FEF9EE;border:1px solid #E7E5E4"><div class="mini-kpi-label" style="color:#78716C">分享</div><div class="mini-kpi-value" style="color:#B45309">890</div><div class="mini-kpi-trend" style="color:#166534">↑</div></div>
+              <div class="mini-kpi-item" style="background:#FEF9EE;border:1px solid #E7E5E4"><div class="mini-kpi-label" style="color:#78716C">Readers</div><div class="mini-kpi-value" style="color:#B45309">12,400</div><div class="mini-kpi-trend" style="color:#166534">↑18%</div></div>
+              <div class="mini-kpi-item" style="background:#FEF9EE;border:1px solid #E7E5E4"><div class="mini-kpi-label" style="color:#78716C">Read Rate</div><div class="mini-kpi-value" style="color:#B45309">64%</div><div class="mini-kpi-trend" style="color:#166534">↑</div></div>
+              <div class="mini-kpi-item" style="background:#FEF9EE;border:1px solid #E7E5E4"><div class="mini-kpi-label" style="color:#78716C">Shares</div><div class="mini-kpi-value" style="color:#B45309">890</div><div class="mini-kpi-trend" style="color:#166534">↑</div></div>
             </div>
-            <p class="mini-p">本期简报完读率达 64%，远高于行业均值 42%。精选内容策略效果显著。</p>
+            <p class="mini-p">This issue's read-through rate of 64% far exceeds the 42% industry average. Curated content strategy is working.</p>
           </div>
         </div>
       </div>
@@ -231,8 +231,8 @@ Extract the numeric part of Value into `data-target-value`, set `data-prefix` an
 
     <div data-component="kpi" class="kpi-grid">
       <div class="kpi-card fade-in-up">
-        <div class="kpi-label">总营收</div>
-        <div class="kpi-value" data-target-value="2450" data-prefix="¥" data-suffix="万">¥2,450万</div>
+        <div class="kpi-label">Total Revenue</div>
+        <div class="kpi-value" data-target-value="2450" data-prefix="$" data-suffix="K">$2,450K</div>
         <div class="kpi-trend kpi-trend--up">↑12%</div>
       </div>
     </div>
@@ -313,7 +313,7 @@ Each item: `- Date: Description` or `- Label: Description`
       <div class="timeline-item">
         <div class="timeline-date">2024-07</div>
         <div class="timeline-dot"></div>
-        <div class="timeline-content">启动项目</div>
+        <div class="timeline-content">Project kickoff</div>
       </div>
     </div>
 
@@ -591,12 +591,13 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       </script>
 
       <!-- Floating TOC (omit entirely if toc:false) -->
-      <button class="toc-toggle" id="toc-toggle-btn" aria-label="目录" aria-expanded="false">☰</button>
-      <nav class="toc-sidebar" id="toc-sidebar" aria-label="报告目录">
-        <h4>目录</h4>
+      <!-- TOC label localization: lang:en → aria-label="Contents" / "Table of Contents" / <h4>Contents</h4> -->
+      <!--                         lang:zh → aria-label="目录" / "报告目录" / <h4>目录</h4> -->
+      <button class="toc-toggle" id="toc-toggle-btn" aria-label="[Contents|目录]" aria-expanded="false">☰</button>
+      <nav class="toc-sidebar" id="toc-sidebar" aria-label="[Table of Contents|报告目录]">
+        <h4>[Contents|目录]</h4>
         <!-- Generate one <a> per ## heading and one per ### heading in the report -->
-        <!-- For ## heading "核心指标": -->
-        <!-- <a href="#section-he-xin-zhi-biao" data-section="核心指标">核心指标</a> -->
+        <!-- Example (lang:en): <a href="#section-core-metrics" data-section="Core Metrics">Core Metrics</a> -->
         <!-- For ### heading: add class="toc-h3" -->
         [TOC links generated from all ## and ### headings in the IR]
       </nav>
