@@ -84,12 +84,15 @@ body.edit-mode [contenteditable]:focus { outline: 2px solid var(--primary); }
 .export-item { display: block; width: 100%; padding: .55rem 1rem; font-size: .84rem; background: none; border: none; cursor: pointer; text-align: left; color: var(--text, #111); font-family: var(--font-sans, system-ui); white-space: nowrap; border-bottom: 1px solid var(--border, #e5e7eb); }
 .export-item:last-child { border-bottom: none; }
 .export-item:hover { background: var(--primary-light, #e3edff); }
+@page { size: A4; margin: 1.5cm; }
 @media print {
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   .toc-toggle, .toc-sidebar, .edit-hotzone, .edit-toggle, .export-btn, .export-menu { display: none !important; }
   h2 { break-after: avoid; }
   .kpi-grid, .kpi-card, .callout, .timeline, .timeline-item,
   .table-wrapper, [data-component="chart"], .diagram-wrapper { break-inside: avoid; }
-  canvas { max-height: 320px !important; width: 100% !important; }
+  .chart-container { height: 200px !important; }
+  canvas { max-height: 200px !important; width: 100% !important; }
+  img { max-height: 260px !important; width: auto !important; object-fit: contain; }
   .fade-in-up { opacity: 1 !important; transform: translateY(0) !important; }
 }

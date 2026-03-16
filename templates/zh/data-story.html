@@ -94,6 +94,7 @@
     }
     .export-item:last-child { border-bottom: none; }
     .export-item:hover { background: var(--primary-light, #e3edff); }
+    @page { size: A4; margin: 1.5cm; }
     @media print {
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       .toc-toggle, .toc-sidebar, .edit-hotzone, .edit-toggle,
@@ -107,7 +108,10 @@
       .timeline-item { break-inside: avoid; }
       .table-wrapper { break-inside: avoid; }
       [data-component="chart"] { break-inside: avoid; }
-      canvas { max-height: 320px !important; width: 100% !important; }
+      /* Reduce chart & image height so they fit without skipping to next page */
+      .chart-container { height: 200px !important; }
+      canvas { max-height: 200px !important; width: 100% !important; }
+      img { max-height: 260px !important; width: auto !important; object-fit: contain; }
       .diagram-wrapper { break-inside: avoid; }
       .fade-in-up { opacity: 1 !important; transform: translateY(0) !important; }
     }
