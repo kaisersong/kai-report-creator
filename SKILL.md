@@ -450,12 +450,13 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       <button class="edit-toggle" id="edit-toggle" title="Edit mode (E)">✏ Edit</button>
 
       <!-- Export (always present) -->
-      <!-- lang:en labels: "↓ Export" / "🖨 Print / PDF" / "🖥 Save PNG (Desktop)" / "📱 Save PNG (Mobile)" -->
-      <!-- lang:zh labels: "↓ 导出"  / "🖨 打印 / PDF"  / "🖥 保存图片（桌面）"    / "📱 保存图片（手机）"  -->
+      <!-- lang:en labels: "↓ Export" / "🖨 Print / PDF" / "🖥 Save PNG (Desktop)" / "📱 Save PNG (Mobile)" / "💬 IM Share Image" -->
+      <!-- lang:zh labels: "↓ 导出"  / "🖨 打印 / PDF"  / "🖥 保存图片（桌面）"    / "📱 保存图片（手机）"  / "💬 IM 分享长图"   -->
       <div class="export-menu" id="export-menu">
         <button class="export-item" onclick="window.print()">[🖨 Print / PDF|🖨 打印 / PDF]</button>
         <button class="export-item" id="export-png-desktop">[🖥 Save PNG (Desktop)|🖥 保存图片（桌面）]</button>
         <button class="export-item" id="export-png-mobile">[📱 Save PNG (Mobile)|📱 保存图片（手机）]</button>
+        <button class="export-item" id="export-im-share">[💬 IM Share Image|💬 IM 分享长图]</button>
       </div>
       <button class="export-btn" id="export-btn" title="Export">[↓ Export|↓ 导出]</button>
 
@@ -622,14 +623,16 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       </script>
 
       <script>
-        // Export: Print/PDF via window.print(); PNG via html2canvas (lazy CDN)
-        // Desktop PNG: full-page at 2× scale
-        // Mobile PNG: .report-wrapper only, scaled to 1170px wide (≈ 3× iPhone width)
+        // Export: Print/PDF via window.print(); images via html2canvas (preloaded on page open)
+        // Desktop PNG : full-page, adaptive scale (2× short / 1.5× long pages), PNG
+        // Mobile PNG  : .report-wrapper 750px wide (iPhone 2× Retina), JPEG 92%
+        // IM Share    : .report-wrapper 800px wide (WeChat/Feishu/DingTalk), JPEG 92%
         (function() {
           const exportBtn  = document.getElementById('export-btn');
           const exportMenu = document.getElementById('export-menu');
           const pngDesktop = document.getElementById('export-png-desktop');
           const pngMobile  = document.getElementById('export-png-mobile');
+          const pngIM      = document.getElementById('export-im-share');
           if (!exportBtn || !exportMenu) return;
           const LABEL = exportBtn.textContent;
 
@@ -639,49 +642,65 @@ When generating the final HTML report, produce a complete self-contained HTML fi
               exportMenu.classList.remove('open');
           });
 
-          function withLib(fn) {
+          /* Preload html2canvas immediately — ready before first click */
+          let libPromise = null;
+          function loadLib() {
+            if (libPromise) return libPromise;
+            libPromise = new Promise(resolve => {
+              if (window.html2canvas) { resolve(); return; }
+              const s = document.createElement('script');
+              s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1/dist/html2canvas.min.js';
+              s.onload = resolve; document.head.appendChild(s);
+            });
+            return libPromise;
+          }
+          loadLib(); /* fire immediately */
+
+          function restore() { exportBtn.style.visibility = ''; exportBtn.textContent = LABEL; }
+          function filename(suffix, ext) {
+            const d = new Date(), pad = n => String(n).padStart(2,'0');
+            const date = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+            return (document.title||'report').replace(/[/\\:*?"<>|]/g,'_') + `_${date}${suffix}.${ext}`;
+          }
+          function saveBlob(canvas, fname, jpeg) {
+            canvas.toBlob(blob => {
+              const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: fname });
+              a.click(); URL.revokeObjectURL(a.href); restore();
+            }, jpeg ? 'image/jpeg' : 'image/png', jpeg ? 0.92 : 1);
+          }
+          function capture(el, cfg, fname, jpeg) {
             exportMenu.classList.remove('open');
             exportBtn.style.visibility = 'hidden';
-            if (window.html2canvas) { fn(); return; }
-            const s = document.createElement('script');
-            s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1/dist/html2canvas.min.js';
-            s.onload = fn; document.head.appendChild(s);
-          }
-          function restore() { exportBtn.style.visibility = ''; exportBtn.textContent = LABEL; }
-          function download(canvas, suffix) {
-            canvas.toBlob(blob => {
-              const a = Object.assign(document.createElement('a'), {
-                href: URL.createObjectURL(blob),
-                download: (document.title || 'report') + suffix + '.png'
-              });
-              a.click(); URL.revokeObjectURL(a.href); restore();
-            }, 'image/png');
+            exportBtn.textContent = '…';
+            document.querySelectorAll('.fade-in-up').forEach(e => e.classList.add('visible'));
+            loadLib().then(() => html2canvas(el, cfg).then(c => saveBlob(c, fname, jpeg)));
           }
 
-          pngDesktop && pngDesktop.addEventListener('click', () => withLib(() => {
-            exportBtn.textContent = '…';
-            document.querySelectorAll('.fade-in-up').forEach(el => el.classList.add('visible'));
-            html2canvas(document.documentElement, {
-              scale: 2, useCORS: true, allowTaint: true,
+          pngDesktop && pngDesktop.addEventListener('click', () => {
+            const H = document.documentElement.scrollHeight;
+            capture(document.documentElement, {
+              scale: H > 4000 ? 1.5 : 2, useCORS: true, allowTaint: true,
               scrollX: 0, scrollY: 0,
-              width: document.documentElement.scrollWidth,
-              height: document.documentElement.scrollHeight,
-              windowWidth: document.documentElement.scrollWidth,
-              windowHeight: document.documentElement.scrollHeight
-            }).then(c => download(c, ''));
-          }));
+              width: document.documentElement.scrollWidth, height: H,
+              windowWidth: document.documentElement.scrollWidth, windowHeight: H
+            }, filename('', 'png'), false);
+          });
 
-          pngMobile && pngMobile.addEventListener('click', () => withLib(() => {
-            exportBtn.textContent = '…';
-            document.querySelectorAll('.fade-in-up').forEach(el => el.classList.add('visible'));
+          pngMobile && pngMobile.addEventListener('click', () => {
             const el = document.querySelector('.report-wrapper') || document.documentElement;
-            const scale = Math.min(3, 1170 / el.offsetWidth);
-            html2canvas(el, {
-              scale, useCORS: true, allowTaint: true,
-              scrollX: 0, scrollY: 0,
-              width: el.scrollWidth, height: el.scrollHeight
-            }).then(c => download(c, '-mobile'));
-          }));
+            capture(el, {
+              scale: 750 / el.offsetWidth, useCORS: true, allowTaint: true,
+              scrollX: 0, scrollY: 0, width: el.scrollWidth, height: el.scrollHeight
+            }, filename('-mobile', 'jpg'), true);
+          });
+
+          pngIM && pngIM.addEventListener('click', () => {
+            const el = document.querySelector('.report-wrapper') || document.documentElement;
+            capture(el, {
+              scale: 800 / el.offsetWidth, useCORS: true, allowTaint: true,
+              scrollX: 0, scrollY: 0, width: el.scrollWidth, height: el.scrollHeight
+            }, filename('-im', 'jpg'), true);
+          });
         })();
       </script>
 
