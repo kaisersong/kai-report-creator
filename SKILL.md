@@ -565,14 +565,11 @@ When generating the final HTML report, produce a complete self-contained HTML fi
           padding: .45rem .7rem; cursor: pointer; font-size: 1rem; line-height: 1;
           box-shadow: 0 2px 8px rgba(0,0,0,.2);
         }
-        .toc-backdrop {
-          display: none; position: fixed; inset: 0; background: rgba(0,0,0,.3); z-index: 90;
-        }
-        .toc-backdrop.visible { display: block; }
+        .toc-toggle.locked { box-shadow: 0 0 0 2px #fff, 0 2px 8px rgba(0,0,0,.2); }
         @media (max-width: 768px) {
           .report-wrapper { padding: 1.5rem 1rem; }
         }
-        body.no-toc .toc-sidebar, body.no-toc .toc-toggle, body.no-toc .toc-backdrop { display: none; }
+        body.no-toc .toc-sidebar, body.no-toc .toc-toggle { display: none; }
         body.no-toc .main-with-toc { margin-left: 0; }
       </style>
     </head>
@@ -595,7 +592,6 @@ When generating the final HTML report, produce a complete self-contained HTML fi
 
       <!-- Floating TOC (omit entirely if toc:false) -->
       <button class="toc-toggle" id="toc-toggle-btn" aria-label="目录" aria-expanded="false">☰</button>
-      <div class="toc-backdrop" id="toc-backdrop"></div>
       <nav class="toc-sidebar" id="toc-sidebar" aria-label="报告目录">
         <h4>目录</h4>
         <!-- Generate one <a> per ## heading and one per ### heading in the report -->
@@ -666,24 +662,36 @@ When generating the final HTML report, produce a complete self-contained HTML fi
           document.querySelectorAll('.kpi-value[data-target-value]').forEach(el => kpiObserver.observe(el));
         }
 
-        // TOC toggle — floating overlay, default collapsed
+        // TOC: hover to open, click to lock, no backdrop
         const tocBtn = document.getElementById('toc-toggle-btn');
         const tocSidebar = document.getElementById('toc-sidebar');
-        const tocBackdrop = document.getElementById('toc-backdrop');
         if (tocBtn && tocSidebar) {
+          let locked = false, closeTimer;
           function openToc() {
+            clearTimeout(closeTimer);
             tocSidebar.classList.add('open');
-            tocBackdrop.classList.add('visible');
             tocBtn.setAttribute('aria-expanded', 'true');
           }
-          function closeToc() {
-            tocSidebar.classList.remove('open');
-            tocBackdrop.classList.remove('visible');
-            tocBtn.setAttribute('aria-expanded', 'false');
+          function scheduleClose() {
+            closeTimer = setTimeout(() => {
+              if (!locked) {
+                tocSidebar.classList.remove('open');
+                tocBtn.setAttribute('aria-expanded', 'false');
+              }
+            }, 150);
           }
-          tocBtn.addEventListener('click', () => tocSidebar.classList.contains('open') ? closeToc() : openToc());
-          tocBackdrop.addEventListener('click', closeToc);
-          document.querySelectorAll('.toc-sidebar a').forEach(a => a.addEventListener('click', closeToc));
+          tocBtn.addEventListener('mouseenter', openToc);
+          tocSidebar.addEventListener('mouseenter', openToc);
+          tocBtn.addEventListener('mouseleave', scheduleClose);
+          tocSidebar.addEventListener('mouseleave', scheduleClose);
+          tocBtn.addEventListener('click', () => {
+            locked = !locked;
+            tocBtn.classList.toggle('locked', locked);
+            if (locked) openToc(); else scheduleClose();
+          });
+          document.querySelectorAll('.toc-sidebar a').forEach(a => a.addEventListener('click', () => {
+            locked = false; tocBtn.classList.remove('locked'); scheduleClose();
+          }));
         }
 
         // TOC active state tracking
