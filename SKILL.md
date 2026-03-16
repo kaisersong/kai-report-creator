@@ -225,7 +225,7 @@ For `###` headings: `<h3 id="section-[slug]">[heading text]</h3>`
 ### :::kpi
 
 Each list item format: `- Label: Value TrendSymbol`
-Trend: `↑` = positive (green), `↓` = negative (red), `→` = neutral (gray)
+Trend: `↑` = positive (green), `↓` = negative (red), `→` = neutral (gray). If no trend symbol is present, omit the `kpi-trend` div entirely.
 
 Extract the numeric part of Value into `data-target-value`, set `data-prefix` and `data-suffix`.
 
@@ -254,12 +254,28 @@ Choose library: Chart.js for bar/line/pie/scatter; ECharts for radar/funnel/heat
 
 Use theme's `--primary` color for chart colors. Add `<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>` in `<head>` (or inline if `--bundle`).
 
+**ECharts rendering** (used when any chart in the report requires radar/funnel/heatmap/multi-axis):
+
+    <div data-component="chart" data-type="radar" data-raw='{"legend":["..."],"series":[{"name":"...","data":[...]}]}' class="fade-in-up">
+      <div id="chart-[unique-id]" style="height:300px"></div>
+      <script>
+        var chart = echarts.init(document.getElementById('chart-[unique-id]'));
+        chart.setOption({
+          legend: { data: ['...'] },
+          series: [{ type: 'radar', data: [{ value: [...], name: '...' }] }]
+        });
+      </script>
+    </div>
+
+Add `<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>` in `<head>` (or inline if `--bundle`). The `data-raw` attribute for ECharts uses `series` format matching the ECharts `setOption` data structure.
+
 ### :::table
 
-Body is a Markdown table. Convert to HTML:
+Body is a Markdown table. Convert to HTML. If `caption` param is provided, emit `<caption>[caption text]</caption>` as the first child of `<table>`.
 
     <div data-component="table" class="table-wrapper fade-in-up">
       <table class="report-table">
+        <caption>Table title if provided</caption>
         <thead><tr><th>Col1</th>...</tr></thead>
         <tbody><tr><td>Val</td>...</tr></tbody>
       </table>
@@ -270,8 +286,13 @@ Body is a Markdown table. Convert to HTML:
     <div data-component="list" class="report-list">
       <ul class="styled-list">  <!-- or <ol> if style=ordered -->
         <li>Item</li>
+        <li>Item with sub-items
+          <ul><li>Sub-item</li></ul>
+        </li>
       </ul>
     </div>
+
+If an item has indented sub-items (2-space or 4-space indent), render them as nested `<ul>` or `<ol>` inside the parent `<li>`.
 
 ### :::image
 
@@ -307,12 +328,16 @@ Generate inline SVG. All SVGs must be self-contained (no external refs). Wrap in
     </div>
 
 **type=sequence:** Draw vertical lifelines for each actor, horizontal arrows for each step. Actors as columns at top with labels, steps numbered on left, arrows with labels between lifelines.
+Sizing: width = 180 × (actor count), height = 80 + 50 × (step count).
 
 **type=flowchart:** Draw nodes as shapes (circle=oval, diamond=rhombus, rect=rectangle). Connect with directed arrows. Use edge labels where provided.
+Sizing: width = 600, height = 120 × (node count).
 
 **type=tree:** Top-down tree with root at top, children below, connected by lines.
+Sizing: width = 200 × (max leaf count at any level), height = 120 × (depth).
 
 **type=mindmap:** Radial layout, center node in middle, branches radiating out with items as leaf nodes.
+Sizing: width = 700, height = 500.
 
 ### :::code
 
@@ -321,7 +346,7 @@ Generate inline SVG. All SVGs must be self-contained (no external refs). Wrap in
       <pre><code class="language-[lang]">[HTML-escaped code content]</code></pre>
     </div>
 
-Add `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github.min.css">` and `<script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/highlight.min.js"></script>` + `<script>hljs.highlightAll();</script>` in head (or inline if --bundle).
+Add `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github.min.css">` and `<script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/highlight.min.js"></script>` + `<script>hljs.highlightAll();</script>` in head (or inline the full highlight.js CSS and JS if `--bundle` mode).
 
 For dark-tech theme use `github-dark.min.css` instead of `github.min.css`.
 
@@ -687,7 +712,8 @@ If `template:` is set in frontmatter:
    - `{{report.abstract}}` → abstract value
    - `{{report.theme_css}}` → selected theme CSS + shared component CSS
    - `{{report.summary_json}}` → the complete `<script type="application/json" id="report-summary">...</script>` block (including the script tags)
-3. Output the result as the HTML file
+3. If `logo` is set in `theme_overrides`, prepend `<img src="[logo]" alt="Company logo" class="report-logo" style="height:48px;margin-bottom:1.5rem;display:block">` at the start of `{{report.body}}` content.
+4. Output the result as the HTML file
 
 ## --generate Mode
 
