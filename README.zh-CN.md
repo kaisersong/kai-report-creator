@@ -17,6 +17,8 @@
 
 ## 快速开始
 
+**方式 A — Claude Code（手动安装）**
+
 1. 将 `SKILL.md` 复制到 `~/.claude/skills/report-creator.md`
 2. 指向一个文档或链接：
 
@@ -24,6 +26,12 @@
 /report --from meeting-notes.md
 /report --from https://example.com/data-page --output market-analysis.html
 /report --plan "Q3 销售总结" --from q3-data.csv
+```
+
+**方式 B — OpenClaw / ClawHub（一行命令）**
+
+```
+clawhub install kai-report-creator
 ```
 
 HTML 文件将生成到当前目录，用任意浏览器打开即可查看。

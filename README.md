@@ -17,6 +17,8 @@ English | [简体中文](README.zh-CN.md)
 
 ## Quick Start
 
+**Option A — Claude Code (manual install)**
+
 1. Copy `SKILL.md` to `~/.claude/skills/report-creator.md`
 2. Point it at a document or URL:
 
@@ -24,6 +26,12 @@ English | [简体中文](README.zh-CN.md)
 /report --from meeting-notes.md
 /report --from https://example.com/data-page --output market-analysis.html
 /report --plan "Q3 Sales Summary" --from q3-data.csv
+```
+
+**Option B — OpenClaw / ClawHub (one command)**
+
+```
+clawhub install kai-report-creator
 ```
 
 An HTML file is generated in your current directory. Open it in any browser.

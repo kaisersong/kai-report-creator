@@ -1,7 +1,9 @@
 ---
 name: kai-report-creator
-description: Generate beautiful single-file HTML reports with mixed text, charts, KPI cards, timelines, diagrams, and images. Use when the user wants to create a report, business summary, research doc, or formatted HTML output. Supports --plan (generate IR outline), --generate (render IR to HTML), --themes (preview styles), --bundle (offline HTML), --from (read file), --output (custom filename).
+description: Use when the user wants to create a report, business summary, data dashboard, research doc, or formatted HTML output from notes, data, or a URL. Triggers: /report, --plan, --generate, --themes, --from, --bundle, or any mention of "HTML report", "KPI dashboard", "generate report".
 version: 1.0.0
+user-invocable: true
+metadata: {"openclaw": {"emoji": "📊"}}
 ---
 
 # kai-report-creator
@@ -24,7 +26,7 @@ When invoked as `/report [flags] [content]`, parse flags and route:
 |------|--------|
 | `--plan "topic"` | Generate a `.report.md` IR file only. Do NOT generate HTML. Save as `report-<slug>.report.md`. |
 | `--generate [file]` | Read the specified `.report.md` file (or IR from context if no file given), render to HTML. |
-| `--themes` | Output `report-themes-preview.html` showing all 8 built-in themes. Do not generate a report. |
+| `--themes` | Output `report-themes-preview.html` showing all 6 built-in themes. Do not generate a report. |
 | `--bundle` | Generate HTML with all CDN libraries inlined. Overrides `charts: cdn` in frontmatter. |
 | `--from <file>` | If file's first line is `---`, treat as IR and render directly. Otherwise treat as raw content, generate IR first then render. If ambiguous, ask user to confirm. |
 | `--theme <name>` | Override theme. Valid: `corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`. |
@@ -367,7 +369,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         /* Floating TOC overlay — default collapsed on all screen sizes */
         .toc-sidebar {
           position: fixed; top: 0; left: 0; width: 240px; height: 100vh;
-          overflow-y: auto; padding: 1.5rem 1rem; background: var(--surface);
+          overflow-y: auto; padding: 3rem 1rem 1.5rem; background: var(--surface);
           border-right: 1px solid var(--border); font-size: .83rem; z-index: 100;
           transform: translateX(-100%); transition: transform .28s ease;
         }
@@ -632,6 +634,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
 
           pngDesktop && pngDesktop.addEventListener('click', () => withLib(() => {
             exportBtn.textContent = '…';
+            document.querySelectorAll('.fade-in-up').forEach(el => el.classList.add('visible'));
             html2canvas(document.documentElement, {
               scale: 2, useCORS: true, allowTaint: true,
               scrollX: 0, scrollY: 0,
@@ -644,6 +647,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
 
           pngMobile && pngMobile.addEventListener('click', () => withLib(() => {
             exportBtn.textContent = '…';
+            document.querySelectorAll('.fade-in-up').forEach(el => el.classList.add('visible'));
             const el = document.querySelector('.report-wrapper') || document.documentElement;
             const scale = Math.min(3, 1170 / el.offsetWidth);
             html2canvas(el, {
