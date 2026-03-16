@@ -91,4 +91,5 @@ body.edit-mode [contenteditable]:focus { outline: 2px solid var(--primary); }
   .kpi-grid, .kpi-card, .callout, .timeline, .timeline-item,
   .table-wrapper, [data-component="chart"], .diagram-wrapper { break-inside: avoid; }
   canvas { max-height: 320px !important; width: 100% !important; }
+  .fade-in-up { opacity: 1 !important; transform: translateY(0) !important; }
 }

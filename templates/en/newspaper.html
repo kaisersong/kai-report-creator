@@ -162,6 +162,7 @@
       [data-component="chart"] { break-inside: avoid; }
       canvas { max-height: 320px !important; width: 100% !important; }
       .diagram-wrapper { break-inside: avoid; }
+      .fade-in-up { opacity: 1 !important; transform: translateY(0) !important; }
     }
   </style>
 </head>
@@ -495,6 +496,7 @@
       /* Desktop: full-page, 2× */
       pngDesktop && pngDesktop.addEventListener('click', () => withLib(() => {
         exportBtn.textContent = '…';
+        document.querySelectorAll('.fade-in-up').forEach(el => el.classList.add('visible'));
         html2canvas(document.documentElement, {
           scale: 2, useCORS: true, allowTaint: true,
           scrollX: 0, scrollY: 0,
@@ -508,6 +510,7 @@
       /* Mobile: report-wrapper only, scaled to 1170px wide (≈ 3× iPhone width) */
       pngMobile && pngMobile.addEventListener('click', () => withLib(() => {
         exportBtn.textContent = '…';
+        document.querySelectorAll('.fade-in-up').forEach(el => el.classList.add('visible'));
         const el = document.querySelector('.report-wrapper') || document.documentElement;
         const scale = Math.min(3, 1170 / el.offsetWidth);
         html2canvas(el, {
