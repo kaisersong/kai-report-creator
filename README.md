@@ -287,6 +287,28 @@ The skill enforces a visual rhythm rule: never place 3+ consecutive sections wit
 
 This is also why the IR's component block syntax (`:::tag ... :::`) was designed to be visually obvious: authors can scan an IR file and immediately see where the data-heavy sections are, without parsing HTML or YAML.
 
+## Use Cases
+
+### Daily work report via OpenClaw → Telegram / Discord
+
+Ask your OpenClaw assistant at the end of the day:
+
+```
+Generate a report of your work today in dark-board style, export it as an IM image, and send it to me via Telegram (or Discord).
+```
+
+OpenClaw will:
+1. Summarize today's completed tasks, key decisions, and next steps
+2. Render them into a `dark-board` HTML report with KPI cards and a timeline
+3. Screenshot the page as an 800 px JPEG (IM long-image format, animations disabled automatically)
+4. Deliver the image directly to your Telegram or Discord channel
+
+The result is a visually rich daily summary readable right inside the chat — no browser required.
+
+> **Why this works:** Every generated report detects headless screenshot environments (`navigator.webdriver`) and immediately disables fade-in animations, so tables, timelines, and KPI grids are fully visible in the captured image.
+
+---
+
 ## Examples
 
 | File | Description |
