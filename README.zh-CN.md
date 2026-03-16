@@ -45,14 +45,22 @@ HTML 文件将生成到当前目录，用任意浏览器打开即可查看。
 
 ## 主题演示
 
-| 主题 | 演示 | 适用场景 |
-|------|------|----------|
-| `corporate-blue` | [打开演示](templates/zh/corporate-blue.html) | 商务报告、高管汇报、内部团队报告 |
-| `minimal` | [打开演示](templates/zh/minimal.html) | 研究报告、学术论文、白皮书 |
-| `dark-tech` | [打开演示](templates/zh/dark-tech.html) | 技术文档、API 参考、工程报告 |
-| `dark-board` | [打开演示](templates/zh/dark-board.html) | 项目看板、系统监控、品牌与用研报告 |
-| `data-story` | [打开演示](templates/zh/data-story.html) | 年度报告、增长复盘、数据叙事 |
-| `newspaper` | [打开演示](templates/zh/newspaper.html) | 行业分析、通讯、编辑内容 |
+点击截图可在浏览器中直接打开演示：
+
+<table>
+<tr>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/corporate-blue.html"><img src="templates/screenshots/corporate-blue.png" width="360" alt="corporate-blue"/><br/><b>corporate-blue</b></a><br/><sub>商务 · 高管汇报</sub></td>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/minimal.html"><img src="templates/screenshots/minimal.png" width="360" alt="minimal"/><br/><b>minimal</b></a><br/><sub>研究 · 学术论文</sub></td>
+</tr>
+<tr>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/dark-tech.html"><img src="templates/screenshots/dark-tech.png" width="360" alt="dark-tech"/><br/><b>dark-tech</b></a><br/><sub>工程 · 运维</sub></td>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/dark-board.html"><img src="templates/screenshots/dark-board.png" width="360" alt="dark-board"/><br/><b>dark-board</b></a><br/><sub>看板 · 架构</sub></td>
+</tr>
+<tr>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/data-story.html"><img src="templates/screenshots/data-story.png" width="360" alt="data-story"/><br/><b>data-story</b></a><br/><sub>年度报告 · 增长叙事</sub></td>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/newspaper.html"><img src="templates/screenshots/newspaper.png" width="360" alt="newspaper"/><br/><b>newspaper</b></a><br/><sub>行业分析 · 通讯</sub></td>
+</tr>
+</table>
 
 预览全部主题：`/report --themes` → 打开 `report-themes-preview.html`
 

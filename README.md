@@ -45,14 +45,22 @@ An HTML file is generated in your current directory. Open it in any browser.
 
 ## Theme Demos
 
-| Theme | Demo | Best For |
-|-------|------|----------|
-| `corporate-blue` | [Open demo](templates/en/corporate-blue.html) | Business reports, executive summaries, internal team reports |
-| `minimal` | [Open demo](templates/en/minimal.html) | Research reports, academic papers, whitepapers |
-| `dark-tech` | [Open demo](templates/en/dark-tech.html) | Technical docs, API references, engineering reports |
-| `dark-board` | [Open demo](templates/en/dark-board.html) | Project boards, system dashboards, brand & UX reports |
-| `data-story` | [Open demo](templates/en/data-story.html) | Annual reports, growth retrospectives, data narratives |
-| `newspaper` | [Open demo](templates/en/newspaper.html) | Industry analysis, newsletters, editorial content |
+Click any screenshot to open the live demo:
+
+<table>
+<tr>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/corporate-blue.html"><img src="templates/screenshots/corporate-blue.png" width="360" alt="corporate-blue"/><br/><b>corporate-blue</b></a><br/><sub>Business · Executive</sub></td>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/minimal.html"><img src="templates/screenshots/minimal.png" width="360" alt="minimal"/><br/><b>minimal</b></a><br/><sub>Research · Academic</sub></td>
+</tr>
+<tr>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/dark-tech.html"><img src="templates/screenshots/dark-tech.png" width="360" alt="dark-tech"/><br/><b>dark-tech</b></a><br/><sub>Engineering · Ops</sub></td>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/dark-board.html"><img src="templates/screenshots/dark-board.png" width="360" alt="dark-board"/><br/><b>dark-board</b></a><br/><sub>Dashboards · Architecture</sub></td>
+</tr>
+<tr>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/data-story.html"><img src="templates/screenshots/data-story.png" width="360" alt="data-story"/><br/><b>data-story</b></a><br/><sub>Annual Reports · Growth</sub></td>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/newspaper.html"><img src="templates/screenshots/newspaper.png" width="360" alt="newspaper"/><br/><b>newspaper</b></a><br/><sub>Editorial · Industry Analysis</sub></td>
+</tr>
+</table>
 
 Preview all themes in one page: `/report --themes` → opens `report-themes-preview.html`
 
