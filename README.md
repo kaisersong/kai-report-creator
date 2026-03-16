@@ -43,6 +43,18 @@ An HTML file is generated in your current directory. Open it in any browser.
 | `/report --output my-report.html --from file.md` | Custom output filename |
 | `/report [content]` | One-step: generate from a short description |
 
+## Export
+
+Every generated report has a built-in **↓ Export** button (bottom-right corner). No extra tools needed.
+
+| Option | How it works |
+|--------|--------------|
+| 🖨 Print / PDF | Opens the browser print dialog. Select **Save as PDF** as the destination. |
+| 🖥 Save PNG (Desktop) | Captures the full page at 2× resolution. |
+| 📱 Save PNG (Mobile) | Captures the report body scaled to 1170 px wide (≈ 3× iPhone width). |
+
+**For clean PDFs, uncheck "Headers and footers" in the print dialog** — otherwise the browser adds the page URL, date, and page numbers as print headers/footers. In Chrome: *Print → More settings → uncheck Headers and footers*.
+
 ## Theme Demos
 
 Click any screenshot to open the live demo:
