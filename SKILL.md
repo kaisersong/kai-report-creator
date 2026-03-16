@@ -177,17 +177,43 @@ For `###` headings: `<h3 id="section-[slug]">[heading text]</h3>`
 ### :::kpi
 
 Each list item format: `- Label: Value TrendSymbol`
-Trend: `↑` = positive (green), `↓` = negative (red), `→` = neutral (gray). If no trend symbol is present, omit the `kpi-trend` div entirely.
+Trend: `↑` = positive (green), `↓` = negative (red), `→` = neutral (gray).
 
 Extract the numeric part of Value into `data-target-value`, set `data-prefix` and `data-suffix`.
 
+**Accent system:** When a KPI grid has 2+ cards, assign `data-accent` cycling `blue → green → purple → orange` (also: `teal`, `red`). Each card gets a distinct top-border color and matching value color — avoids the flat single-color look.
+
+**Trend badge:** Prefer `.kpi-delta` pill over plain `.kpi-trend` for stronger visual emphasis. Use `kpi-delta--up` (green), `kpi-delta--down` (red), `kpi-delta--info` (blue, neutral comparisons).
+
     <div data-component="kpi" class="kpi-grid">
-      <div class="kpi-card fade-in-up">
-        <div class="kpi-label">Total Revenue</div>
-        <div class="kpi-value" data-target-value="2450" data-prefix="$" data-suffix="K">$2,450K</div>
-        <div class="kpi-trend kpi-trend--up">↑12%</div>
+      <div class="kpi-card fade-in-up" data-accent="blue">
+        <div class="kpi-label">MAU</div>
+        <div class="kpi-value" data-target-value="128" data-suffix="K">128K</div>
+        <div class="kpi-delta kpi-delta--up">↑18% MoM</div>
+      </div>
+      <div class="kpi-card fade-in-up" data-accent="green">
+        <div class="kpi-label">Paid Conversion</div>
+        <div class="kpi-value" data-target-value="8.6" data-suffix="%">8.6%</div>
+        <div class="kpi-delta kpi-delta--up">↑1.2 pts</div>
+      </div>
+      <div class="kpi-card fade-in-up" data-accent="purple">
+        <div class="kpi-label">D1 Retention</div>
+        <div class="kpi-value" data-target-value="67" data-suffix="%">67%</div>
+        <div class="kpi-delta kpi-delta--info">vs 55% avg</div>
+      </div>
+      <div class="kpi-card fade-in-up" data-accent="orange">
+        <div class="kpi-label">NPS</div>
+        <div class="kpi-value" data-target-value="72">72</div>
+        <div class="kpi-delta kpi-delta--up">↑8 pts</div>
       </div>
     </div>
+
+**Badges / chips** (`.badge .badge--[color]`): Use inline in prose, table cells, and timeline items to add categorical color. Colors: `blue`, `green`, `purple`, `orange`, `red`, `gray`, `teal`.
+
+    <span class="badge badge--green">Shipped</span>
+    <span class="badge badge--orange">In Progress</span>
+    <span class="badge badge--red">Critical</span>
+    <span class="badge badge--blue">Q4 Priority</span>
 
 ### :::chart
 

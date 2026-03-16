@@ -6,7 +6,7 @@
   --font-sans: 'Georgia', 'Noto Serif SC', serif;
   --font-mono: 'Courier New', monospace; --radius: 4px;
 }
-body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.6; }
+body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.6; font-variant-numeric: lining-nums tabular-nums; }
 h1 { font-size: 2rem; font-weight: 700; color: var(--primary); letter-spacing: -.02em; margin-bottom: 1.5rem; }
 h2 { font-size: 1.35rem; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: .4rem; margin-top: 1.75rem; }
 h3 { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-top: 1.1rem; }

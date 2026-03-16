@@ -42,9 +42,23 @@
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .75rem; margin: 1rem 0; }
     .kpi-card { background: var(--bg); border: 1px solid var(--border); border-top: 3px solid var(--text); border-radius: 0; padding: .85rem .75rem; text-align: center; }
     .kpi-label { font-size: .65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: .35rem; font-family: var(--font-sans); }
-    .kpi-value { font-size: 1.8rem; font-weight: 800; color: var(--primary); line-height: 1.2; font-family: var(--font-serif); }
+    .kpi-value { font-size: 1.8rem; font-weight: 800; color: var(--primary); line-height: 1.2; font-variant-numeric: lining-nums tabular-nums; font-family: var(--font-serif); }
     .kpi-trend { font-size: .8rem; margin-top: .2rem; font-family: var(--font-sans); }
     .kpi-trend--up { color: var(--success); } .kpi-trend--down { color: var(--danger); } .kpi-trend--neutral { color: var(--text-muted); }
+/* KPI accent palette */
+.kpi-card[data-accent="blue"]   { border-top-color: #3B82F6; } .kpi-card[data-accent="blue"]   .kpi-value { color: #2563EB; }
+.kpi-card[data-accent="green"]  { border-top-color: #10B981; } .kpi-card[data-accent="green"]  .kpi-value { color: #059669; }
+.kpi-card[data-accent="purple"] { border-top-color: #8B5CF6; } .kpi-card[data-accent="purple"] .kpi-value { color: #7C3AED; }
+.kpi-card[data-accent="orange"] { border-top-color: #F59E0B; } .kpi-card[data-accent="orange"] .kpi-value { color: #D97706; }
+.kpi-card[data-accent="red"]    { border-top-color: #EF4444; } .kpi-card[data-accent="red"]    .kpi-value { color: #DC2626; }
+.kpi-card[data-accent="teal"]   { border-top-color: #14B8A6; } .kpi-card[data-accent="teal"]   .kpi-value { color: #0F766E; }
+/* KPI delta badge */
+.kpi-delta { display: inline-block; padding: .15rem .48rem; border-radius: 999px; font-size: .74rem; font-weight: 700; margin-top: .28rem; }
+.kpi-delta--up { background: #D1FAE5; color: #065F46; } .kpi-delta--down { background: #FEE2E2; color: #991B1B; } .kpi-delta--info { background: #DBEAFE; color: #1E40AF; }
+/* Badges/chips */
+.badge { display: inline-flex; align-items: center; padding: .18rem .55rem; border-radius: 999px; font-size: .75rem; font-weight: 600; letter-spacing: .01em; white-space: nowrap; }
+.badge--blue { background: #DBEAFE; color: #1E40AF; } .badge--green { background: #D1FAE5; color: #065F46; } .badge--purple { background: #EDE9FE; color: #5B21B6; }
+.badge--orange { background: #FEF3C7; color: #92400E; } .badge--red { background: #FEE2E2; color: #991B1B; } .badge--gray { background: #F3F4F6; color: #374151; } .badge--teal { background: #CCFBF1; color: #115E59; }
 
     /* Tables */
     .table-wrapper { overflow-x: auto; margin: 1.1rem 0; }
