@@ -24,6 +24,14 @@ from pathlib import Path
 from datetime import date
 
 
+# Module-level config — importable by tests
+EXPORT_CONFIGS = {
+    "desktop": {"viewport_w": 1440, "scale": 2.5,  "jpeg": False},
+    "mobile":  {"viewport_w": 750,  "scale": 2,    "jpeg": True,  "target_w": 750},
+    "im":      {"viewport_w": 800,  "scale": 2,    "jpeg": True,  "target_w": 800},
+}
+
+
 def parse_args():
     p = argparse.ArgumentParser(description="Export HTML report to image")
     p.add_argument("html", help="Path to the HTML report file")
@@ -56,13 +64,7 @@ def export_image(html_path: Path, mode: str, output_path: Path | None, width_ove
         output_path = html_path.parent / f"{stem}_{today}{suffix}.{ext}"
     output_path = Path(output_path)
 
-    # Mode config
-    configs = {
-        "desktop": {"viewport_w": 1440, "scale": 2.5,  "jpeg": False},
-        "mobile":  {"viewport_w": 750,  "scale": 2,    "jpeg": True,  "target_w": 750},
-        "im":      {"viewport_w": 800,  "scale": 2,    "jpeg": True,  "target_w": 800},
-    }
-    cfg = configs[mode]
+    cfg = dict(EXPORT_CONFIGS[mode])
     if width_override:
         cfg = {**cfg, "target_w": width_override, "viewport_w": width_override}
 
