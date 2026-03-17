@@ -58,9 +58,9 @@ def export_image(html_path: Path, mode: str, output_path: Path | None, width_ove
 
     # Mode config
     configs = {
-        "desktop": {"viewport_w": 1440, "scale": 1.5,  "jpeg": False},
-        "mobile":  {"viewport_w": 390,  "scale": None,  "jpeg": True,  "target_w": 750},
-        "im":      {"viewport_w": 800,  "scale": None,  "jpeg": True,  "target_w": 800},
+        "desktop": {"viewport_w": 1440, "scale": 2.5,  "jpeg": False},
+        "mobile":  {"viewport_w": 750,  "scale": 2,    "jpeg": True,  "target_w": 750},
+        "im":      {"viewport_w": 800,  "scale": 2,    "jpeg": True,  "target_w": 800},
     }
     cfg = configs[mode]
     if width_override:
@@ -69,9 +69,21 @@ def export_image(html_path: Path, mode: str, output_path: Path | None, width_ove
     print(f"Exporting [{mode}] → {output_path}")
 
     with sync_playwright() as pw:
+        dpr = cfg.get("scale", 2)
         browser = pw.chromium.launch(channel="chrome")
-        page = browser.new_page(viewport={"width": cfg["viewport_w"], "height": 900})
+        context = browser.new_context(
+            viewport={"width": cfg["viewport_w"], "height": 900},
+            device_scale_factor=dpr,
+        )
+        page = context.new_page()
         page.goto(f"file://{html_path}", wait_until="networkidle")
+
+        # Hide UI chrome (TOC button, export button) — not needed in screenshots
+        page.evaluate("""
+            document.querySelectorAll(
+                '.toc-toggle, .export-btn, .export-menu, .edit-toggle, .edit-hotzone'
+            ).forEach(el => el.style.display = 'none');
+        """)
 
         # Force all fade-in-up elements visible
         page.evaluate("""
@@ -92,16 +104,15 @@ def export_image(html_path: Path, mode: str, output_path: Path | None, width_ove
         """)
 
         if mode == "desktop":
-            scale = cfg["scale"]
             page.set_viewport_size({"width": cfg["viewport_w"], "height": full_height})
             screenshot_opts = {
                 "path": str(output_path),
                 "full_page": True,
                 "type": "png",
-                "scale": "device",
+                "scale": "device",  # uses device_scale_factor=2.5 set on context
             }
         else:
-            # For mobile/im: resize viewport to target width, capture full height
+            # For mobile/im: set viewport to target width, then re-measure full height
             target_w = cfg.get("target_w", 800)
             page.set_viewport_size({"width": target_w, "height": full_height})
             full_height = page.evaluate("""
@@ -114,8 +125,9 @@ def export_image(html_path: Path, mode: str, output_path: Path | None, width_ove
                 "full_page": True,
                 "type": "jpeg" if cfg["jpeg"] else "png",
                 "quality": 92 if cfg["jpeg"] else None,
+                "scale": "device",  # uses device_scale_factor=2 set on context
             }
-            if screenshot_opts["quality"] is None:
+            if screenshot_opts.get("quality") is None:
                 del screenshot_opts["quality"]
 
         page.screenshot(**screenshot_opts)

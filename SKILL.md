@@ -679,14 +679,22 @@ When generating the final HTML report, produce a complete self-contained HTML fi
             exportMenu.classList.remove('open');
             exportBtn.style.visibility = 'hidden';
             exportBtn.textContent = '…';
+            // Hide TOC toggle button if sidebar is not open (don't pollute screenshot)
+            const tocSidebar = document.getElementById('toc-sidebar');
+            const tocToggle = document.getElementById('toc-toggle-btn');
+            const tocIsOpen = tocSidebar && tocSidebar.classList.contains('open');
+            if (tocToggle && !tocIsOpen) tocToggle.style.visibility = 'hidden';
             document.querySelectorAll('.fade-in-up').forEach(e => e.classList.add('visible'));
-            loadLib().then(() => html2canvas(el, cfg).then(c => saveBlob(c, fname, jpeg)));
+            loadLib().then(() => html2canvas(el, cfg).then(c => {
+              if (tocToggle && !tocIsOpen) tocToggle.style.visibility = '';
+              saveBlob(c, fname, jpeg);
+            }));
           }
 
           pngDesktop && pngDesktop.addEventListener('click', () => {
             const H = document.documentElement.scrollHeight;
             capture(document.documentElement, {
-              scale: H > 4000 ? 1.5 : 2, useCORS: true, allowTaint: true,
+              scale: H > 4000 ? 2.5 : 3, useCORS: true, allowTaint: true,
               scrollX: 0, scrollY: 0,
               width: document.documentElement.scrollWidth, height: H,
               windowWidth: document.documentElement.scrollWidth, windowHeight: H
@@ -696,7 +704,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
           pngMobile && pngMobile.addEventListener('click', () => {
             const el = document.querySelector('.report-wrapper') || document.documentElement;
             capture(el, {
-              scale: 750 / el.offsetWidth, useCORS: true, allowTaint: true,
+              scale: (750 / el.offsetWidth) * 2, useCORS: true, allowTaint: true,
               scrollX: 0, scrollY: 0, width: el.scrollWidth, height: el.scrollHeight
             }, filename('-mobile', 'jpg'), true);
           });
@@ -704,7 +712,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
           pngIM && pngIM.addEventListener('click', () => {
             const el = document.querySelector('.report-wrapper') || document.documentElement;
             capture(el, {
-              scale: 800 / el.offsetWidth, useCORS: true, allowTaint: true,
+              scale: (800 / el.offsetWidth) * 2, useCORS: true, allowTaint: true,
               scrollX: 0, scrollY: 0, width: el.scrollWidth, height: el.scrollHeight
             }, filename('-im', 'jpg'), true);
           });
