@@ -2,6 +2,32 @@
 
 When rendering IR to HTML, apply these rules per block type. Each component must be wrapped with `data-component` attribute for AI readability.
 
+## CRITICAL: IR Directive Parsing — Never Let `:::` Leak Into Output
+
+**Before emitting any HTML, do a mental pass to ensure zero `:::` sequences appear in the final output.** Any `:::` in the output means an IR directive was not converted — this is a bug.
+
+### Block Detection Rules
+
+A `:::` directive block has this structure:
+
+    :::tag [param=value ...]
+    [content — can be multiple lines, YAML, or a Markdown list]
+    :::
+
+**The closing `:::` is ALWAYS on its own line.** Parse the IR line by line:
+1. When you see a line starting with `:::tag`, begin collecting the block body.
+2. Collect all lines until you hit a line that is exactly `:::` (the closing marker).
+3. Convert the entire block (opening tag + body + closing `:::`) to HTML per the rules below.
+4. Never output the `:::tag`, params, closing `:::`, or any part of the directive syntax as text.
+
+**Single-line `:::` format also exists** (generated when the block body is short):
+
+    :::list style=ordered 1. Item A 2. Item B :::
+
+When the opening and closing `:::` appear on the same line, treat everything between the tag/params and the trailing `:::` as the block body, split on the item separators (numbered or bullet items).
+
+**NEVER pass `:::` lines through to HTML as `<p>` tags or any other text node.** If in doubt: parse it as a block, not as prose.
+
 ## Plain Markdown (default)
 
 Convert using standard Markdown rules. Wrap each `##` section in:
@@ -10,6 +36,8 @@ Convert using standard Markdown rules. Wrap each `##` section in:
       <h2 id="section-[slug]">[heading text]</h2>
       [section content]
     </section>
+
+**`data-summary` must be plain text only** — write a short human-readable summary of the section in natural language. Never copy raw IR content (lists, prose, component bodies) into it. Especially never include `:::` directive syntax in `data-summary`.
 
 For `###` headings: `<h3 id="section-[slug]">[heading text]</h3>`
 
@@ -100,6 +128,10 @@ Body is a Markdown table. Convert to HTML. If `caption` param is provided, emit 
 
 ## :::list
 
+Body is a Markdown list (ordered `1. Item` or unordered `- Item`). `style=ordered` → `<ol>`, default → `<ul>`.
+
+**Single-line format:** `:::list style=ordered 1. A 2. B :::` — split on `N. ` or `- ` separators to recover individual items; render the same HTML below.
+
     <div data-component="list" class="report-list">
       <ul class="styled-list">  <!-- or <ol> if style=ordered -->
         <li>Item</li>
@@ -110,6 +142,8 @@ Body is a Markdown table. Convert to HTML. If `caption` param is provided, emit 
     </div>
 
 If an item has indented sub-items (2-space or 4-space indent), render them as nested `<ul>` or `<ol>` inside the parent `<li>`.
+
+**Do NOT output `:::list`, params, or `:::` closing marker as text — they are never user-visible content.**
 
 ## :::image
 

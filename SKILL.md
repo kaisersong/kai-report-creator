@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --themes (preview styles), --from <file>, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.2.2
+version: 1.2.3
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -172,6 +172,8 @@ When rendering IR to HTML, apply component-specific rendering rules. Each compon
 
 **Detailed rendering rules are in `references/rendering-rules.md`** — load when generating HTML.
 
+**CRITICAL: The final HTML must contain zero `:::` sequences.** Any `:::tag`, param line, or closing `:::` appearing in the output means a directive was not converted — find it and fix it before writing the file.
+
 ### Component Overview
 
 | Tag | Purpose | Required params | Optional params |
@@ -215,8 +217,9 @@ When the user runs `/report --generate [file]`:
 4. Render all components according to Component Rendering Rules.
 5. Apply chart library selection rule.
 6. Build the HTML shell with TOC, AI summary, animations.
-7. Write to `[output_filename].html` using the Write tool.
-8. Tell the user the file path and a 1-sentence summary of the report.
+7. **Pre-write validation:** Before writing, mentally scan the assembled HTML for any occurrence of `:::`. If found, locate the unconverted directive and fix it by converting it to the correct HTML component. The final HTML MUST NOT contain any `:::` sequences.
+8. Write to `[output_filename].html` using the Write tool.
+9. Tell the user the file path and a 1-sentence summary of the report.
 
 **CRITICAL: Follow `references/html-shell-template.md` EXACTLY**
 
