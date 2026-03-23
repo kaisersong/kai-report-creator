@@ -85,9 +85,18 @@
 [data-component="chart"] { margin: 1.1rem 0; }
 
 /* Animations */
-.fade-in-up { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
+.fade-in-up { opacity: 0; transform: translateY(18px); transition: opacity .5s cubic-bezier(0.22,1,0.36,1), transform .5s cubic-bezier(0.22,1,0.36,1); }
 .fade-in-up.visible { opacity: 1; transform: translateY(0); }
 body.no-animations .fade-in-up { opacity: 1; transform: none; transition: none; }
+
+/* KPI card stagger — JS adds .stagger-ready to grid, then .visible to each card */
+.kpi-grid.stagger-ready .kpi-card { opacity: 0; transform: translateY(20px) scale(0.95); transition: opacity .45s cubic-bezier(0.34,1.56,0.64,1), transform .45s cubic-bezier(0.34,1.56,0.64,1); }
+.kpi-grid.stagger-ready .kpi-card.visible { opacity: 1; transform: none; }
+/* Timeline stagger — same pattern */
+.timeline.stagger-ready .timeline-item { opacity: 0; transform: translateX(-12px); transition: opacity .4s cubic-bezier(0.22,1,0.36,1), transform .4s cubic-bezier(0.22,1,0.36,1); }
+.timeline.stagger-ready .timeline-item.visible { opacity: 1; transform: none; }
+body.no-animations .kpi-grid .kpi-card,
+body.no-animations .timeline .timeline-item { opacity: 1 !important; transform: none !important; transition: none !important; }
 
 /* Edit mode */
 .edit-hotzone { position: fixed; bottom: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
@@ -116,4 +125,5 @@ body.edit-mode [contenteditable]:focus { outline: 2px solid var(--primary); }
   canvas { max-height: 200px !important; width: 100% !important; }
   img { max-height: 260px !important; width: auto !important; object-fit: contain; }
   .fade-in-up { opacity: 1 !important; transform: translateY(0) !important; }
+  .kpi-grid .kpi-card, .timeline .timeline-item { opacity: 1 !important; transform: none !important; }
 }

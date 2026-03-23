@@ -137,6 +137,39 @@ class TestAnimationsVisible:
         )
 
 
+# ── Background color passed to html2canvas ────────────────────────────────────
+
+class TestBackgroundColor:
+    """
+    Regression: mobile/IM exports capture .report-wrapper, not body.
+    html2canvas defaults to white when no backgroundColor is given, producing
+    a white background on dark-theme reports.
+    capture() must pass backgroundColor: getComputedStyle(body).backgroundColor.
+    """
+
+    def test_mobile_capture_passes_background_color(self, report_page):
+        """html2canvas must receive a non-null backgroundColor for mobile export."""
+        reset_log(report_page)
+        trigger_export(report_page, "export-png-mobile")
+        entry = last_capture(report_page)
+
+        assert entry["backgroundColor"] is not None, (
+            "backgroundColor was not passed to html2canvas for mobile export — "
+            "dark-theme reports will render with a white background."
+        )
+
+    def test_im_capture_passes_background_color(self, report_page):
+        """html2canvas must receive a non-null backgroundColor for IM export."""
+        reset_log(report_page)
+        trigger_export(report_page, "export-im-share")
+        entry = last_capture(report_page)
+
+        assert entry["backgroundColor"] is not None, (
+            "backgroundColor was not passed to html2canvas for IM export — "
+            "dark-theme reports will render with a white background."
+        )
+
+
 # ── Resolution regression ─────────────────────────────────────────────────────
 
 class TestExportResolution:

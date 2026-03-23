@@ -125,8 +125,9 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       </div>
 
       <script>
-        // Scroll-triggered fade-in animations
+        // Scroll-triggered animations
         if (!document.body.classList.contains('no-animations')) {
+          // Generic fade-in-up
           const fadeObserver = new IntersectionObserver(
             entries => entries.forEach(e => {
               if (e.isIntersecting) { e.target.classList.add('visible'); fadeObserver.unobserve(e.target); }
@@ -135,7 +136,23 @@ When generating the final HTML report, produce a complete self-contained HTML fi
           );
           document.querySelectorAll('.fade-in-up').forEach(el => fadeObserver.observe(el));
 
-          // KPI counter animation
+          // Stagger helper: observe parent, animate children one by one
+          function staggerGroup(parentSel, childSel, delay) {
+            document.querySelectorAll(parentSel).forEach(parent => {
+              new IntersectionObserver((entries, obs) => {
+                if (!entries[0].isIntersecting) return;
+                obs.disconnect();
+                parent.classList.add('stagger-ready');
+                parent.querySelectorAll(childSel).forEach((el, i) =>
+                  setTimeout(() => el.classList.add('visible'), i * delay)
+                );
+              }, { threshold: 0.1 }).observe(parent);
+            });
+          }
+          staggerGroup('.kpi-grid', '.kpi-card', 100);   // KPI cards: spring bounce stagger
+          staggerGroup('.timeline', '.timeline-item', 130); // Timeline items: slide-in stagger
+
+          // KPI counter animation (CountUp)
           const kpiObserver = new IntersectionObserver(entries => {
             entries.forEach(e => {
               if (!e.isIntersecting) return;
