@@ -4,6 +4,8 @@ English | [简体中文](README.zh-CN.md)
 
 > Generate beautiful, single-file HTML reports — zero dependencies, mobile responsive, AI-readable.
 
+**v1.3.0** — GSAP-inspired zero-dependency animation upgrade: KPI cards now spring-bounce in with stagger (cubic-bezier back.out approximation), timeline items slide in one by one, and all easing curves upgraded to power3.out. No new libraries — IntersectionObserver + CSS transitions only.
+
 ## What it does
 
 `/report` is a Claude Code skill that turns plain text or a structured outline into a polished, standalone HTML report. Drop it in `.claude/skills/` and it's instantly available in any project.

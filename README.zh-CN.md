@@ -4,6 +4,8 @@
 
 > 生成美观的单文件 HTML 报告 — 零依赖，移动端自适应，AI 可读。
 
+**v1.3.0** — 借鉴 GSAP 设计思路的零依赖动画升级：KPI 卡片弹入 stagger（cubic-bezier 近似 back.out 弹性曲线）、时间线逐条滑入，所有缓动曲线升级为 power3.out 近似。无新依赖——纯 IntersectionObserver + CSS transition 实现。
+
 ## 功能介绍
 
 `/report` 是一个 Claude Code 技能，可将文档或结构化大纲转换为精美的独立 HTML 报告。将其放入 `.claude/skills/` 目录，即可在任意项目中立即使用。
