@@ -426,10 +426,11 @@ When generating the final HTML report, produce a complete self-contained HTML fi
             // (html2canvas cannot capture position:fixed overlays)
             if (document.body.classList.contains('card-mode')) {
               const card = document.getElementById('sc-card');
-              loadLib().then(() => html2canvas(card, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null }).then(c => {
+              const cardFname = filename('-摘要卡', jpeg ? 'jpg' : 'png');
+              loadLib().then(() => html2canvas(card, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' }).then(c => {
                 if (cardBtn) cardBtn.style.visibility = '';
                 restore();
-                saveBlob(c, fname, jpeg);
+                saveBlob(c, cardFname, jpeg);
               }));
               return;
             }

@@ -8,9 +8,9 @@
 
 /* KPI */
 .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .75rem; margin: 1.1rem 0; }
-.kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .9rem; text-align: center; border-top: 3px solid var(--primary); }
+.kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .9rem; text-align: center; border-top: 3px solid var(--primary); display: flex; flex-direction: column; align-items: center; }
 .kpi-label { font-size: .78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .4rem; }
-.kpi-value { font-size: 2rem; font-weight: 800; color: var(--primary); line-height: 1.2; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; font-variant-numeric: lining-nums tabular-nums; }
+.kpi-value { font-size: 2rem; font-weight: 800; color: var(--primary); line-height: 1.2; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; font-variant-numeric: lining-nums tabular-nums; flex: 1; display: flex; align-items: center; justify-content: center; }
 .kpi-trend { font-size: .85rem; margin-top: .3rem; }
 .kpi-trend--up { color: var(--success); } .kpi-trend--down { color: var(--danger); } .kpi-trend--neutral { color: var(--text-muted); }
 /* KPI accent palette — assign data-accent="blue|green|purple|orange|red|teal" to each card for multi-color grids */
@@ -49,7 +49,7 @@
 .callout--warning { background: #FFFBEB; border-color: #F59E0B; }
 .callout--danger { background: #FEF2F2; border-color: #EF4444; }
 .callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
-.callout-body { line-height: 1.6; font-size: .93rem; }
+.callout-body { flex: 1; min-width: 0; line-height: 1.6; font-size: .93rem; }
 
 /* Timeline */
 .timeline { position: relative; padding-left: 2rem; margin: 1.1rem 0; }
