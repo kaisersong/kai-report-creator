@@ -4,6 +4,8 @@
 
 > 生成美观的单文件 HTML 报告 — 零依赖，移动端自适应，AI 可读。
 
+**v1.4.0** — 摘要卡片：每份报告标题旁新增 `⊞ 摘要卡` 按钮，点击弹出编辑风格摘要卡，内容来自内嵌 `#report-summary` JSON（标题、摘要、KPI、章节标签）。支持 ✕ 按钮、Escape 键或点击遮罩关闭。零额外依赖。
+
 **v1.3.0** — 借鉴 GSAP 设计思路的零依赖动画升级：KPI 卡片弹入 stagger（cubic-bezier 近似 back.out 弹性曲线）、时间线逐条滑入，所有缓动曲线升级为 power3.out 近似。无新依赖——纯 IntersectionObserver + CSS transition 实现。
 
 ## 功能介绍

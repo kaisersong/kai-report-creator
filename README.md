@@ -4,6 +4,8 @@ English | [简体中文](README.zh-CN.md)
 
 > Generate beautiful, single-file HTML reports — zero dependencies, mobile responsive, AI-readable.
 
+**v1.4.0** — Summary card overlay: every report now has a `⊞ Summary` button next to the title. Click it to open an editorial-style card drawn from the embedded `#report-summary` JSON — title, abstract, KPIs, section chips. Close with ✕, Escape, or click the backdrop. Zero extra dependencies.
+
 **v1.3.0** — GSAP-inspired zero-dependency animation upgrade: KPI cards now spring-bounce in with stagger (cubic-bezier back.out approximation), timeline items slide in one by one, and all easing curves upgraded to power3.out. No new libraries — IntersectionObserver + CSS transitions only.
 
 ## What it does
