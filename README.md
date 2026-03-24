@@ -4,6 +4,8 @@ English | [简体中文](README.zh-CN.md)
 
 > Generate beautiful, single-file HTML reports — zero dependencies, mobile responsive, AI-readable.
 
+**v1.5.0** — Design Quality Baseline: new `references/design-quality.md` encodes anti-slop rules across four disciplines — 90/8/2 color law (primary color capped to 2% bullet-point role), KPI grid column rules (4 KPIs → 2×2 not 3-column, hero metric gets `2fr`), content-tone color calibration (contemplative/brown, technical/navy, business/teal), and a `highlight-sentence` component for surfacing key insight sentences. The `--plan` mode now suggests tone-matched `primary_color` overrides in frontmatter. Pre-output self-check added: *"If you told someone 'an AI wrote this', would they immediately believe it?"*
+
 **v1.4.1** — Summary card redesign: editorial two-column layout — large uppercase title on the left, compact KPI rows + per-section summaries on the right. Removed redundant labels and footer clutter. Fixed export-while-card-open capturing blank images (now captures `.sc-card` directly).
 
 **v1.4.0** — Summary card overlay: every report now has a `⊞ Summary` button next to the title. Click it to open an editorial-style card drawn from the embedded `#report-summary` JSON — title, abstract, KPIs, section chips. Close with ✕, Escape, or click the backdrop. Zero extra dependencies.
@@ -292,6 +294,29 @@ Reports that work well for humans follow a rhythm: **prose sets context, compone
 The skill enforces a visual rhythm rule: never place 3+ consecutive sections with only prose and no components. Every 4–5 sections must include a "visual anchor" — a KPI grid, chart, or diagram. This isn't aesthetic preference; it's cognitive pacing. Dense prose fatigues readers. Data without context loses them. The alternation creates flow.
 
 This is also why the IR's component block syntax (`:::tag ... :::`) was designed to be visually obvious: authors can scan an IR file and immediately see where the data-heavy sections are, without parsing HTML or YAML.
+
+### 5. Design Quality Baseline: Against AI Slop
+
+A generated report's greatest enemy is looking instantly AI-made — uniform border radii everywhere, primary color flooding six element types simultaneously, three equal-column KPI grids regardless of count, section headings that sound like templates ("Overview", "Key Findings", "Next Steps").
+
+v1.5.0 introduces `references/design-quality.md`, a shared quality baseline that the AI loads alongside rendering rules during `--generate`. It encodes four disciplines:
+
+**The 90/8/2 Color Law.** Every report allocates color in three tiers: 90% neutral surface (background, body text), 8% structural accent (one emphasis block, borders), 2% bullet point (at most 1–2 precise high-contrast hits). When `--primary` floods headings, KPI values, chart bars, callout borders, TOC links, and badges all at once — it stops being a signal and becomes noise.
+
+**Typography Tension: 10:1 Scale Ratio.** The largest element on a page should be at least 10× the smallest readable element. A report title should feel like an anchor, not a label — minimum 2.8rem, ideally 3.2–4rem with tight leading. When every element lives in the 15–22px range, the page has no hierarchy. It looks like a spreadsheet export.
+
+**KPI Grid Column Rules.** The default is not always 3 columns. 4 KPIs belong in a 2×2 grid. A hero metric deserves `grid-template-columns: 2fr 1fr 1fr`. 7+ KPIs need visual group dividers. Rigid 3-column grids for any count are a template smell — they signal the AI wasn't paying attention to the data.
+
+**Content-Tone Color Calibration.** A philosophical research report and a quarterly business dashboard have different emotional registers. The `--plan` mode now suggests tone-matched `primary_color` overrides in frontmatter:
+
+| Content tone | `primary_color` | Feel |
+|---|---|---|
+| Contemplative / Research | `#7C6853` warm brown | Grounded, editorial |
+| Technical / Engineering | `#3D5A80` navy | Precise, authoritative |
+| Business / Data | `#0F7B6C` deep teal | Confident, forward |
+| Narrative / Annual | `#B45309` amber | Warm, momentum |
+
+The pre-output self-check in `design-quality.md` ends with a final gate: *"If you told someone 'an AI wrote this', would they immediately believe it? If yes — find the most generic-looking part and redesign it."*
 
 ## Use Cases
 

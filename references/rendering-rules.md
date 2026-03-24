@@ -52,6 +52,14 @@ Extract the numeric part of Value into `data-target-value`, set `data-prefix` an
 
 **Trend badge:** Prefer `.kpi-delta` pill over plain `.kpi-trend` for stronger visual emphasis. Use `kpi-delta--up` (green), `kpi-delta--down` (red), `kpi-delta--info` (blue, neutral comparisons).
 
+**Column count rule (from design-quality.md):** Do NOT default all grids to 3 columns. Match to KPI count:
+- 1–2 KPIs → `grid-template-columns: repeat(2, 1fr)`
+- 3 KPIs → `grid-template-columns: repeat(3, 1fr)`
+- 4 KPIs → `grid-template-columns: repeat(2, 1fr)` (2×2 grid)
+- 5–6 KPIs → `grid-template-columns: repeat(3, 1fr)`
+- 7+ KPIs → `grid-template-columns: repeat(3, 1fr)` with larger `gap` and visual group dividers
+- When one KPI is the hero metric, consider `grid-template-columns: 2fr 1fr 1fr` for emphasis
+
     <div data-component="kpi" class="kpi-grid">
       <div class="kpi-card fade-in-up" data-accent="blue">
         <div class="kpi-label">MAU</div>

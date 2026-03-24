@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --themes (preview styles), --from <file>, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.4.1
+version: 1.5.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -145,6 +145,11 @@ When the user runs `/report --plan "topic"`:
    - A mix of component types (kpi, chart, table, timeline, callout, etc.)
    - Placeholder values for data: use `[数据待填写]` (zh) or `[INSERT VALUE]` (en) — **never fabricate numbers**
    - Comments for fields the user should customize
+   - **Content-tone color hint:** Based on topic keywords, add a `theme_overrides` block in the frontmatter with a commented `primary_color` suggestion matching the content tone (see `references/design-quality.md` § Content-Tone Color Calibration). Example for a research report:
+     ```yaml
+     theme_overrides:
+       primary_color: "#7C6853"  # 思辨/研究气质 — 温暖棕色 (change to suit your brand)
+     ```
 3. **Apply visual rhythm rules** when laying out sections:
    - Never place 3 or more consecutive sections containing only plain Markdown prose (no components)
    - Ideal section rhythm: `prose → kpi → chart/table → callout/timeline → prose → ...`
@@ -171,6 +176,8 @@ When the user runs `/report --themes`:
 When rendering IR to HTML, apply component-specific rendering rules. Each component must be wrapped with `data-component` attribute for AI readability.
 
 **Detailed rendering rules are in `references/rendering-rules.md`** — load when generating HTML.
+
+**Design quality rules are in `references/design-quality.md`** — load alongside rendering-rules.md. Apply the 90/8/2 color law, KPI column rules, anti-slop patterns, and run the pre-output self-check before writing.
 
 **CRITICAL: The final HTML must contain zero `:::` sequences.** Any `:::tag`, param line, or closing `:::` appearing in the output means a directive was not converted — find it and fix it before writing the file.
 
