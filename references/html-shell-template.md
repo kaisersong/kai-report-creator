@@ -60,14 +60,14 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         body.no-toc .toc-sidebar, body.no-toc .toc-toggle { display: none; }
         body.no-toc .main-with-toc { margin-left: 0; }
 
-        /* Summary card button — sits to the right of h1 */
-        .title-row { display: flex; align-items: flex-start; gap: 1rem; }
+        /* Summary card button — bottom-aligned with h1 */
+        .title-row { display: flex; align-items: flex-end; gap: 1rem; }
         .title-row h1 { flex: 1; }
         .card-mode-btn {
-          flex-shrink: 0; margin-top: .6rem;
-          background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
-          padding: .32rem .7rem; font-size: .78rem; font-weight: 600; letter-spacing: .01em;
-          color: var(--text-muted); cursor: pointer; transition: all .2s;
+          flex-shrink: 0; margin-bottom: .6rem;
+          background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+          padding: .28rem .65rem; font-size: .76rem; font-weight: 600;
+          color: var(--text-muted); cursor: pointer; transition: all .15s;
           font-family: var(--font-sans, system-ui); white-space: nowrap;
         }
         .card-mode-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
@@ -75,50 +75,75 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         /* Summary card overlay */
         .sc-overlay {
           display: none; position: fixed; inset: 0; z-index: 500;
-          background: rgba(0,0,0,.5); backdrop-filter: blur(6px);
+          background: rgba(0,0,0,.52); backdrop-filter: blur(6px);
           align-items: center; justify-content: center; padding: 2rem;
         }
         body.card-mode .sc-overlay { display: flex; }
+        body.card-mode { overflow: hidden; height: 100vh; }
+        html:has(body.card-mode) { overflow: hidden; height: 100vh; }
         body.card-mode .main-with-toc,
         body.card-mode .toc-toggle,
         body.card-mode .toc-sidebar { visibility: hidden; }
         body.card-mode .sc-overlay { visibility: visible; }
 
-        /* The card itself */
+        /* Card — editorial two-column, high density */
         .sc-card {
-          position: relative; width: 420px; max-width: 100%;
-          background: #f5f3ed; border-radius: 14px; overflow: hidden;
-          box-shadow: 0 32px 96px rgba(0,0,0,.4);
+          position: relative; display: flex; width: min(900px, 92vw);
+          background: #fff; border: 1px solid rgba(0,0,0,.12);
+          border-radius: 8px; overflow: hidden;
+          box-shadow: 0 24px 72px rgba(0,0,0,.3);
         }
-        /* Paper noise texture */
-        .sc-card::before {
-          content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .04;
-          background-image:
-            radial-gradient(circle at 20% 20%, rgba(0,0,0,.8) .5px, transparent .8px),
-            radial-gradient(circle at 80% 40%, rgba(0,0,0,.7) .4px, transparent .7px);
-          background-size: 8px 8px, 11px 11px;
+        /* Left panel */
+        .sc-left {
+          flex: 0 0 44%; display: flex; flex-direction: column;
+          padding: 1.8rem 2rem 1.6rem;
+          background: var(--primary); color: #fff;
         }
-        .sc-inner { padding: 2.2rem 2rem; display: flex; flex-direction: column; gap: 1rem; }
-        .sc-meta { font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #888; }
-        .sc-title { font-size: 1.85rem; font-weight: 800; color: #111; line-height: 1.1; letter-spacing: -.02em; }
-        .sc-bar { width: 48px; height: 4px; background: var(--primary, #1A56DB); border-radius: 2px; }
-        .sc-abstract { font-size: .88rem; line-height: 1.65; color: #444; }
-        .sc-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(88px,1fr)); gap: .5rem; margin-top: .2rem; }
-        .sc-kpi { background: rgba(0,0,0,.05); border-radius: 7px; padding: .55rem .7rem; }
-        .sc-kpi-v { font-size: 1.35rem; font-weight: 800; color: #111; line-height: 1.1; }
-        .sc-kpi-l { font-size: .65rem; color: #777; text-transform: uppercase; letter-spacing: .06em; margin-top: .18rem; }
-        .sc-kpi-t { font-size: .7rem; color: #10B981; margin-top: .1rem; }
-        .sc-sections { display: flex; flex-wrap: wrap; gap: .35rem; }
-        .sc-chip { font-size: .68rem; background: rgba(0,0,0,.07); border-radius: 99px; padding: .18rem .55rem; color: #555; }
-        .sc-footer { font-size: .68rem; color: #aaa; text-align: center; padding: .8rem 2rem; border-top: 1px solid rgba(0,0,0,.07); }
+        .sc-label {
+          font-size: .55rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+          opacity: .5; margin-bottom: .55rem; display: flex; align-items: center; gap: .45rem;
+        }
+        .sc-label::before { content: ''; display: inline-block; width: 20px; height: 1px; background: currentColor; }
+        .sc-title {
+          font-size: 3.6rem; font-weight: 900; line-height: .96; letter-spacing: -.04em;
+          text-transform: uppercase; margin-bottom: .8rem; word-break: break-word;
+        }
+        .sc-abstract { font-size: .78rem; line-height: 1.6; opacity: .8; flex: 1; }
+        .sc-bottom { margin-top: 1rem; display: flex; flex-direction: column; gap: .3rem; }
+        .sc-byline { font-size: .6rem; opacity: .45; letter-spacing: .04em; }
+        .sc-tags { display: flex; flex-wrap: wrap; gap: .22rem; }
+        .sc-tag {
+          font-size: .56rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+          border: 1px solid rgba(255,255,255,.35); border-radius: 2px;
+          padding: .13rem .48rem; color: rgba(255,255,255,.8);
+        }
+        /* Right panel */
+        .sc-right {
+          flex: 1; display: flex; flex-direction: column;
+          padding: 1.8rem 1.8rem 1.8rem;
+          border-left: 1px solid var(--border);
+        }
+        /* KPI rows — compact 2-col, no card boxes */
+        .sc-kpi-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 0 .6rem; margin-bottom: .5rem; }
+        .sc-kpi-row { padding: .32rem 0; border-bottom: 1px solid var(--border); }
+        .sc-kpi-row-l { font-size: .56rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+        .sc-kpi-row-v { font-size: 1.15rem; font-weight: 800; color: var(--primary); line-height: 1.15; }
+        .sc-kpi-row-t { font-size: .6rem; color: var(--success, #057A55); font-weight: 600; }
+        /* Section summaries — divider rows */
+        .sc-summaries { flex: 1; display: flex; flex-direction: column; }
+        .sc-sum-item { padding: .35rem 0; border-bottom: 1px solid var(--border); }
+        .sc-sum-item:last-child { border-bottom: none; }
+        .sc-sum-name { font-size: .56rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: .08em; }
+        .sc-sum-text { font-size: .74rem; color: var(--text); line-height: 1.45; margin-top: .06rem; opacity: .72; }
+        /* Close button */
         .sc-close {
-          position: absolute; top: .85rem; right: .85rem;
-          background: rgba(0,0,0,.09); border: none; border-radius: 50%;
-          width: 26px; height: 26px; cursor: pointer; color: #666;
-          display: flex; align-items: center; justify-content: center; font-size: .85rem;
-          transition: background .2s;
+          position: absolute; top: .8rem; right: .8rem; z-index: 1;
+          background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 3px;
+          width: 24px; height: 24px; cursor: pointer; color: #fff;
+          display: flex; align-items: center; justify-content: center; font-size: .75rem;
+          transition: background .15s;
         }
-        .sc-close:hover { background: rgba(0,0,0,.18); }
+        .sc-close:hover { background: rgba(255,255,255,.28); }
         @media print { .sc-overlay, .card-mode-btn { display: none !important; } }
       </style>
     </head>
@@ -177,12 +202,11 @@ When generating the final HTML report, produce a complete self-contained HTML fi
           </div>
           [if author or date: <p class="report-meta">[author] · [date]</p>]
 
-          <!-- Summary card overlay (always present) — populated from #report-summary JSON -->
+          <!-- Summary card overlay (always present) — left+right panels injected by buildCard() -->
           <div class="sc-overlay" id="sc-overlay">
             <div class="sc-card" id="sc-card">
               <button class="sc-close" id="sc-close" aria-label="Close">✕</button>
-              <div class="sc-inner" id="sc-inner"><!-- filled by JS --></div>
-              <div class="sc-footer" id="sc-footer"></div>
+              <!-- .sc-left and .sc-right injected by JS -->
             </div>
           </div>
 
@@ -396,7 +420,19 @@ When generating the final HTML report, produce a complete self-contained HTML fi
             exportMenu.classList.remove('open');
             exportBtn.style.visibility = 'hidden';
             exportBtn.textContent = '…';
-            // Hide TOC toggle button if sidebar is not open (don't pollute screenshot)
+            const cardBtn = document.getElementById('card-mode-btn');
+            if (cardBtn) cardBtn.style.visibility = 'hidden';
+            // When summary card is open, capture .sc-card directly
+            // (html2canvas cannot capture position:fixed overlays)
+            if (document.body.classList.contains('card-mode')) {
+              const card = document.getElementById('sc-card');
+              loadLib().then(() => html2canvas(card, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null }).then(c => {
+                if (cardBtn) cardBtn.style.visibility = '';
+                restore();
+                saveBlob(c, fname, jpeg);
+              }));
+              return;
+            }
             const tocSidebar = document.getElementById('toc-sidebar');
             const tocToggle = document.getElementById('toc-toggle-btn');
             const tocIsOpen = tocSidebar && tocSidebar.classList.contains('open');
@@ -404,6 +440,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
             document.querySelectorAll('.fade-in-up').forEach(e => e.classList.add('visible'));
             loadLib().then(() => html2canvas(el, cfg).then(c => {
               if (tocToggle && !tocIsOpen) tocToggle.style.visibility = '';
+              if (cardBtn) cardBtn.style.visibility = '';
               saveBlob(c, fname, jpeg);
             }));
           }
@@ -441,60 +478,76 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       </script>
 
       <script>
-        // Summary card mode — reads #report-summary JSON, renders inline card, toggles body.card-mode
+        // Summary card — editorial two-column layout, built from #report-summary JSON + DOM data-summary
         (function() {
-          const btn     = document.getElementById('card-mode-btn');
-          const overlay = document.getElementById('sc-overlay');
-          const inner   = document.getElementById('sc-inner');
-          const footer  = document.getElementById('sc-footer');
-          const closeBtn= document.getElementById('sc-close');
-          if (!btn || !overlay || !inner) return;
+          const btn      = document.getElementById('card-mode-btn');
+          const overlay  = document.getElementById('sc-overlay');
+          const closeBtn = document.getElementById('sc-close');
+          if (!btn || !overlay) return;
 
           function buildCard() {
             try {
               const d = JSON.parse(document.getElementById('report-summary').textContent);
-
               const metaParts = [d.author, d.date].filter(Boolean);
-              const kpisHtml = (d.kpis || []).slice(0, 6).map(k => `
-                <div class="sc-kpi">
-                  <div class="sc-kpi-v">${k.value || ''}</div>
-                  <div class="sc-kpi-l">${k.label || ''}</div>
-                  ${k.trend ? `<div class="sc-kpi-t">${k.trend}</div>` : ''}
+
+              // Left panel: large uppercase title + abstract + rectangular tags at bottom
+              const tagsHtml = (d.sections || []).map(s => `<span class="sc-tag">${s}</span>`).join('');
+              const leftHtml = `
+                <div class="sc-left">
+                  <div class="sc-label">REPORT</div>
+                  <div class="sc-title">${d.title || ''}</div>
+                  ${d.abstract ? `<div class="sc-abstract">${d.abstract}</div>` : ''}
+                  <div class="sc-bottom">
+                    ${metaParts.length ? `<div class="sc-byline">${metaParts.join(' · ')}</div>` : ''}
+                    ${tagsHtml ? `<div class="sc-tags">${tagsHtml}</div>` : ''}
+                  </div>
+                </div>`;
+
+              // Right panel: compact KPI rows + section summaries from data-summary attributes
+              const kpiRowsHtml = (d.kpis || []).slice(0, 6).map(k => `
+                <div class="sc-kpi-row">
+                  <div class="sc-kpi-row-l">${k.label || ''}</div>
+                  <div class="sc-kpi-row-v">${k.value || ''}${k.trend ? ` <span class="sc-kpi-row-t">${k.trend}</span>` : ''}</div>
                 </div>`).join('');
-              const chipsHtml = (d.sections || []).map(s =>
-                `<span class="sc-chip">${s}</span>`).join('');
+              const sectionSummaries = Array.from(
+                document.querySelectorAll('section[data-section]')
+              ).map(s => ({ name: s.dataset.section || '', text: s.dataset.summary || '' }))
+               .filter(s => s.name);
+              const summariesHtml = sectionSummaries.map(s => `
+                <div class="sc-sum-item">
+                  <div class="sc-sum-name">${s.name}</div>
+                  ${s.text ? `<div class="sc-sum-text">${s.text}</div>` : ''}
+                </div>`).join('');
+              const rightHtml = `
+                <div class="sc-right">
+                  ${kpiRowsHtml ? `<div class="sc-kpi-rows">${kpiRowsHtml}</div>` : ''}
+                  ${summariesHtml ? `<div class="sc-summaries" style="margin-top:.5rem">${summariesHtml}</div>` : ''}
+                </div>`;
 
-              inner.innerHTML = [
-                metaParts.length ? `<div class="sc-meta">${metaParts.join(' · ')}</div>` : '',
-                `<div class="sc-title">${d.title || ''}</div>`,
-                `<div class="sc-bar"></div>`,
-                d.abstract  ? `<div class="sc-abstract">${d.abstract}</div>` : '',
-                kpisHtml    ? `<div class="sc-kpis">${kpisHtml}</div>` : '',
-                chipsHtml   ? `<div class="sc-sections">${chipsHtml}</div>` : '',
-              ].filter(Boolean).join('');
-
-              if (footer) footer.textContent = window.location.pathname.split('/').pop() || 'report.html';
+              const card = document.getElementById('sc-card');
+              card.insertAdjacentHTML('beforeend', leftHtml + rightHtml);
             } catch(e) {
-              inner.textContent = 'Summary unavailable.';
+              const card = document.getElementById('sc-card');
+              card.insertAdjacentHTML('beforeend', '<div style="padding:2rem;color:#666">Summary unavailable.</div>');
             }
           }
 
           let built = false;
-          function open() {
+          function openCard() {
             if (!built) { buildCard(); built = true; }
             document.body.classList.add('card-mode');
             overlay.setAttribute('aria-hidden', 'false');
           }
-          function close() {
+          function closeCard() {
             document.body.classList.remove('card-mode');
             overlay.setAttribute('aria-hidden', 'true');
           }
 
-          btn.addEventListener('click', open);
-          closeBtn && closeBtn.addEventListener('click', close);
-          overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+          btn.addEventListener('click', openCard);
+          closeBtn && closeBtn.addEventListener('click', closeCard);
+          overlay.addEventListener('click', e => { if (e.target === overlay) closeCard(); });
           document.addEventListener('keydown', e => {
-            if (e.key === 'Escape' && document.body.classList.contains('card-mode')) close();
+            if (e.key === 'Escape' && document.body.classList.contains('card-mode')) closeCard();
           });
         })();
       </script>
