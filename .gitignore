@@ -4,3 +4,4 @@
 !templates/en/*.html
 !examples/zh/*.html
 !examples/en/*.html
+.gstack/

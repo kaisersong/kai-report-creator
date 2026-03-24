@@ -59,6 +59,67 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         }
         body.no-toc .toc-sidebar, body.no-toc .toc-toggle { display: none; }
         body.no-toc .main-with-toc { margin-left: 0; }
+
+        /* Summary card button — sits to the right of h1 */
+        .title-row { display: flex; align-items: flex-start; gap: 1rem; }
+        .title-row h1 { flex: 1; }
+        .card-mode-btn {
+          flex-shrink: 0; margin-top: .6rem;
+          background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+          padding: .32rem .7rem; font-size: .78rem; font-weight: 600; letter-spacing: .01em;
+          color: var(--text-muted); cursor: pointer; transition: all .2s;
+          font-family: var(--font-sans, system-ui); white-space: nowrap;
+        }
+        .card-mode-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+        /* Summary card overlay */
+        .sc-overlay {
+          display: none; position: fixed; inset: 0; z-index: 500;
+          background: rgba(0,0,0,.5); backdrop-filter: blur(6px);
+          align-items: center; justify-content: center; padding: 2rem;
+        }
+        body.card-mode .sc-overlay { display: flex; }
+        body.card-mode .main-with-toc,
+        body.card-mode .toc-toggle,
+        body.card-mode .toc-sidebar { visibility: hidden; }
+        body.card-mode .sc-overlay { visibility: visible; }
+
+        /* The card itself */
+        .sc-card {
+          position: relative; width: 420px; max-width: 100%;
+          background: #f5f3ed; border-radius: 14px; overflow: hidden;
+          box-shadow: 0 32px 96px rgba(0,0,0,.4);
+        }
+        /* Paper noise texture */
+        .sc-card::before {
+          content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .04;
+          background-image:
+            radial-gradient(circle at 20% 20%, rgba(0,0,0,.8) .5px, transparent .8px),
+            radial-gradient(circle at 80% 40%, rgba(0,0,0,.7) .4px, transparent .7px);
+          background-size: 8px 8px, 11px 11px;
+        }
+        .sc-inner { padding: 2.2rem 2rem; display: flex; flex-direction: column; gap: 1rem; }
+        .sc-meta { font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #888; }
+        .sc-title { font-size: 1.85rem; font-weight: 800; color: #111; line-height: 1.1; letter-spacing: -.02em; }
+        .sc-bar { width: 48px; height: 4px; background: var(--primary, #1A56DB); border-radius: 2px; }
+        .sc-abstract { font-size: .88rem; line-height: 1.65; color: #444; }
+        .sc-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(88px,1fr)); gap: .5rem; margin-top: .2rem; }
+        .sc-kpi { background: rgba(0,0,0,.05); border-radius: 7px; padding: .55rem .7rem; }
+        .sc-kpi-v { font-size: 1.35rem; font-weight: 800; color: #111; line-height: 1.1; }
+        .sc-kpi-l { font-size: .65rem; color: #777; text-transform: uppercase; letter-spacing: .06em; margin-top: .18rem; }
+        .sc-kpi-t { font-size: .7rem; color: #10B981; margin-top: .1rem; }
+        .sc-sections { display: flex; flex-wrap: wrap; gap: .35rem; }
+        .sc-chip { font-size: .68rem; background: rgba(0,0,0,.07); border-radius: 99px; padding: .18rem .55rem; color: #555; }
+        .sc-footer { font-size: .68rem; color: #aaa; text-align: center; padding: .8rem 2rem; border-top: 1px solid rgba(0,0,0,.07); }
+        .sc-close {
+          position: absolute; top: .85rem; right: .85rem;
+          background: rgba(0,0,0,.09); border: none; border-radius: 50%;
+          width: 26px; height: 26px; cursor: pointer; color: #666;
+          display: flex; align-items: center; justify-content: center; font-size: .85rem;
+          transition: background .2s;
+        }
+        .sc-close:hover { background: rgba(0,0,0,.18); }
+        @media print { .sc-overlay, .card-mode-btn { display: none !important; } }
       </style>
     </head>
     <body class="[add 'no-toc' if toc:false] [add 'no-animations' if animations:false]">
@@ -109,8 +170,21 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         <div class="report-wrapper">
 
           <!-- Report title and meta -->
-          <h1>[title]</h1>
+          <!-- lang:en card button label: "⊞ Summary" | lang:zh: "⊞ 摘要卡" -->
+          <div class="title-row">
+            <h1>[title]</h1>
+            <button class="card-mode-btn" id="card-mode-btn" title="[Summary card|摘要卡片]">[⊞ Summary|⊞ 摘要卡]</button>
+          </div>
           [if author or date: <p class="report-meta">[author] · [date]</p>]
+
+          <!-- Summary card overlay (always present) — populated from #report-summary JSON -->
+          <div class="sc-overlay" id="sc-overlay">
+            <div class="sc-card" id="sc-card">
+              <button class="sc-close" id="sc-close" aria-label="Close">✕</button>
+              <div class="sc-inner" id="sc-inner"><!-- filled by JS --></div>
+              <div class="sc-footer" id="sc-footer"></div>
+            </div>
+          </div>
 
           <!-- AI Readability Layer 2: Section annotations are on each <section> element -->
           <!-- Rendered sections — each ## becomes: -->
@@ -362,6 +436,65 @@ When generating the final HTML report, produce a complete self-contained HTML fi
               backgroundColor: bg,
               scrollX: 0, scrollY: 0, width: el.scrollWidth, height: el.scrollHeight
             }, filename('-im', 'jpg'), true);
+          });
+        })();
+      </script>
+
+      <script>
+        // Summary card mode — reads #report-summary JSON, renders inline card, toggles body.card-mode
+        (function() {
+          const btn     = document.getElementById('card-mode-btn');
+          const overlay = document.getElementById('sc-overlay');
+          const inner   = document.getElementById('sc-inner');
+          const footer  = document.getElementById('sc-footer');
+          const closeBtn= document.getElementById('sc-close');
+          if (!btn || !overlay || !inner) return;
+
+          function buildCard() {
+            try {
+              const d = JSON.parse(document.getElementById('report-summary').textContent);
+
+              const metaParts = [d.author, d.date].filter(Boolean);
+              const kpisHtml = (d.kpis || []).slice(0, 6).map(k => `
+                <div class="sc-kpi">
+                  <div class="sc-kpi-v">${k.value || ''}</div>
+                  <div class="sc-kpi-l">${k.label || ''}</div>
+                  ${k.trend ? `<div class="sc-kpi-t">${k.trend}</div>` : ''}
+                </div>`).join('');
+              const chipsHtml = (d.sections || []).map(s =>
+                `<span class="sc-chip">${s}</span>`).join('');
+
+              inner.innerHTML = [
+                metaParts.length ? `<div class="sc-meta">${metaParts.join(' · ')}</div>` : '',
+                `<div class="sc-title">${d.title || ''}</div>`,
+                `<div class="sc-bar"></div>`,
+                d.abstract  ? `<div class="sc-abstract">${d.abstract}</div>` : '',
+                kpisHtml    ? `<div class="sc-kpis">${kpisHtml}</div>` : '',
+                chipsHtml   ? `<div class="sc-sections">${chipsHtml}</div>` : '',
+              ].filter(Boolean).join('');
+
+              if (footer) footer.textContent = window.location.pathname.split('/').pop() || 'report.html';
+            } catch(e) {
+              inner.textContent = 'Summary unavailable.';
+            }
+          }
+
+          let built = false;
+          function open() {
+            if (!built) { buildCard(); built = true; }
+            document.body.classList.add('card-mode');
+            overlay.setAttribute('aria-hidden', 'false');
+          }
+          function close() {
+            document.body.classList.remove('card-mode');
+            overlay.setAttribute('aria-hidden', 'true');
+          }
+
+          btn.addEventListener('click', open);
+          closeBtn && closeBtn.addEventListener('click', close);
+          overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+          document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && document.body.classList.contains('card-mode')) close();
           });
         })();
       </script>
