@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --themes (preview styles), --from <file>, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.5.1
+version: 1.5.2
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---

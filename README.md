@@ -4,6 +4,8 @@ English | [简体中文](README.zh-CN.md)
 
 > Generate beautiful, single-file HTML reports — zero dependencies, mobile responsive, AI-readable.
 
+**v1.5.2** — Template fix: shared component CSS (export button, code block, all components) is now hardcoded verbatim in the HTML shell template instead of relying on an LLM placeholder substitution. Fixes export dropdown appearing at page top and code block missing border/overflow styles in generated reports.
+
 **v1.5.1** — Bug fixes: KPI card three-row alignment via flex column layout (cross-card delta row alignment), callout block text wrapping fix (`flex: 1; min-width: 0`), summary card export now captures only the card (not full page), and summary card export filename gets `-摘要卡` suffix.
 
 **v1.5.0** — Design Quality Baseline: new `references/design-quality.md` encodes anti-slop rules across four disciplines — 90/8/2 color law (primary color capped to 2% bullet-point role), KPI grid column rules (4 KPIs → 2×2 not 3-column, hero metric gets `2fr`), content-tone color calibration (contemplative/brown, technical/navy, business/teal), and a `highlight-sentence` component for surfacing key insight sentences. The `--plan` mode now suggests tone-matched `primary_color` overrides in frontmatter. Pre-output self-check added: *"If you told someone 'an AI wrote this', would they immediately believe it?"*
