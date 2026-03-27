@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --themes (preview styles), --from <file>, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.5.2
+version: 1.6.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -90,7 +90,7 @@ Plain Markdown between blocks renders as rich text (headings, paragraphs, bold, 
 | Tag | Required params | Optional params |
 |-----|----------------|-----------------|
 | `:::kpi` | (none — list items in body) | (none) |
-| `:::chart` | `type` (bar\|line\|pie\|scatter\|radar\|funnel) | `title`, `height` |
+| `:::chart` | `type` (bar\|line\|pie\|scatter\|radar\|funnel\|sankey) | `title`, `height` |
 | `:::table` | (none — Markdown table in body) | `caption` |
 | `:::list` | (none — list items in body) | `style` (ordered\|unordered) |
 | `:::image` | `src` | `layout` (left\|right\|full), `caption`, `alt` |
@@ -101,7 +101,7 @@ Plain Markdown between blocks renders as rich text (headings, paragraphs, bold, 
 
 **Plain text (default):** Any Markdown outside a `:::` block is rendered as rich text — no explicit `:::text` tag needed.
 
-**Chart library rule:** Default to Chart.js (bar/line/pie/scatter). If ANY chart in the report uses radar, funnel, heatmap, or multi-axis, use ECharts for ALL charts in the report. Never load both libraries.
+**Chart library rule:** Default to Chart.js (bar/line/pie/scatter). If ANY chart in the report uses radar, funnel, heatmap, multi-axis, or **sankey**, use ECharts for ALL charts in the report. Never load both libraries.
 
 ## Language Auto-Detection
 
@@ -150,13 +150,20 @@ When the user runs `/report --plan "topic"`:
      theme_overrides:
        primary_color: "#7C6853"  # 思辨/研究气质 — 温暖棕色 (change to suit your brand)
      ```
-3. **Apply visual rhythm rules** when laying out sections:
+3. **Chart type selection guidance** — when choosing `:::chart type=?`, apply these rules:
+   - `bar` / `line` / `pie`: standard comparisons, trends, proportions
+   - `radar`: multi-dimension capability/coverage comparison
+   - `funnel`: single-path conversion with ordered stages
+   - `sankey`: **use when data has quantified flows between named categories** — budget allocation across departments, multi-source conversion funnels (where users branch to different paths), supply chain, energy/material flows. Key signal: the data has `source → target: value` triples. Requires ECharts.
+   - Do NOT use sankey for simple proportions (use pie) or ordered stages with no branching (use funnel).
+
+4. **Apply visual rhythm rules** when laying out sections:
    - Never place 3 or more consecutive sections containing only plain Markdown prose (no components)
    - Ideal section rhythm: `prose → kpi → chart/table → callout/timeline → prose → ...`
    - Every 4–5 sections, insert a "visual anchor" — at least one `:::kpi`, `:::chart`, or `:::diagram` block
    - If a topic area would generate 3+ consecutive prose sections, break it up by inserting a `:::callout` or `:::kpi` with placeholder values
-4. Save to `report-<slug>.report.md` using the Write tool.
-5. Tell the user:
+5. Save to `report-<slug>.report.md` using the Write tool.
+6. Tell the user:
    - The IR file path
    - Which placeholders need to be filled in
    - The suggested theme (from routing) and how to override it
@@ -186,7 +193,7 @@ When rendering IR to HTML, apply component-specific rendering rules. Each compon
 | Tag | Purpose | Required params | Optional params |
 |-----|---------|----------------|-----------------|
 | `:::kpi` | KPI cards with trend indicators | (none — list items in body) | (none) |
-| `:::chart` | Charts (bar/line/pie/scatter/radar/funnel) | `type` | `title`, `height` |
+| `:::chart` | Charts (bar/line/pie/scatter/radar/funnel/sankey) | `type` | `title`, `height` |
 | `:::table` | Data tables | (none — Markdown table in body) | `caption` |
 | `:::list` | Styled lists | (none — list items in body) | `style` (ordered\|unordered) |
 | `:::image` | Images with captions | `src` | `layout` (left\|right\|full), `caption`, `alt` |

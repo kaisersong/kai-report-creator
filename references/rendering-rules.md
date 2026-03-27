@@ -122,6 +122,74 @@ Use theme's `--primary` color for chart colors. Add `<script src="https://cdn.js
 
 Add `<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>` in `<head>` (or inline if `--bundle`). The `data-raw` attribute for ECharts uses `series` format matching the ECharts `setOption` data structure.
 
+**Sankey rendering** (triggered by `type=sankey`; requires ECharts):
+
+IR input format:
+```
+:::chart type=sankey title=资金流向
+nodes: [A, B, C, D]
+links: [A->B:120, A->C:80, B->D:90, C->D:110]
+:::
+```
+
+Parse `nodes` as `[{name: "A"}, ...]` and `links` as `[{source: "A", target: "B", value: 120}, ...]`.
+
+**Label display rule (mandatory):** Node labels MUST show both name and value. Use ECharts `rich` text to give them distinct visual weight — name in muted small text, value in bold primary-color larger text. Never show name-only labels; a Sankey without numbers loses its core meaning.
+
+    <div data-component="chart" data-type="sankey" class="fade-in-up">
+      <div id="chart-[unique-id]" style="height:380px"></div>
+      <script>
+        // Pre-compute node totals for label display
+        var nodeTotal = {};
+        var links = [{ source: 'A', target: 'B', value: 120 }, ...];
+        links.forEach(function(l) { nodeTotal[l.target] = (nodeTotal[l.target]||0) + l.value; });
+        links.forEach(function(l) { if (!nodeTotal[l.source]) nodeTotal[l.source] = links.filter(function(x){return x.source===l.source;}).reduce(function(s,x){return s+x.value;},0); });
+
+        var chart = echarts.init(document.getElementById('chart-[unique-id]'));
+        chart.setOption({
+          tooltip: {
+            trigger: 'item', triggerOn: 'mousemove',
+            formatter: function(p) {
+              if (p.dataType === 'edge') {
+                var pct = (p.data.value / (nodeTotal[p.data.source]||1) * 100).toFixed(1);
+                return p.data.source + ' → ' + p.data.target + '<br/>' + p.data.value.toLocaleString() + ' (' + pct + '%)';
+              }
+              return p.name + '<br/>' + (nodeTotal[p.name]||0).toLocaleString();
+            }
+          },
+          series: [{
+            type: 'sankey',
+            layout: 'none',
+            emphasis: { focus: 'adjacency' },
+            nodeWidth: 18,
+            nodeGap: 14,
+            lineStyle: { color: 'gradient', opacity: 0.4 },
+            label: {
+              fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+              formatter: function(p) {
+                var v = nodeTotal[p.name] || 0;
+                return '{name|' + p.name + '}\n{val|' + v.toLocaleString() + '}';
+              },
+              rich: {
+                name: { fontSize: 12, color: '#555', fontWeight: 'normal', lineHeight: 18 },
+                val:  { fontSize: 15, color: '#0B6E6E', fontWeight: '700', lineHeight: 20 }
+              }
+            },
+            edgeLabel: {
+              show: true, fontSize: 11, color: '#555',
+              formatter: function(p) { return p.data.value.toLocaleString(); }
+            },
+            data: [{ name: 'A' }, { name: 'B' }, ...],
+            links: links
+          }]
+        });
+      </script>
+    </div>
+
+**val color rule:** Use theme's `--primary` color for the value text (default `#0B6E6E`). For dark themes substitute the theme accent color.
+
+Use cases: budget flows, conversion funnels (multi-step), resource allocation, supply chain. Height default 380px; increase to 500px for 8+ nodes.
+
 ## :::table
 
 Body is a Markdown table. Convert to HTML. If `caption` param is provided, emit `<caption>[caption text]</caption>` as the first child of `<table>`.

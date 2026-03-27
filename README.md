@@ -4,6 +4,8 @@ English | [简体中文](README.zh-CN.md)
 
 > Generate beautiful, single-file HTML reports — zero dependencies, mobile responsive, AI-readable.
 
+**v1.6.0** — Sankey chart: new `:::chart type=sankey` component powered by ECharts. Renders flow diagrams where data has source → target → value triples (budget allocation, multi-path conversion funnels, supply chains). Node labels show name + value with distinct typographic weight (muted name / bold primary-color number). Edge labels show flow values inline. The `--plan` mode now selects sankey automatically when it detects branching flow data. Triggers ECharts like radar/funnel.
+
 **v1.5.2** — Template fix: shared component CSS (export button, code block, all components) is now hardcoded verbatim in the HTML shell template instead of relying on an LLM placeholder substitution. Fixes export dropdown appearing at page top and code block missing border/overflow styles in generated reports.
 
 **v1.5.1** — Bug fixes: KPI card three-row alignment via flex column layout (cross-card delta row alignment), callout block text wrapping fix (`flex: 1; min-width: 0`), summary card export now captures only the card (not full page), and summary card export filename gets `-摘要卡` suffix.
