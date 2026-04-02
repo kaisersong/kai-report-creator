@@ -150,11 +150,17 @@ Classify:
 | `mixed` | 5–20% | Mix of text and data — project reports, team updates, product reviews |
 | `data` | > 20% | Data-heavy — sales dashboards, KPI reports, financial summaries |
 
+(Boundary: exactly 20% counts as `mixed`.)
+
+If total word count < 10 (e.g. a bare topic like `Q3`), skip density calculation and default to `mixed`.
+
 Announce the classification to the user. Examples:
 - narrative: "内容以文字叙述为主（narrative），将使用 callout/timeline 作为视觉锚点，不插入空 KPI 占位符。"
 - mixed: "内容为图文混合（mixed），有明确数字的章节才会使用 KPI/图表组件。"
 - data: "内容以数据为主（data），将使用 KPI/图表作为主要视觉锚点。"
 - (English equivalent when `lang: en`)
+
+Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5 (component routing) and item 4 (visual rhythm rules).
 
 **Step 2 — Plan the structure.**
 
