@@ -188,7 +188,7 @@ Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5
 | Class | Preferred visual anchors | Prohibited |
 |-------|--------------------------|------------|
 | `narrative` | `:::callout`, `:::timeline`, `:::diagram`, `highlight-sentence` | `:::kpi` and `:::chart` with all-placeholder values |
-| `mixed` | `:::callout`/`:::timeline` by default; `:::kpi`/`:::chart` only when that section contains real numbers from the source | `:::kpi` where every value is a placeholder |
+| `mixed` | `:::callout`/`:::timeline` by default; `:::kpi`/`:::chart` only when that section contains real numbers from the source | `:::kpi` or `:::chart` where every value is a placeholder |
 | `data` | `:::kpi` > `:::chart` > others | — (existing behavior) |
 
 **narrative strict rule:** Never generate a `:::kpi` or `:::chart` block where all values are `[数据待填写]` / `[INSERT VALUE]`. If a section has no numbers, use `:::callout`, `:::timeline`, or `:::diagram` instead.
