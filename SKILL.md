@@ -183,6 +183,18 @@ Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5
    - `sankey`: **use when data has quantified flows between named categories** — budget allocation across departments, multi-source conversion funnels (where users branch to different paths), supply chain, energy/material flows. Key signal: the data has `source → target: value` triples. Requires ECharts.
    - Do NOT use sankey for simple proportions (use pie) or ordered stages with no branching (use funnel).
 
+3.5. **Content Nature → Component Routing** — apply based on the class determined in Step 1.5:
+
+| Class | Preferred visual anchors | Prohibited |
+|-------|--------------------------|------------|
+| `narrative` | `:::callout`, `:::timeline`, `:::diagram`, `highlight-sentence` | `:::kpi` and `:::chart` with all-placeholder values |
+| `mixed` | `:::callout`/`:::timeline` by default; `:::kpi`/`:::chart` only when that section contains real numbers from the source | `:::kpi` where every value is a placeholder |
+| `data` | `:::kpi` > `:::chart` > others | — (existing behavior) |
+
+**narrative strict rule:** Never generate a `:::kpi` or `:::chart` block where all values are `[数据待填写]` / `[INSERT VALUE]`. If a section has no numbers, use `:::callout`, `:::timeline`, or `:::diagram` instead.
+
+**mixed rule:** A `:::kpi` block is only allowed if at least one value in that block is a real number extracted from the source content.
+
 4. **Apply visual rhythm rules** when laying out sections:
    - Never place 3 or more consecutive sections containing only plain Markdown prose (no components)
    - Ideal section rhythm: `prose → kpi → chart/table → callout/timeline → prose → ...`
