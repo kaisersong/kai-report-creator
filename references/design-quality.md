@@ -115,4 +115,5 @@ Before writing the final HTML, answer each question. Fix any "no":
 - [ ] Are there 3+ consecutive all-prose sections with no component? If yes → insert visual anchor
 - [ ] Do all section headings feel like AI-generated template phrases? If yes → make them content-specific
 - [ ] Is every card's `border-radius` identical? If yes → vary radii between data elements and prose cards
+- [ ] Does any `:::kpi` or `:::chart` block contain only placeholder values (`[INSERT VALUE]` / `[数据待填写]`) in a `narrative` or `mixed` report? If yes → replace with `:::callout`, `:::timeline`, or `:::diagram`
 - [ ] **If you told someone "an AI wrote this", would they immediately believe it?** If yes → find the most generic-looking part and redesign it
