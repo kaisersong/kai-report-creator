@@ -197,9 +197,15 @@ Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5
 
 4. **Apply visual rhythm rules** when laying out sections:
    - Never place 3 or more consecutive sections containing only plain Markdown prose (no components)
-   - Ideal section rhythm: `prose → kpi → chart/table → callout/timeline → prose → ...`
-   - Every 4–5 sections, insert a "visual anchor" — at least one `:::kpi`, `:::chart`, or `:::diagram` block
-   - If a topic area would generate 3+ consecutive prose sections, break it up by inserting a `:::callout` or `:::kpi` with placeholder values
+   - Every 4–5 sections, insert a "visual anchor" — type depends on content class from Step 1.5:
+     - `narrative`: use `:::callout`, `:::timeline`, `:::diagram`, or a `highlight-sentence` paragraph
+     - `mixed`: use `:::callout`/`:::timeline` by default; use `:::kpi`/`:::chart` only if that section has real numbers
+     - `data`: use `:::kpi` or `:::chart` (existing behavior)
+   - Ideal rhythm by class:
+     - `narrative`: `prose → callout → prose → timeline → prose → diagram → ...`
+     - `mixed`: `prose → callout → prose → kpi(if numbers) → prose → timeline → ...`
+     - `data`: `prose → kpi → chart/table → callout/timeline → prose → ...`
+   - **Never** break up consecutive prose sections by inserting a `:::kpi` with placeholder values in `narrative` or `mixed` reports — use `:::callout` instead
 5. Save to `report-<slug>.report.md` using the Write tool.
 6. Tell the user:
    - The IR file path
