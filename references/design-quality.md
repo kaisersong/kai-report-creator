@@ -61,6 +61,8 @@ These patterns make a report look instantly AI-generated. Do not produce them:
 | Same font size for every paragraph | Vary prose density: lead paragraphs slightly larger (16px), supporting detail smaller (14px) |
 | Symmetrical two-column layouts everywhere | Use `2fr 1fr` or `3fr 1fr` — asymmetry implies hierarchy |
 | Inter as body font | Use system-ui / -apple-system stack (already in themes) |
+| `:::kpi` block where every value is `[INSERT VALUE]` / `[数据待填写]` in a narrative report | Use `:::callout` or `:::timeline` as the visual anchor instead |
+| `:::chart` with all-placeholder data in a text-heavy (narrative/mixed) section | Use `:::diagram` (flowchart/mindmap) or a `highlight-sentence` paragraph |
 
 ## 5. Content-Tone Color Calibration
 
