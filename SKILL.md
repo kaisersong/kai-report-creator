@@ -136,6 +136,26 @@ When the user runs `/report --plan "topic"`:
 
 **Step 1 — Suggest theme.** Check content-type routing table. If a match is found, suggest the recommended theme in the IR frontmatter and inform the user.
 
+**Step 1.5 — Analyze content nature.**
+
+Scan the user's topic/content input and compute numeric density:
+- Count **numeric tokens**: words/phrases containing digits with quantitative meaning — e.g. `128K`, `8.6%`, `¥3200万`, `$1.2B`, `+18%`, `3x`. Exclude ordinals used as labels (`Q3`, `第一`, `Step 2`).
+- **Density** = numeric token count / total word count (Chinese: character-segment count; English: whitespace-split word count)
+
+Classify:
+
+| Class | Density | Description |
+|-------|---------|-------------|
+| `narrative` | < 5% | Primarily text — research, editorial, philosophy, retrospective prose |
+| `mixed` | 5–20% | Mix of text and data — project reports, team updates, product reviews |
+| `data` | > 20% | Data-heavy — sales dashboards, KPI reports, financial summaries |
+
+Announce the classification to the user. Examples:
+- narrative: "内容以文字叙述为主（narrative），将使用 callout/timeline 作为视觉锚点，不插入空 KPI 占位符。"
+- mixed: "内容为图文混合（mixed），有明确数字的章节才会使用 KPI/图表组件。"
+- data: "内容以数据为主（data），将使用 KPI/图表作为主要视觉锚点。"
+- (English equivalent when `lang: en`)
+
 **Step 2 — Plan the structure.**
 
 1. Think about the report structure: appropriate sections, data the user likely has.
