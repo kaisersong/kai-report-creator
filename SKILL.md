@@ -29,7 +29,7 @@ When invoked as `/report [flags] [content]`, parse flags and route:
 | `--themes` | Output `report-themes-preview.html` showing all 6 built-in themes. Do not generate a report. |
 | `--bundle` | Generate HTML with all CDN libraries inlined. Overrides `charts: cdn` in frontmatter. |
 | `--from <file>` | If file's first line is `---`, treat as IR and render directly. Otherwise treat as raw content, generate IR first then render. If ambiguous, ask user to confirm. |
-| `--theme <name>` | Override theme. Valid: `corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`. |
+| `--theme <name>` | Override theme. Built-in: `corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`. Custom: any folder name under `themes/` (e.g. `--theme my-brand` uses `themes/my-brand/`). See `themes/README.zh-CN.md`. |
 | `--template <file>` | Use a custom HTML template file. Read it and inject rendered content into placeholders. |
 | `--output <filename>` | Save HTML to this filename instead of the default. |
 | `--export-image [mode]` | After generating HTML, also export to image via `scripts/export-image.py`. Mode: `im` (default), `mobile`, `desktop`, `all`. Requires: `pip install playwright && playwright install chromium`. |
