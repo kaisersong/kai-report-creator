@@ -530,6 +530,16 @@ When generating the final HTML report, produce a complete self-contained HTML fi
             const date = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
             return (document.title||'report').replace(/[/\\:*?"<>|]/g,'_') + `_${date}${suffix}.${ext}`;
           }
+          function exportBackgroundColor() {
+            const rootStyles = getComputedStyle(document.documentElement);
+            const cssVar = (rootStyles.getPropertyValue('--bg') || '').trim();
+            if (cssVar) return cssVar;
+            const bodyColor = getComputedStyle(document.body).backgroundColor;
+            if (bodyColor && bodyColor !== 'rgba(0, 0, 0, 0)' && bodyColor !== 'rgba(0,0,0,0)' && bodyColor !== 'transparent') {
+              return bodyColor;
+            }
+            return '#ffffff';
+          }
           function saveBlob(canvas, fname, jpeg) {
             canvas.toBlob(blob => {
               const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: fname });
@@ -578,20 +588,18 @@ When generating the final HTML report, produce a complete self-contained HTML fi
 
           pngMobile && pngMobile.addEventListener('click', () => {
             const el = document.querySelector('.report-wrapper') || document.documentElement;
-            const bg = getComputedStyle(document.body).backgroundColor;
             capture(el, {
               scale: (750 / el.offsetWidth) * 2, useCORS: true, allowTaint: true,
-              backgroundColor: bg,
+              backgroundColor: exportBackgroundColor(),
               scrollX: 0, scrollY: 0, width: el.scrollWidth, height: el.scrollHeight
             }, filename('-mobile', 'jpg'), true);
           });
 
           pngIM && pngIM.addEventListener('click', () => {
             const el = document.querySelector('.report-wrapper') || document.documentElement;
-            const bg = getComputedStyle(document.body).backgroundColor;
             capture(el, {
               scale: (800 / el.offsetWidth) * 2, useCORS: true, allowTaint: true,
-              backgroundColor: bg,
+              backgroundColor: exportBackgroundColor(),
               scrollX: 0, scrollY: 0, width: el.scrollWidth, height: el.scrollHeight
             }, filename('-im', 'jpg'), true);
           });

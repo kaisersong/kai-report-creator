@@ -16,7 +16,7 @@ SCRIPTS_DIR = REPO_ROOT / "scripts"
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 def script_source() -> str:
-    return (SCRIPTS_DIR / "export-image.py").read_text()
+    return (SCRIPTS_DIR / "export-image.py").read_text(encoding="utf-8")
 
 
 # ── Resolution regression tests ──────────────────────────────────────────────
