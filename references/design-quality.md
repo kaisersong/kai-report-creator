@@ -72,7 +72,7 @@ When generating `theme_overrides` in `--plan` mode, suggest a tone-appropriate p
 |---|---|---|---|
 | **Contemplative / Research** | 认知、思维、本质、意义、哲学、研究、白皮书、学术 / philosophy, cognition, research, academic | `#7C6853` (warm brown) | Grounded, editorial |
 | **Technical / Engineering** | 架构、系统、API、性能、部署、代码、工程 / architecture, system, API, performance, engineering | `#3D5A80` (navy blue) | Precise, authoritative |
-| **Business / Data** | 销售、营收、KPI、增长、季报、业绩 / sales, revenue, KPI, growth, quarterly | `#0F7B6C` (deep teal) | Confident, forward |
+| **Business / Data** | 销售、营收、KPI、增长、季报、业绩 / sales, revenue, KPI, growth, quarterly | `#1F6F50` (pine green) | Restrained, commercial, premium |
 | **Narrative / Annual** | 故事、增长、复盘、年度 / story, growth, retrospective, annual | `#B45309` (amber) | Warm, momentum |
 | **Editorial / News** | 新闻、行业、趋势、观察 / news, industry, trend | `#1C1C1E` (near-black) | Authoritative, print |
 
