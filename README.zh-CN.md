@@ -85,7 +85,7 @@ HTML 文件将生成到当前目录，用任意浏览器打开即可查看。
 
 <table>
 <tr>
-<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/corporate-blue.html"><img src="templates/screenshots/corporate-blue.png" width="360" alt="corporate-blue"/><br/><b>corporate-blue</b></a><br/><sub>商务 · 高管汇报</sub></td>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/corporate-blue.html"><img src="templates/screenshots/corporate-blue.png" width="360" alt="corporate-blue"/><br/><b>corporate-blue</b></a><br/><sub>暖感商务 · 高级汇报</sub></td>
 <td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/minimal.html"><img src="templates/screenshots/minimal.png" width="360" alt="minimal"/><br/><b>minimal</b></a><br/><sub>研究 · 学术论文</sub></td>
 </tr>
 <tr>

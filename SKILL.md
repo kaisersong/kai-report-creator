@@ -230,6 +230,8 @@ When rendering IR to HTML, apply component-specific rendering rules. Each compon
 
 **Design quality rules are in `references/design-quality.md`** — load alongside rendering-rules.md. Apply the 90/8/2 color law, KPI column rules, anti-slop patterns, and run the pre-output self-check before writing.
 
+When the report is explicitly comparing named vendors, models, or tools, set `data-report-mode="comparison"` on the outer report container and use `.badge--entity-a/.badge--entity-b/.badge--entity-c` only for entity identity. Do not use entity colors on generic KPI values or generic badges.
+
 **CRITICAL: The final HTML must contain zero `:::` sequences.** Any `:::tag`, param line, or closing `:::` appearing in the output means a directive was not converted — find it and fix it before writing the file.
 
 ### Component Overview

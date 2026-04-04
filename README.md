@@ -85,7 +85,7 @@ Click any screenshot to open the live demo:
 
 <table>
 <tr>
-<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/corporate-blue.html"><img src="templates/screenshots/corporate-blue.png" width="360" alt="corporate-blue"/><br/><b>corporate-blue</b></a><br/><sub>Business · Executive</sub></td>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/corporate-blue.html"><img src="templates/screenshots/corporate-blue.png" width="360" alt="corporate-blue"/><br/><b>corporate-blue</b></a><br/><sub>Warm Premium · Business</sub></td>
 <td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/minimal.html"><img src="templates/screenshots/minimal.png" width="360" alt="minimal"/><br/><b>minimal</b></a><br/><sub>Research · Academic</sub></td>
 </tr>
 <tr>
