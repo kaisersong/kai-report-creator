@@ -4,6 +4,12 @@ English | [简体中文](README.zh-CN.md)
 
 > Generate beautiful, single-file HTML reports — zero dependencies, mobile responsive, AI-readable.
 
+**v1.8.2** — Restrained color system: shared badges and KPI accents now default to one neutral palette, comparison reports can opt into entity-specific badge colors via `data-report-mode="comparison"`, and `corporate-blue` now ships as a warm premium business theme. Updated docs, tests, and demo screenshot to match.
+
+**v1.8.1** — Export background fix: PNG/mobile/IM capture now resolves a concrete page background via `--bg` before falling back to `body` background color, so reports with gradients or background images no longer export as white/transparent. Added regression coverage for transparent-background capture paths.
+
+**v1.8.0** — Custom themes: `--theme <name>` can now load user-defined theme folders from `themes/`. Includes bilingual theme-authoring docs and an example warm-editorial starter theme.
+
 **v1.6.1** — Export background fix: PNG/mobile/IM capture now resolves a concrete page background via `--bg` before falling back to `body` background color, so reports with gradients or background images no longer export as white/transparent. Added regression coverage for transparent-background capture paths.
 
 **v1.6.0** — Sankey chart: new `:::chart type=sankey` component powered by ECharts. Renders flow diagrams where data has source → target → value triples (budget allocation, multi-path conversion funnels, supply chains). Node labels show name + value with distinct typographic weight (muted name / bold primary-color number). Edge labels show flow values inline. The `--plan` mode now selects sankey automatically when it detects branching flow data. Triggers ECharts like radar/funnel.
@@ -26,7 +32,7 @@ English | [简体中文](README.zh-CN.md)
 
 **Features**
 - **Zero dependencies** — single `.html` file, works offline (with `--bundle`)
-- **6 built-in themes** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper
+- **6 built-in themes + custom theme folders** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper, or your own `themes/<name>/theme.css`
 - **9 component types** — KPIs, charts, tables, timelines, diagrams, code blocks, callouts, images, lists
 - **AI-readable output** — 3-layer machine-readable structure for downstream agents
 - **Bilingual** — full zh/en support with auto-detection
@@ -62,10 +68,12 @@ An HTML file is generated in your current directory. Open it in any browser.
 | `/report --generate file.report.md` | Render an outline to HTML |
 | `/report --themes` | Preview all 6 themes side by side |
 | `/report --bundle --from file.md` | Offline HTML with all CDN assets inlined |
-| `/report --theme dark-tech --from file.md` | Use a specific theme |
+| `/report --theme dark-tech --from file.md` | Use a built-in or custom theme |
 | `/report --template my-template.html` | Use a custom HTML template |
 | `/report --output my-report.html --from file.md` | Custom output filename |
 | `/report [content]` | One-step: generate from a short description |
+
+Custom themes: create `themes/<name>/theme.css`, then run `/report --theme <name> --from file.md`.
 
 ## Export
 

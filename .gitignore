@@ -6,3 +6,10 @@
 !examples/en/*.html
 !tests/fixtures/*.html
 .gstack/
+.superpowers/
+docs/superpowers/plans/
+outputs/
+tmp-*
+scripts/__pycache__/
+tests/__pycache__/
+.pytest_cache/

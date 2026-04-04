@@ -1,3 +1,5 @@
+.superpowers/
+docs/superpowers/plans/
 outputs/
 tmp-*
 scripts/__pycache__/
