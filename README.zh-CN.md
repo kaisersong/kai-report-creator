@@ -4,6 +4,8 @@
 
 > 生成美观的单文件 HTML 报告 — 零依赖，移动端自适应，AI 可读。
 
+**v1.8.3** — KPI 长单位溢出修复：`commits/hour`、`req/sec` 等长单位现在通过新的 `.kpi-suffix` 子元素正确渲染（字号更小、独立成行），`.kpi-value` 同步加入 `word-break: break-word` 兜底。渲染规则更新：超过 4 个字符的单位必须用 `<span class="kpi-suffix">` 包裹，且不得添加 `data-target-value`（countUp 动画会覆盖 `textContent` 并破坏 span）。
+
 **v1.8.2** — 克制配色系统：共享 badge 和 KPI 强调色默认统一为中性色盘，对比类报告可通过 `data-report-mode="comparison"` 启用实体专属 badge 颜色，`corporate-blue` 也升级为更暖感、更高级的商务主题。文档、测试和演示截图已一并同步。
 
 **v1.8.1** — 导出背景修复：PNG / Mobile / IM 截图会优先解析页面 `--bg` 背景色，再回退到 `body` 背景色，因此使用渐变或背景图的报告不再导出成白底或透明底。新增透明背景导出回归测试覆盖。

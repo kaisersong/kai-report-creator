@@ -54,6 +54,20 @@ Extract the numeric part of Value into `data-target-value`, set `data-prefix` an
 
 **Trend badge:** Prefer `.kpi-delta` pill over plain `.kpi-trend` for stronger visual emphasis. Keep `kpi-delta--up`, `kpi-delta--down`, and `kpi-delta--info` visually restrained so they read as status hints, not a second palette system.
 
+**Suffix length rule:** Keep `data-suffix` short (≤4 chars: `K`, `%`, `ms`, `x`). If the unit is longer (e.g. `commits/hour`, `req/sec`, `美元/月`), split number and unit — put the numeric part directly in `.kpi-value` and wrap the unit in `<span class="kpi-suffix">unit</span>`:
+
+    <!-- ✅ Short suffix — inline is fine -->
+    <div class="kpi-value" data-target-value="128" data-suffix="K">128K</div>
+
+    <!-- ✅ Long unit — use kpi-suffix span, NO data-target-value (countUp rewrites textContent and destroys the span) -->
+    <div class="kpi-value">1,000<span class="kpi-suffix">commits/hour</span></div>
+
+    <!-- ❌ Never put long units directly as plain text content -->
+    <div class="kpi-value">1000 commits/hour</div>
+
+    <!-- ❌ Never combine data-target-value with kpi-suffix span — countUp will overwrite the span -->
+    <div class="kpi-value" data-target-value="1000">1,000<span class="kpi-suffix">commits/hour</span></div>
+
 **Column count rule (from design-quality.md):** Do NOT default all grids to 3 columns. Match to KPI count:
 - 1–2 KPIs → `grid-template-columns: repeat(2, 1fr)`
 - 3 KPIs → `grid-template-columns: repeat(3, 1fr)`

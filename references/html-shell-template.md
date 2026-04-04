@@ -33,7 +33,8 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .75rem; margin: 1.1rem 0; }
         .kpi-card { background: var(--report-surface, var(--surface)); border: 1px solid var(--report-border, var(--border)); border-radius: var(--radius); padding: .9rem; text-align: center; border-top: 2px solid var(--report-structure, var(--primary)); display: flex; flex-direction: column; align-items: center; }
         .kpi-label { font-size: .78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .4rem; }
-        .kpi-value { font-size: 2rem; font-weight: 800; color: var(--report-text, var(--text)); line-height: 1.2; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; font-variant-numeric: lining-nums tabular-nums; flex: 1; display: flex; align-items: center; justify-content: center; }
+        .kpi-value { font-size: 2rem; font-weight: 800; color: var(--report-text, var(--text)); line-height: 1.2; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; font-variant-numeric: lining-nums tabular-nums; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; word-break: break-word; overflow-wrap: break-word; }
+        .kpi-value .kpi-suffix { font-size: .75em; font-weight: 600; line-height: 1.3; }
         .kpi-trend { font-size: .85rem; margin-top: .3rem; }
         .kpi-trend--up { color: var(--success); } .kpi-trend--down { color: var(--danger); } .kpi-trend--neutral { color: var(--text-muted); }
         .kpi-card[data-accent] { border-top-color: var(--report-structure, var(--primary)); }

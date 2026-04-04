@@ -4,6 +4,8 @@ English | [简体中文](README.zh-CN.md)
 
 > Generate beautiful, single-file HTML reports — zero dependencies, mobile responsive, AI-readable.
 
+**v1.8.3** — KPI overflow fix: long units (e.g. `commits/hour`, `req/sec`) now render correctly inside narrow cards via a new `.kpi-suffix` child element (smaller font, block display). Added `word-break: break-word` to `.kpi-value` as a safety net. Rendering rule updated: suffixes longer than 4 characters must use `<span class="kpi-suffix">` and must not carry `data-target-value` (the countUp animation rewrites `textContent` and would destroy the span).
+
 **v1.8.2** — Restrained color system: shared badges and KPI accents now default to one neutral palette, comparison reports can opt into entity-specific badge colors via `data-report-mode="comparison"`, and `corporate-blue` now ships as a warm premium business theme. Updated docs, tests, and demo screenshot to match.
 
 **v1.8.1** — Export background fix: PNG/mobile/IM capture now resolves a concrete page background via `--bg` before falling back to `body` background color, so reports with gradients or background images no longer export as white/transparent. Added regression coverage for transparent-background capture paths.
