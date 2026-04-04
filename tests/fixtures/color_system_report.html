@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Color System Fixture</title>
+  <style>
+    :root {
+      --bg: #F8F5EF;
+      --surface: #FFFDF9;
+      --text: #2B2623;
+      --text-muted: #766B63;
+      --border: #E7DDD2;
+      --primary: #1F6F50;
+      --success: #2F6B50;
+      --warning: #A8741A;
+      --danger: #A34A3F;
+      --radius: 10px;
+      --report-bg: #F8F5EF;
+      --report-surface: #FFFDF9;
+      --report-text: #2B2623;
+      --report-border: #E7DDD2;
+      --report-structure: #1F6F50;
+      --report-chip-bg: #F4EAD5;
+      --report-chip-text: #7A6858;
+      --report-chip-border: #E0D4C6;
+      --report-delta-up-bg: #E7F1EA;
+      --report-delta-up-text: #2F6B50;
+      --report-delta-down-bg: #F6E8E6;
+      --report-delta-down-text: #A34A3F;
+      --report-delta-flat-bg: #EEE7DE;
+      --report-delta-flat-text: #766B63;
+      --entity-a: #2F6B50;
+      --entity-b: #6F6A7C;
+      --entity-c: #5C768A;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .scene {
+      margin-bottom: 24px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+
+    .scene h2 {
+      margin: 0 0 12px;
+      font-size: 16px;
+    }
+  </style>
+  <link rel="stylesheet" href="../../templates/themes/shared.css" />
+</head>
+<body>
+  <section id="default" class="scene">
+    <h2>Default mode</h2>
+    <div class="kpi-grid">
+      <div class="kpi-card" data-accent="blue">
+        <div class="kpi-label">Growth</div>
+        <div class="kpi-value">38%</div>
+        <div class="kpi-delta kpi-delta--up">↑ 18%</div>
+      </div>
+      <div class="kpi-card" data-accent="green">
+        <div class="kpi-label">Retention</div>
+        <div class="kpi-value">91%</div>
+        <div class="kpi-delta kpi-delta--info">Stable</div>
+      </div>
+    </div>
+    <div>
+      <span class="badge badge--blue">Blue</span>
+      <span class="badge badge--green">Green</span>
+      <span class="badge badge--purple">Purple</span>
+      <span class="badge badge--orange">Orange</span>
+      <span class="badge badge--red">Red</span>
+      <span class="badge badge--teal">Teal</span>
+      <span class="badge badge--done">Done</span>
+      <span class="badge badge--warn">Warn</span>
+      <span class="badge badge--err">Error</span>
+    </div>
+  </section>
+
+  <section id="comparison" class="scene" data-report-mode="comparison">
+    <h2>Comparison mode</h2>
+    <div>
+      <span class="badge badge--entity-a">OpenAI</span>
+      <span class="badge badge--entity-b">Anthropic</span>
+      <span class="badge badge--entity-c">Cursor</span>
+      <span class="badge badge--blue">Still Neutral</span>
+    </div>
+  </section>
+</body>
+</html>
