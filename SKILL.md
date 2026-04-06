@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
-description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --themes (preview styles), --from <file>, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.8.3
+description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from <file>, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
+version: 1.9.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -26,6 +26,7 @@ When invoked as `/report [flags] [content]`, parse flags and route:
 |------|--------|
 | `--plan "topic"` | Generate a `.report.md` IR file only. Do NOT generate HTML. Save as `report-<slug>.report.md`. |
 | `--generate [file]` | Read the specified `.report.md` file (or IR from context if no file given), render to HTML. |
+| `--review [file]` | Read the specified HTML file and run one-pass automatic refinement using the report review checklist. |
 | `--themes` | Output `report-themes-preview.html` showing all 6 built-in themes. Do not generate a report. |
 | `--bundle` | Generate HTML with all CDN libraries inlined. Overrides `charts: cdn` in frontmatter. |
 | `--from <file>` | If file's first line is `---`, treat as IR and render directly. Otherwise treat as raw content, generate IR first then render. If ambiguous, ask user to confirm. |
@@ -222,6 +223,20 @@ When the user runs `/report --themes`:
 2. Write its content verbatim to `report-themes-preview.html` using the Write tool.
 3. Tell the user the file path and ask them to open it in a browser.
 
+## Review Mode
+
+When the user runs `/report --review [file]`:
+
+1. Read the specified HTML file.
+2. Load `references/review-checklist.md`.
+3. Run the 8-checkpoint report review system.
+4. Apply **hard rules** automatically.
+5. Apply **ai-advised rules** only when confidence is high enough to preserve factual accuracy.
+6. This is **one-pass automatic refinement** — no confirmation window, no interactive approval loop.
+7. If the user wants a structured summary of what changed, format it using `references/review-report-template.md`.
+8. Write the revised HTML back to the target file unless the user asked for diagnosis only.
+9. Tell the user what improved and what was intentionally left untouched.
+
 ## Component Rendering Rules
 
 When rendering IR to HTML, apply component-specific rendering rules. Each component must be wrapped with `data-component` attribute for AI readability.
@@ -277,9 +292,10 @@ When the user runs `/report --generate [file]`:
 4. Render all components according to Component Rendering Rules.
 5. Apply chart library selection rule.
 6. Build the HTML shell with TOC, AI summary, animations.
-7. **Pre-write validation:** Before writing, mentally scan the assembled HTML for any occurrence of `:::`. If found, locate the unconverted directive and fix it by converting it to the correct HTML component. The final HTML MUST NOT contain any `:::` sequences.
-8. Write to `[output_filename].html` using the Write tool.
-9. Tell the user the file path and a 1-sentence summary of the report.
+7. Load `references/review-checklist.md` and run a **silent final review pass** before writing. Use the same report review rules as `--review`, but keep the behavior silent inside `--generate`.
+8. **Pre-write validation:** Before writing, mentally scan the assembled HTML for any occurrence of `:::`. If found, locate the unconverted directive and fix it by converting it to the correct HTML component. The final HTML MUST NOT contain any `:::` sequences.
+9. Write to `[output_filename].html` using the Write tool.
+10. Tell the user the file path and a 1-sentence summary of the report.
 
 **CRITICAL: Follow `references/html-shell-template.md` EXACTLY**
 

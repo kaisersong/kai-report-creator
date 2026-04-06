@@ -18,8 +18,12 @@ echo "════════════════════════�
 
 if [ "${1-}" = "--fast" ]; then
   echo "Mode: unit tests only (--fast)"
-  python -m pytest tests/test_export_config.py "$@"
+  python3 -m pytest \
+    tests/test_export_config.py \
+    tests/test_color_system_docs.py \
+    tests/test_review_docs.py \
+    tests/test_doc_sync.py
 else
   echo "Mode: full suite (unit + Playwright)"
-  python -m pytest tests/ "$@"
+  python3 -m pytest tests/ "$@"
 fi

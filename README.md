@@ -4,6 +4,8 @@ English | [简体中文](README.zh-CN.md)
 
 > Generate beautiful, single-file HTML reports — zero dependencies, mobile responsive, AI-readable.
 
+**v1.9.0** — Report Review System: new `/report --review` mode for **one-pass automatic refinement** of existing HTML reports. Adds an **8-checkpoint review system** tailored for asynchronous reading quality: BLUF opening, heading stack logic, anti-template section headings, prose-wall cleanup, takeaway-after-data, insight-over-data, scan-anchor coverage, and conditional reader guidance. `--generate` now runs the same checklist as a **silent final review** before writing HTML. Added `references/review-checklist.md`, L0/L1 quality layering, and doc-sync tests to keep the feature contract aligned.
+
 **v1.8.3** — KPI overflow fix: long units (e.g. `commits/hour`, `req/sec`) now render correctly inside narrow cards via a new `.kpi-suffix` child element (smaller font, block display). Added `word-break: break-word` to `.kpi-value` as a safety net. Rendering rule updated: suffixes longer than 4 characters must use `<span class="kpi-suffix">` and must not carry `data-target-value` (the countUp animation rewrites `textContent` and would destroy the span).
 
 **v1.8.2** — Restrained color system: shared badges and KPI accents now default to one neutral palette, comparison reports can opt into entity-specific badge colors via `data-report-mode="comparison"`, and `corporate-blue` now ships as a warm premium business theme. Updated docs, tests, and demo screenshot to match.
@@ -36,6 +38,7 @@ English | [简体中文](README.zh-CN.md)
 - **Zero dependencies** — single `.html` file, works offline (with `--bundle`)
 - **6 built-in themes + custom theme folders** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper, or your own `themes/<name>/theme.css`
 - **9 component types** — KPIs, charts, tables, timelines, diagrams, code blocks, callouts, images, lists
+- **Report Review System** — `--review` runs an **8-checkpoint review system** for one-pass automatic refinement; `--generate` includes a **silent final review**
 - **AI-readable output** — 3-layer machine-readable structure for downstream agents
 - **Bilingual** — full zh/en support with auto-detection
 
@@ -68,6 +71,7 @@ An HTML file is generated in your current directory. Open it in any browser.
 | `/report --from URL` | Generate from a web page |
 | `/report --plan "topic"` | Create a `.report.md` outline first |
 | `/report --generate file.report.md` | Render an outline to HTML |
+| `/report --review file.html` | Refine an existing report with the review checklist |
 | `/report --themes` | Preview all 6 themes side by side |
 | `/report --bundle --from file.md` | Offline HTML with all CDN assets inlined |
 | `/report --theme dark-tech --from file.md` | Use a built-in or custom theme |
@@ -109,6 +113,27 @@ Click any screenshot to open the live demo:
 </table>
 
 Preview all themes in one page: `/report --themes` → opens `report-themes-preview.html`
+
+## Review
+
+Run `--review` to improve an existing report with the **8-checkpoint review system**:
+
+```bash
+/report --review market-analysis.html
+```
+
+Review behavior:
+
+1. Load `references/review-checklist.md`
+2. Apply hard rules automatically
+3. Apply AI-advised rules only when confidence is high
+4. Save the refined HTML back to the file
+
+This is **one-pass automatic refinement**, not an interactive approval workflow.
+
+During normal generation, `/report --generate` also performs a **silent final review** before writing HTML.
+
+If you want a structured explanation of what changed, use the review report format defined in [`references/review-report-template.md`](references/review-report-template.md).
 
 ## Report Format (IR)
 
@@ -196,6 +221,7 @@ report-creator is designed for machine-to-machine use. Other agents and skills c
 /report --plan "Market Analysis" --from ./raw-data.md
 # (edit the generated .report.md if needed)
 /report --generate market-analysis.report.md
+/report --review report-2026-04-06-market-analysis.html
 ```
 
 **Reading report output programmatically:**
@@ -313,7 +339,22 @@ The skill enforces a visual rhythm rule: never place 3+ consecutive sections wit
 
 This is also why the IR's component block syntax (`:::tag ... :::`) was designed to be visually obvious: authors can scan an IR file and immediately see where the data-heavy sections are, without parsing HTML or YAML.
 
-### 5. Design Quality Baseline: Against AI Slop
+### 5. Reports Are Asynchronous Decision Support
+
+Slides are consumed with a presenter in the loop. Reports are not. A report has to survive first contact with a busy reader who will skim the opening, scan the headings, glance at the data, and decide in under a minute whether the document is worth continuing.
+
+That constraint changes the product design:
+
+- `--review` exists as a **one-pass refinement stage**, not an interactive editing loop
+- `--generate` runs the same review checklist as a **silent final pass** before writing HTML
+- The checklist is split into **L0 visual/render quality** and **L1 content-reading quality**
+- Only review rules that AI can judge and repair reliably are included in the system
+
+This is why the review checklist focuses on BLUF openings, heading-stack logic, anti-template section headings, prose-wall cleanup, takeaway-after-data, and scan-anchor coverage. These are the failure modes that most often break asynchronous reading, and they are the ones an automatic pipeline can actually fix with high confidence.
+
+The rule of thumb is simple: a generated report should not merely look polished; it should reduce reader effort. If a stakeholder can understand the point, the evidence, and the next action from a fast skim, the report is doing its job.
+
+### 6. Design Quality Baseline: Against AI Slop
 
 A generated report's greatest enemy is looking instantly AI-made — uniform border radii everywhere, primary color flooding six element types simultaneously, three equal-column KPI grids regardless of count, section headings that sound like templates ("Overview", "Key Findings", "Next Steps").
 
@@ -363,7 +404,13 @@ The result is a visually rich daily summary readable right inside the chat — n
 | File | Description |
 |------|-------------|
 | [examples/en/business-report.html](examples/en/business-report.html) | 2024 Q3 Sales Performance Report (EN) |
+| [examples/en/business-report-reviewed-demo.html](examples/en/business-report-reviewed-demo.html) | Reviewed demo showing stronger BLUF, headings, and takeaways (EN) |
+| [examples/en/monthly-progress-reviewed-demo.html](examples/en/monthly-progress-reviewed-demo.html) | Reviewed monthly progress demo (EN) |
 | [examples/zh/business-report.html](examples/zh/business-report.html) | 2024 Q3 销售业绩报告（中文）|
+| [examples/zh/monthly-progress-reviewed-demo.html](examples/zh/monthly-progress-reviewed-demo.html) | Reviewed monthly progress demo (ZH) |
+| [examples/review-reports/monthly-progress-demo-review-report.md](examples/review-reports/monthly-progress-demo-review-report.md) | Structured review report example (EN) |
+| [examples/review-reports/monthly-progress-zh-review-report.md](examples/review-reports/monthly-progress-zh-review-report.md) | Structured review report example (ZH) |
+| [examples/review-reports/business-report-demo-review-report.md](examples/review-reports/business-report-demo-review-report.md) | Chart-heavy review report example (EN) |
 
 ## License
 

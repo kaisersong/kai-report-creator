@@ -117,3 +117,15 @@ Before writing the final HTML, answer each question. Fix any "no":
 - [ ] Is every card's `border-radius` identical? If yes → vary radii between data elements and prose cards
 - [ ] Does any `:::kpi` or `:::chart` block contain only placeholder values (`[INSERT VALUE]` / `[数据待填写]`) in a `narrative` or `mixed` report? If yes → replace with `:::callout`, `:::timeline`, or `:::diagram`
 - [ ] **If you told someone "an AI wrote this", would they immediately believe it?** If yes → find the most generic-looking part and redesign it
+
+## L1 Content Review
+
+For content, structure, and reading-flow checks, see [review-checklist.md](review-checklist.md).
+
+**L0 (Visual)**: This file — color, typography, layout, anti-slop presentation rules.
+**L1 (Content)**: `review-checklist.md` — BLUF opening, heading logic, prose walls, takeaways, scan anchors.
+
+**When to apply:**
+
+- `--generate`: run a **silent final review pass** using the L1 checklist before writing HTML
+- `--review`: run the same one-pass automatic refinement explicitly against an existing report
