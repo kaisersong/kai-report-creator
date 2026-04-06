@@ -22,7 +22,8 @@ if [ "${1-}" = "--fast" ]; then
     tests/test_export_config.py \
     tests/test_color_system_docs.py \
     tests/test_review_docs.py \
-    tests/test_doc_sync.py
+    tests/test_doc_sync.py \
+    tests/test_theme_screenshot_assets.py
 else
   echo "Mode: full suite (unit + Playwright)"
   python3 -m pytest tests/ "$@"
