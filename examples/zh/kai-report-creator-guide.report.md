@@ -8,122 +8,54 @@ toc: true
 abstract: "一行命令生成异步友好的 HTML 报告——决策者 30 秒抓住要点，下游 AI 可解析三层结构。"
 ---
 
-## 为什么需要这个技能
+## 为什么报告总是"一眼 AI"
 
-决策者没时间读完所有材料。AI 能生成报告，但往往一眼就能看出是模板产物：章节标题像填空、主色泛滥在六种元素上、KPI 不管几个都是三列。
+决策者没时间读完所有材料。AI 能生成报告，但往往一眼就能看出是模板产物：
 
-kai-report-creator 解决三个问题：
+- 章节标题像填空（"概述"、"关键发现"、"下一步"）
+- 主色泛滥在六种元素上（标题、KPI、图表、边框、按钮、链接）
+- KPI 不管几个都是三列
 
-- **异步阅读** — 报告没有讲述者在场，必须让读者 30 秒内抓住要点
-- **AI 模板感** — 90/8/2 配色、字号张力、KPI 网格规则，避免"一眼 AI"
-- **机器可读** — 输出内嵌三层结构，下游智能体可自动解析
+**kai-report-creator 解决的核心问题：让报告能独立承受第一次阅读。**
 
-## 一行命令生成报告
-
-:::kpi
-- 零依赖: 单文件 HTML
-- 6 套主题: 企业蓝/极简/深色科技/看板/数据叙事/报纸
-- 9 种组件: KPI/图表/表格/时间线/流程图/代码块/标注/图片/列表
-- AI 可读: 三层机器结构
-:::
-
-**安装后立即可用：**
-
-```
-/report --from meeting-notes.md
-/report --from https://example.com/data-page --output market-analysis.html
-```
-
-对 Claude 说「安装 https://github.com/kaisersong/report-creator」即可。
-
-## 核心工作流
-
-### 一步生成
-
-从文档或 URL 直接生成 HTML：
-
-```
-/report --from ./analysis.md --theme corporate-blue
-/report --from https://example.com/report --output summary.html
-```
-
-### 两阶段流程
-
-复杂报告建议先生成大纲，确认后再渲染：
-
-```
-/report --plan "Q3 销售总结" --from q3-data.csv
-# 编辑生成的 .report.md 文件
-/report --generate q3-sales.report.md
-```
-
-### Review 优化
-
-已有报告可用 8 项检查点自动优化：
-
-```
-/report --review market-analysis.html
-```
-
-检查点包括：BLUF 开场、标题栈逻辑、去模板腔标题、文字砖块拆解、数据后 takeaway、洞察优于数据、扫读锚点覆盖、条件触发读者指引。
-
-## 报告格式（IR）
+## 五大设计原则
 
 :::callout type=tip
-IR 是人机协作的契约：人类自然书写，AI 确定性渲染。
+这些原则对任何编写 AI 技能的人都有参考价值。
 :::
-
-**Frontmatter 声明文档身份：**
-
-```yaml
----
-title: Q3 销售报告
-theme: corporate-blue
-abstract: "Q3 营收同比增长12%，新客户数创历史新高。"
----
-```
-
-**组件块传递结构化数据：**
-
-```
-:::kpi
-- 营收: ¥2,450万 ↑12%
-- 新客户数: 183 ↑8%
-:::
-
-:::chart type=line title="月度营收"
-labels: [7月, 8月, 9月]
-datasets:
-  - data: [780000, 820000, 850000]
-:::
-
-:::timeline
-- 2024-10-15: Q4 目标下发
-- 2024-10-31: 新品发布会
-:::
-```
-
-## 设计理念
 
 ### 渐进式披露
 
-命令路由表确保每次只加载必要内容：`--plan` 不接触 CSS，`--generate` 只加载一个主题。
+命令路由表确保每次只加载必要内容：
+
+| 命令 | 加载内容 |
+|------|----------|
+| `--plan` | 只读 IR 规则，不接触 CSS |
+| `--generate` | 只加载一个主题 CSS |
+| `--themes` | 预构建 HTML，技能不解析内部 |
+
+**效果：** `--plan` 调用从不接触 CSS，`--generate` 从不加载其他 5 套主题。
 
 ### 硅碳协作设计
 
-**输入端：** IR 三层结构（Frontmatter/正文/组件块），人类自然书写。
+:::kpi
+- 输入端: IR 三层结构 → 人类自然书写
+- 输出端: HTML 三层结构 → 机器渐进解析
+:::
 
-**输出端：** HTML 三层 AI 可读结构（文档级/章节级/组件级），机器渐进解析。
-
-渐进式披露为双物种设计：IR 为碳基读者揭示结构，HTML 为硅基读者揭示数据。
+IR 为碳基读者揭示结构，HTML 为硅基读者揭示数据。同一原则为双物种设计。
 
 ### 视觉节奏即认知节拍
 
 禁止连续 3 个纯文字章节，每 4-5 章节必须有视觉锚点（KPI 网格/图表/流程图）。
 
+**为什么：** 大段密集文字让读者疲惫，没有背景的数据让读者迷失。
+
 ### 异步决策支持
 
-报告必须独立承受第一次阅读——读者扫开头、看标题、瞥数据，30 秒内决定是否继续。
+报告没有讲述者在场。读者扫开头、看标题、瞥数据，30 秒内决定是否继续。
+
+**产品设计约束：** `--review` 是一次性自动优化，不是交互式确认。
 
 ### 设计质量基线
 
@@ -132,47 +64,112 @@ datasets:
 - **KPI 网格规则** — 4 个 KPI 用 2×2，英雄指标用 2fr 1fr 1fr
 - **内容气质色调** — 思辨用暖棕、技术用藏蓝、商业用深青绿
 
-## 主题选择
+## 一行命令开始
 
-| 主题 | 风格 | 适合场景 |
-|------|------|----------|
-| corporate-blue | 暖感商务 | 高管汇报、商业报告 |
-| minimal | 简洁学术 | 研究论文、分析报告 |
-| dark-tech | 工程感 | 运维报告、技术文档 |
-| dark-board | 看板风格 | 架构图、指标看板 |
-| data-story | 叙事驱动 | 年度报告、增长故事 |
-| newspaper | 编辑感 | 行业分析、通讯 |
+**安装：**
 
-## 创建自定义主题
+```
+# Claude Code：对 Claude 说
+安装 https://github.com/kaisersong/report-creator
 
-1. 创建 `themes/你的主题/theme.css`
-2. 定义 CSS 变量：`--primary`、`--bg`、`--text`、`--font-heading`
-3. 运行 `/report --theme 你的主题 --from file.md`
+# OpenClaw
+clawhub install kai-report-creator
+```
+
+**使用：**
+
+```
+/report --from meeting-notes.md
+/report --from https://example.com/data --output market-analysis.html
+/report --plan "Q3 总结" --from data.csv
+```
+
+## 核心工作流
+
+### 一步生成
+
+从文档或 URL 直接输出 HTML，零配置。
+
+### 两阶段流程
+
+复杂报告建议先生成 `.report.md` 大纲，编辑确认后再渲染：
+
+```
+/report --plan "Q3 销售" --from q3.csv
+# 编辑生成的 .report.md
+/report --generate q3-sales.report.md
+```
+
+### Review 自动优化
+
+8 项检查点，一次性自动修复：
+
+| 检查点 | 解决的问题 |
+|--------|------------|
+| BLUF 开场 | 开头没有结论，读者不知道为什么继续读 |
+| 标题栈逻辑 | 标题都是名词短语，看不出论证脉络 |
+| 去模板腔标题 | "概述""关键发现"等信息量为零 |
+| 文字砖块拆解 | 段落超过 150 字，无法扫读 |
+| 数据后 takeaway | 有数字没解读，读者自己猜含义 |
+| 洞察优于数据 | 罗列数字，没有说"这意味着什么" |
+| 扫读锚点覆盖 | 连续纯文字，没有视觉休息 |
+| 条件触发指引 | 教程类没说"适合谁、需要什么" |
+
+## 报告格式（IR）
+
+**Frontmatter 声明文档身份：**
+
+```yaml
+---
+title: Q3 销售报告
+theme: corporate-blue
+abstract: "Q3 营收同比增长12%"
+---
+```
+
+**组件块传递结构化数据：**
+
+```
+:::kpi
+- 营收: ¥2,450万 ↑12%
+- 新客户: 183 ↑8%
+:::
+
+:::timeline
+- 10月15日: Q4 目标下发
+- 10月31日: 新品发布
+:::
+```
+
+## 6 套内置主题
+
+| 主题 | 适合场景 |
+|------|----------|
+| corporate-blue | 高管汇报、商业报告 |
+| minimal | 研究论文、分析报告 |
+| dark-tech | 运维报告、技术文档 |
+| dark-board | 架构图、指标看板 |
+| data-story | 年度报告、增长故事 |
+| newspaper | 行业分析、通讯 |
 
 ## 面向 AI 智能体
 
-其他技能可直接调用：
+输出内嵌三层机器可读结构：
 
 ```
-/report --from ./analysis.md --output summary.html
-/report --from https://example.com/data --theme dark-board
+Layer 1 — <script id="report-summary">  文档级：标题、摘要、所有 KPI
+Layer 2 — data-section data-summary     章节级：标题 + 一句话摘要
+Layer 3 — data-component data-raw       组件级：原始数据
 ```
 
-**提取结构化数据：**
+下游技能可直接提取：
 
 ```python
-from bs4 import BeautifulSoup
-import json
-
-soup = BeautifulSoup(open("report.html"), "html.parser")
+soup = BeautifulSoup(open("report.html"))
 summary = json.loads(soup.find("script", {"id": "report-summary"}).string)
-print(summary["title"], summary["kpis"])
+print(summary["kpis"])  # 所有 KPI 数据
 ```
 
 ---
 
-## 安装
-
-**Claude Code：** 对 Claude 说「安装 https://github.com/kaisersong/report-creator」
-
-**OpenClaw：** `clawhub install kai-report-creator`
+**GitHub:** https://github.com/kaisersong/kai-report-creator
