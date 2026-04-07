@@ -51,9 +51,13 @@ report-creator solves this with **rules in the skill, assets in files**:
 
 This is progressive disclosure applied to AI context: **reveal information at the moment it's needed, not before.**
 
-### 2. IR as a Human-AI Interface
+### 2. Silicon-Carbon Collaboration Design
 
-The `.report.md` Intermediate Representation is the contract between human intent and AI rendering.
+report-creator is designed for human-AI collaboration at both input and output ends.
+
+**Input: IR as Human-AI Contract**
+
+The `.report.md` Intermediate Representation is the contract between human intent and AI rendering:
 
 ```
 ---                         ← Frontmatter: document identity
@@ -69,12 +73,9 @@ Plain Markdown text...        Written naturally. AI renders to semantic HTML.
 :::
 ```
 
-**Three benefits:**
-- Humans write and edit naturally, without knowing HTML
-- AI renders each layer with different rules — prose gets Markdown, components get templates
-- IR is inspectable and version-controllable before HTML generation
+Humans write naturally without knowing HTML. AI renders each layer with different rules — prose gets Markdown, components get templates. IR is inspectable and version-controllable.
 
-### 3. Three-Layer AI-Readable Structure
+**Output: Three-Layer AI-Readable Structure**
 
 Every generated HTML embeds machine-readable structure:
 
@@ -86,9 +87,9 @@ Layer 3 — data-component data-raw         Component-level: raw KPI/chart/table
 
 An AI agent reads Layer 1 for a 3-second overview, drills to Layer 2 for section-level understanding, reaches Layer 3 only for specific data.
 
-Same progressive disclosure principle — this time for machines reading reports.
+**Progressive disclosure for both species:** IR reveals structure to humans; HTML reveals data to machines. The same principle applied twice — once for carbon-based readers, once for silicon-based ones.
 
-### 4. Visual Rhythm as Cognitive Pacing
+### 3. Visual Rhythm as Cognitive Pacing
 
 Reports that work follow a rhythm: **prose sets context, components deliver data, prose interprets it**.
 
@@ -96,7 +97,7 @@ The skill enforces this: never 3+ consecutive prose-only sections. Every 4–5 s
 
 This is why IR's component syntax (`:::tag ... :::`) is visually obvious: authors scan IR files and see data-heavy sections immediately.
 
-### 5. Reports Are Asynchronous Decision Support
+### 4. Reports Are Asynchronous Decision Support
 
 Slides have a presenter. Reports don't. A report must survive first contact with a busy reader who skims the opening, scans headings, glances at data, and decides in under a minute whether to continue.
 
@@ -109,7 +110,7 @@ This constraint drives product design:
 
 **Rule of thumb:** A generated report should reduce reader effort. If a stakeholder can understand the point, evidence, and next action from a fast skim, the report works.
 
-### 6. Design Quality Baseline: Against AI Slop
+### 5. Design Quality Baseline: Against AI Slop
 
 The enemy: instantly recognizable AI output — uniform borders, primary color flooding everything, 3-column KPI grids regardless of count, template-sounding headings.
 
