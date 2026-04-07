@@ -1,99 +1,14 @@
 # kai-report-creator
 
-English | [简体中文](README.zh-CN.md)
-
 > Generate beautiful, single-file HTML reports — zero dependencies, mobile responsive, AI-readable.
 
-**v1.9.0** — Report Review System: new `/report --review` mode for **one-pass automatic refinement** of existing HTML reports. Adds an **8-checkpoint review system** tailored for asynchronous reading quality: BLUF opening, heading stack logic, anti-template section headings, prose-wall cleanup, takeaway-after-data, insight-over-data, scan-anchor coverage, and conditional reader guidance. `--generate` now runs the same checklist as a **silent final review** before writing HTML. Added `references/review-checklist.md`, L0/L1 quality layering, and doc-sync tests to keep the feature contract aligned.
+A skill for [Claude Code](https://claude.ai/claude-code) and [OpenClaw](https://openclaw.ai) that turns plain text or structured outlines into polished HTML reports.
 
-**v1.8.3** — KPI overflow fix: long units (e.g. `commits/hour`, `req/sec`) now render correctly inside narrow cards via a new `.kpi-suffix` child element (smaller font, block display). Added `word-break: break-word` to `.kpi-value` as a safety net. Rendering rule updated: suffixes longer than 4 characters must use `<span class="kpi-suffix">` and must not carry `data-target-value` (the countUp animation rewrites `textContent` and would destroy the span).
+English | [简体中文](README.zh-CN.md)
 
-**v1.8.2** — Restrained color system: shared badges and KPI accents now default to one neutral palette, comparison reports can opt into entity-specific badge colors via `data-report-mode="comparison"`, and `corporate-blue` now ships as a warm premium business theme. Updated docs, tests, and demo screenshot to match.
+---
 
-**v1.8.1** — Export background fix: PNG/mobile/IM capture now resolves a concrete page background via `--bg` before falling back to `body` background color, so reports with gradients or background images no longer export as white/transparent. Added regression coverage for transparent-background capture paths.
-
-**v1.8.0** — Custom themes: `--theme <name>` can now load user-defined theme folders from `themes/`. Includes bilingual theme-authoring docs and an example warm-editorial starter theme.
-
-**v1.6.1** — Export background fix: PNG/mobile/IM capture now resolves a concrete page background via `--bg` before falling back to `body` background color, so reports with gradients or background images no longer export as white/transparent. Added regression coverage for transparent-background capture paths.
-
-**v1.6.0** — Sankey chart: new `:::chart type=sankey` component powered by ECharts. Renders flow diagrams where data has source → target → value triples (budget allocation, multi-path conversion funnels, supply chains). Node labels show name + value with distinct typographic weight (muted name / bold primary-color number). Edge labels show flow values inline. The `--plan` mode now selects sankey automatically when it detects branching flow data. Triggers ECharts like radar/funnel.
-
-**v1.5.2** — Template fix: shared component CSS (export button, code block, all components) is now hardcoded verbatim in the HTML shell template instead of relying on an LLM placeholder substitution. Fixes export dropdown appearing at page top and code block missing border/overflow styles in generated reports.
-
-**v1.5.1** — Bug fixes: KPI card three-row alignment via flex column layout (cross-card delta row alignment), callout block text wrapping fix (`flex: 1; min-width: 0`), summary card export now captures only the card (not full page), and summary card export filename gets `-摘要卡` suffix.
-
-**v1.5.0** — Design Quality Baseline: new `references/design-quality.md` encodes anti-slop rules across four disciplines — 90/8/2 color law (primary color capped to 2% bullet-point role), KPI grid column rules (4 KPIs → 2×2 not 3-column, hero metric gets `2fr`), content-tone color calibration (contemplative/brown, technical/navy, business/teal), and a `highlight-sentence` component for surfacing key insight sentences. The `--plan` mode now suggests tone-matched `primary_color` overrides in frontmatter. Pre-output self-check added: *"If you told someone 'an AI wrote this', would they immediately believe it?"*
-
-**v1.4.1** — Summary card redesign: editorial two-column layout — large uppercase title on the left, compact KPI rows + per-section summaries on the right. Removed redundant labels and footer clutter. Fixed export-while-card-open capturing blank images (now captures `.sc-card` directly).
-
-**v1.4.0** — Summary card overlay: every report now has a `⊞ Summary` button next to the title. Click it to open an editorial-style card drawn from the embedded `#report-summary` JSON — title, abstract, KPIs, section chips. Close with ✕, Escape, or click the backdrop. Zero extra dependencies.
-
-**v1.3.0** — GSAP-inspired zero-dependency animation upgrade: KPI cards now spring-bounce in with stagger (cubic-bezier back.out approximation), timeline items slide in one by one, and all easing curves upgraded to power3.out. No new libraries — IntersectionObserver + CSS transitions only.
-
-## What it does
-
-`/report` is a Claude Code skill that turns plain text or a structured outline into a polished, standalone HTML report. Drop it in `.claude/skills/` and it's instantly available in any project.
-
-**Features**
-- **Zero dependencies** — single `.html` file, works offline (with `--bundle`)
-- **6 built-in themes + custom theme folders** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper, or your own `themes/<name>/theme.css`
-- **9 component types** — KPIs, charts, tables, timelines, diagrams, code blocks, callouts, images, lists
-- **Report Review System** — `--review` runs an **8-checkpoint review system** for one-pass automatic refinement; `--generate` includes a **silent final review**
-- **AI-readable output** — 3-layer machine-readable structure for downstream agents
-- **Bilingual** — full zh/en support with auto-detection
-
-## Quick Start
-
-**Option A — Claude Code (manual install)**
-
-1. Copy `SKILL.md` to `~/.claude/skills/report-creator.md`
-2. Point it at a document or URL:
-
-```
-/report --from meeting-notes.md
-/report --from https://example.com/data-page --output market-analysis.html
-/report --plan "Q3 Sales Summary" --from q3-data.csv
-```
-
-**Option B — OpenClaw / ClawHub (one command)**
-
-```
-clawhub install kai-report-creator
-```
-
-An HTML file is generated in your current directory. Open it in any browser.
-
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `/report --from file.md` | Generate from an existing document |
-| `/report --from URL` | Generate from a web page |
-| `/report --plan "topic"` | Create a `.report.md` outline first |
-| `/report --generate file.report.md` | Render an outline to HTML |
-| `/report --review file.html` | Refine an existing report with the review checklist |
-| `/report --themes` | Preview all 6 themes side by side |
-| `/report --bundle --from file.md` | Offline HTML with all CDN assets inlined |
-| `/report --theme dark-tech --from file.md` | Use a built-in or custom theme |
-| `/report --template my-template.html` | Use a custom HTML template |
-| `/report --output my-report.html --from file.md` | Custom output filename |
-| `/report [content]` | One-step: generate from a short description |
-
-Custom themes: create `themes/<name>/theme.css`, then run `/report --theme <name> --from file.md`.
-
-## Export
-
-Every generated report has a built-in **↓ Export** button (bottom-right corner). No extra tools needed.
-
-| Option | How it works |
-|--------|--------------|
-| 🖨 Print / PDF | Opens the browser print dialog. Select **Save as PDF** as the destination. |
-| 🖥 Save PNG (Desktop) | Captures the full page at 2× resolution. |
-| 📱 Save PNG (Mobile) | Captures the report body scaled to 1170 px wide (≈ 3× iPhone width). |
-
-**For clean PDFs, uncheck "Headers and footers" in the print dialog** — otherwise the browser adds the page URL, date, and page numbers as print headers/footers. In Chrome: *Print → More settings → uncheck Headers and footers*.
-
-## Theme Demos
+## Live Demo
 
 Click any screenshot to open the live demo:
 
@@ -112,48 +27,285 @@ Click any screenshot to open the live demo:
 </tr>
 </table>
 
-Preview all themes in one page: `/report --themes` → opens `report-themes-preview.html`
+Preview all themes: `/report --themes` → opens `report-themes-preview.html`
 
-## Review
+---
 
-Run `--review` to improve an existing report with the **8-checkpoint review system**:
+## Design Philosophy: Skills as Domain Harness Engineering
+
+This section explains the principles behind report-creator — both as a user tool and as a Claude Code skill. These principles are reusable for anyone building skills.
+
+### 1. Progressive Disclosure
+
+A skill file loads entirely into the AI's context on every invocation. Size directly affects focus.
+
+report-creator solves this with **rules in the skill, assets in files**:
+
+```
+--plan        → only IR rules + component syntax; no CSS, no HTML shell
+--generate    → one theme CSS + one shared CSS; other 5 themes stay on disk
+--themes      → pre-built preview HTML; skill doesn't parse internals
+```
+
+**Result:** `--plan` never touches CSS. Single-theme generation never loads other themes.
+
+This is progressive disclosure applied to AI context: **reveal information at the moment it's needed, not before.**
+
+### 2. IR as a Human-AI Interface
+
+The `.report.md` Intermediate Representation is the contract between human intent and AI rendering.
+
+```
+---                         ← Frontmatter: document identity
+title: Q3 Sales Report         What is this? Who made it? How should it look?
+theme: corporate-blue          Declares intent, not content.
+---
+
+## Section Heading         ← Prose: human narrative
+Plain Markdown text...        Written naturally. AI renders to semantic HTML.
+
+:::kpi                     ← Component blocks: structured data
+- Revenue: $2.45M ↑12%       Machine-parseable. AI renders deterministically.
+:::
+```
+
+**Three benefits:**
+- Humans write and edit naturally, without knowing HTML
+- AI renders each layer with different rules — prose gets Markdown, components get templates
+- IR is inspectable and version-controllable before HTML generation
+
+### 3. Three-Layer AI-Readable Structure
+
+Every generated HTML embeds machine-readable structure:
+
+```
+Layer 1 — <script id="report-summary">    Document-level: title, abstract, all KPIs
+Layer 2 — data-section data-summary       Section-level: heading + one-sentence summary
+Layer 3 — data-component data-raw         Component-level: raw KPI/chart/table data
+```
+
+An AI agent reads Layer 1 for a 3-second overview, drills to Layer 2 for section-level understanding, reaches Layer 3 only for specific data.
+
+Same progressive disclosure principle — this time for machines reading reports.
+
+### 4. Visual Rhythm as Cognitive Pacing
+
+Reports that work follow a rhythm: **prose sets context, components deliver data, prose interprets it**.
+
+The skill enforces this: never 3+ consecutive prose-only sections. Every 4–5 sections must include a visual anchor — KPI grid, chart, or diagram. Dense prose fatigues; data without context loses. Alternation creates flow.
+
+This is why IR's component syntax (`:::tag ... :::`) is visually obvious: authors scan IR files and see data-heavy sections immediately.
+
+### 5. Reports Are Asynchronous Decision Support
+
+Slides have a presenter. Reports don't. A report must survive first contact with a busy reader who skims the opening, scans headings, glances at data, and decides in under a minute whether to continue.
+
+This constraint drives product design:
+
+- `--review` is **one-pass automatic refinement**, not interactive editing
+- `--generate` runs the same checklist as a **silent final pass**
+- Checklist split into **L0 visual quality** and **L1 content quality**
+- Only rules AI can judge and repair reliably are included
+
+**Rule of thumb:** A generated report should reduce reader effort. If a stakeholder can understand the point, evidence, and next action from a fast skim, the report works.
+
+### 6. Design Quality Baseline: Against AI Slop
+
+The enemy: instantly recognizable AI output — uniform borders, primary color flooding everything, 3-column KPI grids regardless of count, template-sounding headings.
+
+`references/design-quality.md` encodes four disciplines:
+
+**90/8/2 Color Law.** 90% neutral surface, 8% structural accent, 2% bullet-point hits. When `--primary` floods headings, KPIs, charts, callouts, TOC, and badges — it becomes noise.
+
+**10:1 Typography Tension.** Largest element ≥10× smallest. Report titles should feel like anchors (2.8–4rem), not labels. Pages without hierarchy look like spreadsheet exports.
+
+**KPI Grid Rules.** Default isn't always 3 columns. 4 KPIs → 2×2. Hero metric → `2fr 1fr 1fr`. 7+ KPIs need dividers. Rigid 3-column grids signal AI wasn't paying attention.
+
+**Content-Tone Color Calibration.** Different emotional registers deserve different palettes:
+
+| Tone | `primary_color` | Feel |
+|------|-----------------|------|
+| Contemplative / Research | `#7C6853` warm brown | Grounded, editorial |
+| Technical / Engineering | `#3D5A80` navy | Precise, authoritative |
+| Business / Data | `#0F7B6C` deep teal | Confident, forward |
+| Narrative / Annual | `#B45309` amber | Warm, momentum |
+
+**Pre-output check:** *"If you told someone 'an AI wrote this', would they believe it? If yes — find the most generic-looking part and redesign it."*
+
+---
+
+## Install
+
+### Claude Code
+
+Tell Claude: "Install https://github.com/kaisersong/report-creator"
+
+Or manually:
+```bash
+git clone https://github.com/kaisersong/report-creator ~/.claude/skills/report-creator
+```
+
+Restart Claude Code. Use as `/report`.
+
+### OpenClaw
 
 ```bash
+# Via ClawHub (recommended)
+clawhub install kai-report-creator
+
+# Or manually
+git clone https://github.com/kaisersong/report-creator ~/.openclaw/skills/report-creator
+```
+
+---
+
+## Usage
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/report --from file.md` | Generate from an existing document |
+| `/report --from URL` | Generate from a web page |
+| `/report --plan "topic"` | Create a `.report.md` outline first |
+| `/report --generate file.report.md` | Render an outline to HTML |
+| `/report --review file.html` | Refine an existing report |
+| `/report --themes` | Preview all 6 themes side by side |
+| `/report --bundle --from file.md` | Offline HTML with inlined CDN assets |
+| `/report --theme <name> --from file.md` | Use a built-in or custom theme |
+| `/report [content]` | One-step: generate from description |
+
+### Typical Workflows
+
+**One-step generation:**
+```
+/report --from meeting-notes.md
+/report --from https://example.com/data-page --output market-analysis.html
+```
+
+**Two-stage workflow (complex content):**
+```
+/report --plan "Q3 Sales Summary" --from q3-data.csv
+# edit q3-sales-summary.report.md if needed
+/report --generate q3-sales-summary.report.md
+```
+
+**Review and refine:**
+```
 /report --review market-analysis.html
 ```
 
-Review behavior:
+### Review Mode
 
+Run `--review` to improve existing reports with 8 checkpoints:
+
+```
+/report --review market-analysis.html
+```
+
+**Behavior:**
 1. Load `references/review-checklist.md`
 2. Apply hard rules automatically
-3. Apply AI-advised rules only when confidence is high
-4. Save the refined HTML back to the file
+3. Apply AI-advised rules when confidence is high
+4. Save refined HTML back to file
 
-This is **one-pass automatic refinement**, not an interactive approval workflow.
+**One-pass automatic refinement** — not interactive approval.
 
-During normal generation, `/report --generate` also performs a **silent final review** before writing HTML.
+`--generate` also runs this checklist as a **silent final pass** before writing HTML.
 
-If you want a structured explanation of what changed, use the review report format defined in [`references/review-report-template.md`](references/review-report-template.md).
+**8 Checkpoints:**
+- BLUF opening (Bottom Line Up Front)
+- Heading stack logic
+- Anti-template section headings
+- Prose-wall cleanup
+- Takeaway-after-data
+- Insight-over-data
+- Scan-anchor coverage
+- Conditional reader guidance
+
+---
+
+## Features
+
+### Core
+
+- **Zero dependencies** — single `.html` file, works offline with `--bundle`
+- **6 built-in themes** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper
+- **9 component types** — KPIs, charts, tables, timelines, diagrams, code blocks, callouts, images, lists
+- **Report Review System** — 8-checkpoint automatic refinement
+- **AI-readable output** — 3-layer machine-readable structure for downstream agents
+
+### Interaction
+
+- **Summary card overlay** — `⊞ Summary` button shows title, abstract, KPIs, section chips
+- **Built-in export** — Print/PDF, PNG (Desktop), PNG (Mobile) via ↓ Export button
+- **Mobile responsive** — adapts to any screen size
+- **Bilingual** — full zh/en support with auto-detection
+
+### Output
+
+- **Custom themes** — `themes/<name>/theme.css` + `--theme <name>`
+- **Custom templates** — `template: ./my-brand-template.html` with placeholders
+- **Theme overrides** — `theme_overrides.primary_color` in frontmatter
+- **Offline bundles** — `--bundle` inlines all CDN assets
+
+---
+
+## Themes
+
+| Theme | Vibe | Best For |
+|-------|------|----------|
+| **corporate-blue** | Warm premium | Business reports, executive summaries |
+| **minimal** | Clean, academic | Research papers, analysis |
+| **dark-tech** | Engineering feel | Ops reports, technical docs |
+| **dark-board** | Dashboard style | Architecture, metrics dashboards |
+| **data-story** | Narrative-driven | Annual reports, growth stories |
+| **newspaper** | Editorial | Industry analysis, newsletters |
+
+### corporate-blue
+
+Warm business theme with subtle gradients. Default for executive-facing reports. Uses restrained primary color on key elements only — KPI values, section links, and one accent block per report.
+
+**Why it works:** Primary color appears on ≤3 element types, creating clear visual hierarchy without the "AI flooded everything with blue" look.
+
+---
+
+## Creating Custom Themes
+
+1. Create `themes/your-theme/` directory
+2. Write `theme.css` with CSS custom properties:
+```css
+:root {
+  --primary: #B45309;
+  --bg: #FAFAF9;
+  --text: #1C1917;
+  --font-heading: "Merriweather", serif;
+}
+```
+3. Run: `/report --theme your-theme --from file.md`
+
+**Example theme bundled:** `themes/warm-editorial/`
+
+---
 
 ## Report Format (IR)
 
-For complex reports, use `--plan` to create a `.report.md` intermediate file, then edit it before generating HTML.
+For complex reports, use `--plan` to generate a `.report.md` intermediate file.
 
-**Frontmatter example:**
+**Frontmatter:**
 ```yaml
 ---
 title: Q3 Sales Report
 theme: corporate-blue
 author: Sales Team
 date: 2024-10-08
-lang: en                # en | zh — auto-detected if omitted
+lang: en
 toc: true
-animations: true
 abstract: "Q3 revenue grew 12% YoY with record new customer acquisition."
 ---
 ```
 
-**Available component blocks:**
+**Component blocks:**
 ```
 :::kpi
 - Revenue: $2.45M ↑12%
@@ -169,233 +321,70 @@ datasets:
 
 :::timeline
 - 2024-10-15: Q4 targets released
-- 2024-10-31: Product launch event
+- 2024-10-31: Product launch
 :::
 
 :::callout type=tip
-Highlight key insight here.
-:::
-
-:::table caption="Regional Performance"
-| Region | Achievement |
-|--------|-------------|
-| South  | 115%        |
+Key insight goes here.
 :::
 ```
 
-## Themes
-
-Need a different color palette? Use `theme_overrides` to customize any theme:
-```yaml
-theme_overrides:
-  primary_color: "#B45309"          # swap the accent color
-  font_family: "Merriweather, serif" # swap the font
-```
-
-## Custom Templates
-
-Copy `templates/_custom-template.example.html`, customize it with your branding, and reference it:
-
-```yaml
 ---
-template: ./my-brand-template.html
----
-```
 
-Available placeholders: `{{report.title}}`, `{{report.author}}`, `{{report.date}}`, `{{report.abstract}}`, `{{report.theme_css}}`, `{{report.body}}`, `{{report.summary_json}}`
+## For AI Agents
 
-## For AI Agents & Skills
-
-report-creator is designed for machine-to-machine use. Other agents and skills can call it programmatically.
-
-**Calling `/report` from another skill or agent:**
+Other agents can call report-creator programmatically:
 
 ```
-# From a document
+# From document
 /report --from ./analysis.md --output summary.html
 
-# From a URL (Claude fetches and analyzes the page)
+# From URL
 /report --from https://example.com/report-page --theme data-story
 
 # Two-step with review
 /report --plan "Market Analysis" --from ./raw-data.md
-# (edit the generated .report.md if needed)
 /report --generate market-analysis.report.md
-/report --review report-2026-04-06-market-analysis.html
+/report --review report.html
 ```
 
-**Reading report output programmatically:**
-
-Every generated HTML embeds a 3-layer machine-readable structure:
-
-```
-Layer 1 — <script type="application/json" id="report-summary">
-           Document-level: title, author, abstract, all KPIs extracted
-           → Read this for a full document overview in one JSON parse
-
-Layer 2 — data-section="..." data-summary="..."  on each <section>
-           Section-level: heading and one-sentence summary per section
-           → Loop over sections for structured table of contents
-
-Layer 3 — data-component="kpi" data-raw='{...}'  on each component
-           Component-level: raw structured data for every KPI, chart, table
-           → Query specific components for downstream data processing
-```
-
-**Example: extracting Layer 1 summary from a generated report**
-
+**Extracting structured data:**
 ```python
 from bs4 import BeautifulSoup
 import json
 
 soup = BeautifulSoup(open("report.html"), "html.parser")
 summary = json.loads(soup.find("script", {"id": "report-summary"}).string)
-print(summary["title"], summary["abstract"])
-print(summary["kpis"])  # all KPI values extracted
+print(summary["title"], summary["kpis"])
 ```
 
-**Recommended calling patterns for agents:**
-
-| Scenario | Command |
-|----------|---------|
-| Summarize a long doc into a report | `/report --from doc.md --theme minimal` |
-| Turn scraped data into a dashboard | `/report --from data.json --theme dark-board` |
-| Generate a report in a pipeline | `/report --generate plan.report.md --output out.html` |
-| Offline delivery | `/report --bundle --from doc.md` |
-
-## Design Philosophy
-
-This section explains the design principles behind report-creator — both as a user-facing tool and as a Claude Code skill. Understanding these helps you build better skills and better reports.
-
-### 1. Skill as Progressive Disclosure
-
-A skill file is loaded entirely into the AI's context window every time it's invoked. This means skill size directly affects what the AI can focus on.
-
-report-creator solves this by keeping **rules in the skill, assets in files**:
-
-- **`--plan` mode** — only needs IR rules and component syntax. No CSS, no HTML shell. The skill stays focused.
-- **`--generate` mode** — reads exactly one theme CSS file (`templates/themes/[theme].css`) and one shared CSS file. All other 5 themes stay on disk, out of context.
-- **`--themes` mode** — reads the pre-built preview HTML verbatim. The skill doesn't need to know what's inside it.
-
-The result: each command loads only what it needs. A `--plan` invocation never touches CSS. A single-theme generation never loads the other 5 themes.
-
-This is progressive disclosure applied to AI context management: **reveal information at the moment it's needed, not before**.
-
-### 2. IR as a Human-AI Interface
-
-The `.report.md` Intermediate Representation is the contract between human intent and AI rendering.
-
-It has three layers, each with a clear responsibility:
-
-```
----                         ← Frontmatter: document identity
-title: Q3 Sales Report         What is this? Who made it? How should it look?
-theme: corporate-blue          Declares intent, not content.
-abstract: "..."
 ---
 
-## Section Heading         ← Prose: human narrative
-Plain Markdown text...        Written naturally. AI renders to semantic HTML.
+## Export
 
-:::kpi                     ← Component blocks: structured data
-- Revenue: $2.45M ↑12%       Machine-parseable. AI renders deterministically.
-:::                           Each block type has an unambiguous output contract.
-```
+Every report has a built-in **↓ Export** button (bottom-right):
 
-This separation means:
-- Humans can write and edit the IR naturally, without knowing HTML
-- AI renders each layer with different rules — prose gets Markdown conversion, components get deterministic templates
-- The IR is inspectable and version-controllable before any HTML is generated
+| Option | How it works |
+|--------|--------------|
+| Print / PDF | Opens browser print dialog → Save as PDF |
+| PNG (Desktop) | Full page at 2× resolution |
+| PNG (Mobile) | Report body at 1170px wide (≈3× iPhone) |
 
-### 3. Frontmatter as Document Identity, Sections as Document Body
+**Tip:** Uncheck "Headers and footers" in print dialog for clean PDFs.
 
-Frontmatter and section content answer different questions:
+---
 
-| Layer | Question | Examples |
-|-------|----------|---------|
-| Frontmatter | *What is this document?* | title, author, theme, lang, abstract |
-| Sections | *What does this document say?* | headings, prose, KPIs, charts |
-
-The `abstract` field is the most important bridge: it lets downstream AI agents understand the full report from a single sentence — without reading every section. This powers **Layer 1** of the 3-layer AI readability system embedded in every generated HTML file:
+## Use Case: Daily Work Report → Telegram
 
 ```
-Layer 1 — <script type="application/json" id="report-summary">
-           Document-level: title, author, abstract, all KPIs extracted
-
-Layer 2 — data-section="..." data-summary="..."  on each <section>
-           Section-level: heading and one-sentence summary per section
-
-Layer 3 — data-component="kpi" data-raw='{...}'  on each component
-           Component-level: raw structured data for every KPI, chart, table
-```
-
-An AI agent reading a report can start at Layer 1 for a 3-second overview, drill into Layer 2 for section-level understanding, and reach Layer 3 only for the specific data it needs. The same progressive disclosure principle — this time for machines reading reports.
-
-### 4. Visual Rhythm as Cognitive Pacing
-
-Reports that work well for humans follow a rhythm: **prose sets context, components deliver data, prose interprets it**.
-
-The skill enforces a visual rhythm rule: never place 3+ consecutive sections with only prose and no components. Every 4–5 sections must include a "visual anchor" — a KPI grid, chart, or diagram. This isn't aesthetic preference; it's cognitive pacing. Dense prose fatigues readers. Data without context loses them. The alternation creates flow.
-
-This is also why the IR's component block syntax (`:::tag ... :::`) was designed to be visually obvious: authors can scan an IR file and immediately see where the data-heavy sections are, without parsing HTML or YAML.
-
-### 5. Reports Are Asynchronous Decision Support
-
-Slides are consumed with a presenter in the loop. Reports are not. A report has to survive first contact with a busy reader who will skim the opening, scan the headings, glance at the data, and decide in under a minute whether the document is worth continuing.
-
-That constraint changes the product design:
-
-- `--review` exists as a **one-pass refinement stage**, not an interactive editing loop
-- `--generate` runs the same review checklist as a **silent final pass** before writing HTML
-- The checklist is split into **L0 visual/render quality** and **L1 content-reading quality**
-- Only review rules that AI can judge and repair reliably are included in the system
-
-This is why the review checklist focuses on BLUF openings, heading-stack logic, anti-template section headings, prose-wall cleanup, takeaway-after-data, and scan-anchor coverage. These are the failure modes that most often break asynchronous reading, and they are the ones an automatic pipeline can actually fix with high confidence.
-
-The rule of thumb is simple: a generated report should not merely look polished; it should reduce reader effort. If a stakeholder can understand the point, the evidence, and the next action from a fast skim, the report is doing its job.
-
-### 6. Design Quality Baseline: Against AI Slop
-
-A generated report's greatest enemy is looking instantly AI-made — uniform border radii everywhere, primary color flooding six element types simultaneously, three equal-column KPI grids regardless of count, section headings that sound like templates ("Overview", "Key Findings", "Next Steps").
-
-v1.5.0 introduces `references/design-quality.md`, a shared quality baseline that the AI loads alongside rendering rules during `--generate`. It encodes four disciplines:
-
-**The 90/8/2 Color Law.** Every report allocates color in three tiers: 90% neutral surface (background, body text), 8% structural accent (one emphasis block, borders), 2% bullet point (at most 1–2 precise high-contrast hits). When `--primary` floods headings, KPI values, chart bars, callout borders, TOC links, and badges all at once — it stops being a signal and becomes noise.
-
-**Typography Tension: 10:1 Scale Ratio.** The largest element on a page should be at least 10× the smallest readable element. A report title should feel like an anchor, not a label — minimum 2.8rem, ideally 3.2–4rem with tight leading. When every element lives in the 15–22px range, the page has no hierarchy. It looks like a spreadsheet export.
-
-**KPI Grid Column Rules.** The default is not always 3 columns. 4 KPIs belong in a 2×2 grid. A hero metric deserves `grid-template-columns: 2fr 1fr 1fr`. 7+ KPIs need visual group dividers. Rigid 3-column grids for any count are a template smell — they signal the AI wasn't paying attention to the data.
-
-**Content-Tone Color Calibration.** A philosophical research report and a quarterly business dashboard have different emotional registers. The `--plan` mode now suggests tone-matched `primary_color` overrides in frontmatter:
-
-| Content tone | `primary_color` | Feel |
-|---|---|---|
-| Contemplative / Research | `#7C6853` warm brown | Grounded, editorial |
-| Technical / Engineering | `#3D5A80` navy | Precise, authoritative |
-| Business / Data | `#0F7B6C` deep teal | Confident, forward |
-| Narrative / Annual | `#B45309` amber | Warm, momentum |
-
-The pre-output self-check in `design-quality.md` ends with a final gate: *"If you told someone 'an AI wrote this', would they immediately believe it? If yes — find the most generic-looking part and redesign it."*
-
-## Use Cases
-
-### Daily work report via OpenClaw → Telegram / Discord
-
-Ask your OpenClaw assistant at the end of the day:
-
-```
-Generate a report of your work today in dark-board style, export it as an IM image, and send it to me via Telegram (or Discord).
+Generate a report of today's work in dark-board style, export as IM image, send via Telegram.
 ```
 
 OpenClaw will:
-1. Summarize today's completed tasks, key decisions, and next steps
-2. Render them into a `dark-board` HTML report with KPI cards and a timeline
-3. Screenshot the page as an 800 px JPEG (IM long-image format, animations disabled automatically)
-4. Deliver the image directly to your Telegram or Discord channel
-
-The result is a visually rich daily summary readable right inside the chat — no browser required.
-
-> **Why this works:** Every generated report detects headless screenshot environments (`navigator.webdriver`) and immediately disables fade-in animations, so tables, timelines, and KPI grids are fully visible in the captured image.
+1. Summarize tasks, decisions, next steps
+2. Render to `dark-board` HTML with KPIs and timeline
+3. Screenshot as 800px JPEG (animations auto-disabled for headless capture)
+4. Send directly to your Telegram channel
 
 ---
 
@@ -403,15 +392,48 @@ The result is a visually rich daily summary readable right inside the chat — n
 
 | File | Description |
 |------|-------------|
-| [examples/en/business-report.html](examples/en/business-report.html) | 2024 Q3 Sales Performance Report (EN) |
-| [examples/en/business-report-reviewed-demo.html](examples/en/business-report-reviewed-demo.html) | Reviewed demo showing stronger BLUF, headings, and takeaways (EN) |
-| [examples/en/monthly-progress-reviewed-demo.html](examples/en/monthly-progress-reviewed-demo.html) | Reviewed monthly progress demo (EN) |
-| [examples/zh/business-report.html](examples/zh/business-report.html) | 2024 Q3 销售业绩报告（中文）|
-| [examples/zh/monthly-progress-reviewed-demo.html](examples/zh/monthly-progress-reviewed-demo.html) | Reviewed monthly progress demo (ZH) |
-| [examples/review-reports/monthly-progress-demo-review-report.md](examples/review-reports/monthly-progress-demo-review-report.md) | Structured review report example (EN) |
-| [examples/review-reports/monthly-progress-zh-review-report.md](examples/review-reports/monthly-progress-zh-review-report.md) | Structured review report example (ZH) |
-| [examples/review-reports/business-report-demo-review-report.md](examples/review-reports/business-report-demo-review-report.md) | Chart-heavy review report example (EN) |
+| [examples/en/business-report.html](examples/en/business-report.html) | Q3 Sales Report (EN) |
+| [examples/en/business-report-reviewed-demo.html](examples/en/business-report-reviewed-demo.html) | Reviewed demo with stronger BLUF (EN) |
+| [examples/zh/business-report.html](examples/zh/business-report.html) | Q3 销售业绩报告（中文）|
+| [examples/review-reports/](examples/review-reports/) | Structured review report examples |
 
-## License
+---
 
-MIT
+## Requirements
+
+No dependencies. Works in any modern browser.
+
+For offline bundles with `--bundle`: internet connection needed once to inline CDN assets.
+
+---
+
+## Compatibility
+
+| Platform | Version | Install path |
+|----------|---------|--------------|
+| Claude Code | any | `~/.claude/skills/report-creator/` |
+| OpenClaw | ≥ 0.9 | `~/.openclaw/skills/report-creator/` |
+
+---
+
+## Version History
+
+**v1.9.0** — Report Review System: `--review` with 8 checkpoints; silent final review in `--generate`; L0/L1 quality layering.
+
+**v1.8.3** — KPI overflow fix: `.kpi-suffix` for long units; rendering rules updated.
+
+**v1.8.2** — Restrained color system: shared badges default to neutral; `data-report-mode="comparison"` for entity colors.
+
+**v1.8.1** — Export background fix: resolve `--bg` before fallback.
+
+**v1.8.0** — Custom themes: `--theme <name>` loads `themes/<name>/`.
+
+**v1.6.0** — Sankey chart: `:::chart type=sankey` for flow diagrams.
+
+**v1.5.0** — Design Quality Baseline: 90/8/2 color law, KPI grid rules, content-tone calibration.
+
+**v1.4.0** — Summary card overlay with KPIs and section chips.
+
+**v1.3.0** — Zero-dependency animations: staggered KPI bounce, timeline slide-in.
+
+**v1.0.0** — Initial release with 6 themes and 9 component types.

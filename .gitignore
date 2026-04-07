@@ -7,7 +7,7 @@
 !tests/fixtures/*.html
 .gstack/
 .superpowers/
-docs/superpowers/plans/
+docs/
 outputs/
 tmp-*
 scripts/__pycache__/

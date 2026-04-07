@@ -1,99 +1,14 @@
 # kai-report-creator
 
-简体中文 | [English](README.md)
-
 > 生成美观的单文件 HTML 报告 — 零依赖，移动端自适应，AI 可读。
 
-**v1.9.0** — Report 深度 Review 系统：新增 `/report --review`，可对已有 HTML 报告执行**一次性自动优化**。系统内置 **8 项检查点**，聚焦异步阅读质量：BLUF 开场、标题栈逻辑、去模板腔章节标题、文字砖块拆解、数据后的 takeaway、洞察优于数据、扫读锚点覆盖、条件触发的读者指引。`--generate` 也会在写出 HTML 前执行同一套 **静默终审**。仓库同步新增 `references/review-checklist.md`、L0/L1 质量分层，以及文档契约测试。
+适用于 [Claude Code](https://claude.ai/claude-code) 和 [OpenClaw](https://openclaw.ai) 的报告生成技能，将文档或结构化大纲转换为精美的独立 HTML 报告。
 
-**v1.8.3** — KPI 长单位溢出修复：`commits/hour`、`req/sec` 等长单位现在通过新的 `.kpi-suffix` 子元素正确渲染（字号更小、独立成行），`.kpi-value` 同步加入 `word-break: break-word` 兜底。渲染规则更新：超过 4 个字符的单位必须用 `<span class="kpi-suffix">` 包裹，且不得添加 `data-target-value`（countUp 动画会覆盖 `textContent` 并破坏 span）。
+[English](README.md) | 简体中文
 
-**v1.8.2** — 克制配色系统：共享 badge 和 KPI 强调色默认统一为中性色盘，对比类报告可通过 `data-report-mode="comparison"` 启用实体专属 badge 颜色，`corporate-blue` 也升级为更暖感、更高级的商务主题。文档、测试和演示截图已一并同步。
+---
 
-**v1.8.1** — 导出背景修复：PNG / Mobile / IM 截图会优先解析页面 `--bg` 背景色，再回退到 `body` 背景色，因此使用渐变或背景图的报告不再导出成白底或透明底。新增透明背景导出回归测试覆盖。
-
-**v1.8.0** — 自定义主题：`--theme <name>` 现在可以加载 `themes/` 目录下的自定义主题文件夹。附带中英双语的主题编写说明和一个 warm-editorial 示例主题。
-
-**v1.6.1** — 导出背景修复：PNG / Mobile / IM 截图会优先解析页面 `--bg` 背景色，再回退到 `body` 背景色，因此使用渐变或背景图的报告不再导出成白底或透明底。新增透明背景导出回归测试覆盖。
-
-**v1.6.0** — 桑基图：新增 `:::chart type=sankey` 组件，由 ECharts 渲染。适用于数据具有"来源 → 目标 → 数值"三元组结构的场景：预算分配、多路径转化漏斗、供应链流向等。节点标签同时显示名称和数值，名称为浅色细字、数值为主题色粗体，连线上直接标注流量值。`--plan` 模式可自动识别分支流向数据并主动选用桑基图，ECharts 触发规则同 radar/funnel。
-
-**v1.5.2** — 模板修复：共享组件 CSS（导出按钮、代码块及所有组件样式）现已硬编码写入 HTML Shell 模板，不再依赖 LLM 占位符替换。修复了生成报告中导出下拉菜单显示在页面顶部、代码块缺少边框/溢出样式的问题。
-
-**v1.5.1** — Bug 修复：KPI 卡片三行对齐（通过 flex 列布局修复跨卡片 delta 行错位）、提示块文字换行修复（`flex: 1; min-width: 0`）、摘要卡打开时导出只截取卡片本身（不含背后报告）、摘要卡导出文件名增加 `-摘要卡` 后缀。
-
-**v1.5.0** — 设计质量基线：新增 `references/design-quality.md`，从四个维度编码反 AI 审美规则——90/8/2 配色法则（主色最多承担 2% 弹点角色）、KPI 网格分列规则（4 个 KPI → 2×2 而非 3 列，英雄指标用 `2fr`）、内容气质色调校准（思辨/棕、技术/藏蓝、商业/深青绿）、以及语义高亮句（`highlight-sentence`）提取。`--plan` 模式现在会在 frontmatter 中建议与气质匹配的 `primary_color` 覆盖值。新增输出前自检：*"如果告诉别人这是 AI 写的，他们会立刻相信吗？"*
-
-**v1.4.1** — 摘要卡片重设计：编辑风格双栏布局——左侧超大全大写标题，右侧紧凑 KPI 行 + 各章节一句话摘要。去除冗余标签和底部废行。修复卡片打开时导出截图空白的问题（现在直接截取 `.sc-card` 元素）。
-
-**v1.4.0** — 摘要卡片：每份报告标题旁新增 `⊞ 摘要卡` 按钮，点击弹出编辑风格摘要卡，内容来自内嵌 `#report-summary` JSON（标题、摘要、KPI、章节标签）。支持 ✕ 按钮、Escape 键或点击遮罩关闭。零额外依赖。
-
-**v1.3.0** — 借鉴 GSAP 设计思路的零依赖动画升级：KPI 卡片弹入 stagger（cubic-bezier 近似 back.out 弹性曲线）、时间线逐条滑入，所有缓动曲线升级为 power3.out 近似。无新依赖——纯 IntersectionObserver + CSS transition 实现。
-
-## 功能介绍
-
-`/report` 是一个 Claude Code 技能，可将文档或结构化大纲转换为精美的独立 HTML 报告。将其放入 `.claude/skills/` 目录，即可在任意项目中立即使用。
-
-**核心特性**
-- **零依赖** — 单个 `.html` 文件，支持离线使用（`--bundle` 模式）
-- **6 套内置主题 + 自定义主题目录** — 企业蓝、极简、深色科技、深色看板、数据叙事、报纸，或你自己的 `themes/<name>/theme.css`
-- **9 种组件类型** — KPI 指标、图表、表格、时间线、流程图、代码块、标注、图片、列表
-- **Report Review 系统** — `--review` 运行 **8 项检查点** 做一次性自动优化；`--generate` 内置 **静默终审**
-- **AI 可读输出** — 三层机器可读结构，支持下游智能体处理
-- **中英双语** — 完整支持 zh/en，自动检测语言
-
-## 快速开始
-
-**方式 A — Claude Code（手动安装）**
-
-1. 将 `SKILL.md` 复制到 `~/.claude/skills/report-creator.md`
-2. 指向一个文档或链接：
-
-```
-/report --from meeting-notes.md
-/report --from https://example.com/data-page --output market-analysis.html
-/report --plan "Q3 销售总结" --from q3-data.csv
-```
-
-**方式 B — OpenClaw / ClawHub（一行命令）**
-
-```
-clawhub install kai-report-creator
-```
-
-HTML 文件将生成到当前目录，用任意浏览器打开即可查看。
-
-## 命令说明
-
-| 命令 | 说明 |
-|------|------|
-| `/report --from file.md` | 从已有文档生成报告 |
-| `/report --from URL` | 从网页生成报告 |
-| `/report --plan "主题"` | 先生成 `.report.md` 大纲文件 |
-| `/report --generate file.report.md` | 将大纲文件渲染为 HTML |
-| `/report --review file.html` | 用 Review 清单优化已有报告 |
-| `/report --themes` | 并排预览全部 6 套主题 |
-| `/report --bundle --from file.md` | 离线 HTML，内联所有 CDN 资源 |
-| `/report --theme dark-tech --from file.md` | 指定使用内置或自定义主题 |
-| `/report --template my-template.html` | 使用自定义 HTML 模板 |
-| `/report --output my-report.html --from file.md` | 自定义输出文件名 |
-| `/report [内容]` | 一步生成：根据描述直接生成报告 |
-
-自定义主题：在 `themes/<name>/theme.css` 下创建主题文件，然后运行 `/report --theme <name> --from file.md`。
-
-## 导出
-
-每份生成的报告右下角都有内置的 **↓ Export** 按钮，无需任何额外工具。
-
-| 选项 | 说明 |
-|------|------|
-| 🖨 Print / PDF | 调起浏览器打印对话框，目标选择**另存为 PDF**。 |
-| 🖥 Save PNG (Desktop) | 以 2× 分辨率截取完整页面。 |
-| 📱 Save PNG (Mobile) | 截取报告正文区域并缩放至 1170 px 宽（约为 iPhone 宽度的 3 倍）。 |
-
-**导出 PDF 前，请在打印对话框中取消勾选「页眉和页脚」**，否则浏览器会在页面顶部和底部打印网址、日期和页码。Chrome 操作路径：*打印 → 更多设置 → 取消勾选「页眉和页脚」*。
-
-## 主题演示
+## 效果展示
 
 点击截图可在浏览器中直接打开演示：
 
@@ -114,46 +29,279 @@ HTML 文件将生成到当前目录，用任意浏览器打开即可查看。
 
 预览全部主题：`/report --themes` → 打开 `report-themes-preview.html`
 
-## Review
+---
 
-运行 `--review`，可使用 **8 项检查点** 对已有报告做一次性自动优化：
+## 设计理念：Skills 作为领域 Harness 工程
+
+本节介绍 report-creator 的设计原则——既包括作为用户工具的设计，也包括作为 Claude Code 技能的设计。这些原则对任何编写技能的人都有参考价值。
+
+### 一、渐进式披露
+
+技能文件每次被调用时，会完整加载到 AI 的上下文窗口中。文件大小直接影响 AI 的专注程度。
+
+report-creator 的解法是：**规则放在技能里，资产放在文件里**：
+
+```
+--plan        → 只需 IR 规则 + 组件语法；不涉及 CSS 和 HTML Shell
+--generate    → 只读取一个主题 CSS + 一个共享 CSS；其他 5 套主题保留在磁盘
+--themes      → 直接读取预构建的预览 HTML；技能不需要解析内部细节
+```
+
+**最终效果：** `--plan` 调用从不接触 CSS；单主题生成从不加载其他 5 套主题。
+
+这是渐进式披露原则在 AI 上下文管理中的应用：**在需要信息的那一刻才披露，而不是提前全部加载**。
+
+### 二、IR 作为人与 AI 的协作界面
+
+`.report.md` 中间表示（Intermediate Representation）是人类意图与 AI 渲染之间的契约。
+
+```
+---                         ← Frontmatter：文档身份
+title: Q3 销售报告             这是什么？谁写的？应该如何呈现？
+theme: corporate-blue          声明意图，不包含内容。
+---
+
+## 章节标题               ← 正文：人类叙述
+普通 Markdown 文本...        自然书写，AI 渲染为语义化 HTML。
+
+:::kpi                     ← 组件块：结构化数据
+- 营收: ¥2,450万 ↑12%       机器可解析，AI 按确定性模板渲染。
+:::
+```
+
+**三个好处：**
+- 人类可以自然地书写和编辑，无需了解 HTML
+- AI 对每个层次使用不同的渲染规则——正文做 Markdown 转换，组件块做模板渲染
+- IR 文件可检查、可版本管理，在生成 HTML 之前即可审阅
+
+### 三、三层 AI 可读结构
+
+每份生成的 HTML 都内嵌机器可读结构：
+
+```
+第一层 — <script id="report-summary">    文档级：标题、摘要、所有 KPI
+第二层 — data-section data-summary       章节级：标题 + 一句话摘要
+第三层 — data-component data-raw         组件级：原始 KPI/图表/表格数据
+```
+
+AI 智能体读取第一层即可获得 3 秒全局概览，进入第二层获取章节级理解，仅在需要特定数据时才访问第三层。同样的渐进式披露原则——这次是为机器读取报告而设计的。
+
+### 四、视觉节奏即认知节拍
+
+优秀的报告遵循一种节奏：**正文建立背景，组件传递数据，正文再做解读**。
+
+技能强制执行视觉节奏规则：不允许连续出现 3 个以上只有纯文字的章节，每 4-5 个章节必须包含一个"视觉锚点"——KPI 网格、图表或流程图。这不是美学偏好，而是认知节拍的需要。大段密集的文字让读者疲惫；没有背景的数据让读者迷失。交替出现才能形成阅读流。
+
+这也是 IR 组件块语法（`:::tag ... :::`）被设计得如此直观的原因：作者扫一眼 IR 文件就能看出数据密集的章节在哪里。
+
+### 五、报告是异步决策支持
+
+幻灯片默认有讲述者在场，报告没有。报告必须独立承受第一次阅读：读者通常只会扫开头、看标题、瞥一眼数据，然后在不到一分钟内决定这份文档值不值得继续读。
+
+这个约束直接改变了产品设计：
+
+- `--review` 被设计成**一次性自动优化阶段**，而不是交互式编辑回路
+- `--generate` 在写出 HTML 前，会执行同一套 **静默终审**
+- 检查体系被拆成 **L0 视觉/渲染质量** 和 **L1 内容/阅读质量**
+- 只有 AI 能稳定判断、且能稳定修复的规则，才会进入系统
+
+**判断标准：** 一份生成报告应该显著降低读者理解成本。只要决策者能通过快速扫读看明白结论、证据和下一步动作，这份报告就达标了。
+
+### 六、设计质量基线：拒绝 AI 审美
+
+生成报告最大的敌人，是让人一眼就看出"这是 AI 做的"——每个元素都用相同的圆角、主色泛滥在六种元素上、KPI 不管几个都是三列、章节标题听起来像模板。
+
+`references/design-quality.md` 编码了四个维度的约束：
+
+**90/8/2 配色法则。** 90% 中性面（背景、正文），8% 结构色（一个强调块、边框），2% 弹点（最多 1-2 处精准命中）。当主色同时出现在标题、KPI、图表、callout、目录和标签上时，它就不再是信号，而是噪音。
+
+**10:1 字号张力。** 页面上最大的元素应该是最小可读元素的 10 倍以上。报告标题应该有"锚点感"（2.8–4rem），而非"标签感"。所有元素集中在 15–22px 区间时，页面没有层次，看起来像表格导出。
+
+**KPI 网格分列规则。** 默认不是 3 列。4 个 KPI 应该是 2×2。英雄指标应该用 `2fr 1fr 1fr`。7 个以上需要视觉分组分隔线。无论几个都用三列是模板气息。
+
+**内容气质色调校准。** 不同情绪基调需要不同配色：
+
+| 气质 | `primary_color` | 感受 |
+|------|-----------------|------|
+| 思辨 / 研究 | `#7C6853` 暖棕 | 沉稳，编辑感 |
+| 技术 / 工程 | `#3D5A80` 藏蓝 | 精准，权威感 |
+| 商业 / 数据 | `#0F7B6C` 深青绿 | 自信，向前感 |
+| 叙事 / 年度 | `#B45309` 琥珀 | 温暖，势能感 |
+
+**输出前自检：** *"如果告诉别人这是 AI 写的，他们会立刻相信吗？如果会——找出最像模板的那个地方，重新设计它。"*
+
+---
+
+## 安装
+
+### Claude Code
+
+对 Claude 说：「安装 https://github.com/kaisersong/report-creator」
+
+或手动：
+```bash
+git clone https://github.com/kaisersong/report-creator ~/.claude/skills/report-creator
+```
+
+重启 Claude Code，使用 `/report` 调用。
+
+### OpenClaw
 
 ```bash
+# 通过 ClawHub 安装（推荐）
+clawhub install kai-report-creator
+
+# 或手动克隆
+git clone https://github.com/kaisersong/report-creator ~/.openclaw/skills/report-creator
+```
+
+---
+
+## 使用方式
+
+### 基本命令
+
+| 命令 | 说明 |
+|------|------|
+| `/report --from file.md` | 从已有文档生成报告 |
+| `/report --from URL` | 从网页生成报告 |
+| `/report --plan "主题"` | 先生成 `.report.md` 大纲文件 |
+| `/report --generate file.report.md` | 将大纲渲染为 HTML |
+| `/report --review file.html` | 用 Review 清单优化已有报告 |
+| `/report --themes` | 并排预览全部 6 套主题 |
+| `/report --bundle --from file.md` | 离线 HTML，内联所有 CDN 资源 |
+| `/report --theme <name> --from file.md` | 指定使用内置或自定义主题 |
+| `/report [内容]` | 一步生成：根据描述直接生成报告 |
+
+### 典型工作流
+
+**一步生成：**
+```
+/report --from meeting-notes.md
+/report --from https://example.com/data-page --output market-analysis.html
+```
+
+**两阶段工作流（复杂内容）：**
+```
+/report --plan "Q3 销售总结" --from q3-data.csv
+# 如需要，编辑生成的 q3-sales-summary.report.md
+/report --generate q3-sales-summary.report.md
+```
+
+**Review 优化：**
+```
 /report --review market-analysis.html
 ```
 
-Review 行为：
+### Review 模式
 
-1. 读取 `references/review-checklist.md`
+运行 `--review`，用 8 项检查点对已有报告做一次性自动优化：
+
+```
+/report --review market-analysis.html
+```
+
+**行为：**
+1. 加载 `references/review-checklist.md`
 2. 自动应用 hard rules
-3. 仅在高置信度时应用 ai-advised rules
+3. 高置信度时应用 ai-advised rules
 4. 将优化后的 HTML 写回原文件
 
-这是一套**一次性自动优化**流程，不是交互式确认流程。
+这是**一次性自动优化**流程，不是交互式确认流程。
 
-在常规生成路径中，`/report --generate` 也会在写出 HTML 前执行同一套 **静默终审**。
+`--generate` 也会在写出 HTML 前执行同一套 **静默终审**。
 
-如果你希望同时输出一份结构化说明，可使用 [`references/review-report-template.md`](references/review-report-template.md) 中定义的 review 报告格式。
+**8 项检查点：**
+- BLUF 开场（结论先行）
+- 标题栈逻辑
+- 去模板腔章节标题
+- 文字砖块拆解
+- 数据后的 takeaway
+- 洞察优于数据
+- 扫读锚点覆盖
+- 条件触发的读者指引
+
+---
+
+## 功能特性
+
+### 核心功能
+
+- **零依赖** — 单个 `.html` 文件，`--bundle` 模式支持离线
+- **6 套内置主题** — corporate-blue、minimal、dark-tech、dark-board、data-story、newspaper
+- **9 种组件类型** — KPI 指标、图表、表格、时间线、流程图、代码块、标注、图片、列表
+- **Report Review 系统** — 8 项检查点自动优化
+- **AI 可读输出** — 三层机器可读结构
+
+### 交互功能
+
+- **摘要卡片** — 标题旁 `⊞ 摘要卡` 按钮，展示 KPI 和章节标签
+- **内置导出** — ↓ Export 按钮，支持 Print/PDF、PNG (Desktop)、PNG (Mobile)
+- **移动端自适应** — 适配任意屏幕尺寸
+- **中英双语** — 自动检测语言
+
+### 输出功能
+
+- **自定义主题** — `themes/<name>/theme.css` + `--theme <name>`
+- **自定义模板** — `template: ./my-brand-template.html`
+- **主题覆盖** — frontmatter 中设置 `theme_overrides.primary_color`
+- **离线打包** — `--bundle` 内联所有 CDN 资源
+
+---
+
+## 主题
+
+| 主题 | 风格 | 适合场景 |
+|------|------|----------|
+| **corporate-blue** | 暖感商务 | 商业报告、高管汇报 |
+| **minimal** | 简洁学术 | 研究论文、分析报告 |
+| **dark-tech** | 工程感 | 运维报告、技术文档 |
+| **dark-board** | 看板风格 | 架构图、指标看板 |
+| **data-story** | 叙事驱动 | 年度报告、增长故事 |
+| **newspaper** | 编辑感 | 行业分析、通讯 |
+
+### corporate-blue
+
+暖感商务主题，适用于面向高管的报告。主色克制地用于关键元素——KPI 数值、章节链接、每报告一个强调块。主色最多出现在 3 类元素上，形成清晰的视觉层次，避免"AI 把所有东西都染蓝"的效果。
+
+---
+
+## 创建自定义主题
+
+1. 创建 `themes/你的主题/` 目录
+2. 编写 `theme.css`，使用 CSS 自定义属性：
+```css
+:root {
+  --primary: #B45309;
+  --bg: #FAFAF9;
+  --text: #1C1917;
+  --font-heading: "Merriweather", serif;
+}
+```
+3. 运行：`/report --theme 你的主题 --from file.md`
+
+**附带的示例主题：** `themes/warm-editorial/`
+
+---
 
 ## 报告格式（IR）
 
-对于复杂报告，建议先用 `--plan` 生成 `.report.md` 中间文件，编辑确认后再生成 HTML。
+对于复杂报告，建议先用 `--plan` 生成 `.report.md` 中间文件。
 
-**Frontmatter 示例：**
+**Frontmatter：**
 ```yaml
 ---
 title: Q3 销售报告
 theme: corporate-blue
 author: 销售团队
 date: 2024-10-08
-lang: zh                # en | zh — 不填时自动检测
+lang: zh
 toc: true
-animations: true
 abstract: "Q3 营收同比增长12%，新客户数创历史新高。"
 ---
 ```
 
-**可用组件块：**
+**组件块：**
 ```
 :::kpi
 - 营收: ¥2,450万 ↑12%
@@ -173,229 +321,66 @@ datasets:
 :::
 
 :::callout type=tip
-在此填写关键洞察。
-:::
-
-:::table caption="区域业绩"
-| 区域 | 完成率 |
-|------|--------|
-| 华南 | 115%   |
+关键洞察填写在此。
 :::
 ```
 
-## 主题
-
-需要不同配色？用 `theme_overrides` 自定义任意主题：
-```yaml
-theme_overrides:
-  primary_color: "#B45309"           # 替换主色
-  font_family: "Merriweather, serif" # 替换字体
-```
-
-## 自定义模板
-
-复制 `templates/_custom-template.example.html`，加入你的品牌样式后引用：
-
-```yaml
 ---
-template: ./my-brand-template.html
----
-```
 
-可用占位符：`{{report.title}}`、`{{report.author}}`、`{{report.date}}`、`{{report.abstract}}`、`{{report.theme_css}}`、`{{report.body}}`、`{{report.summary_json}}`
+## 面向 AI 智能体
 
-## 面向 AI 智能体与技能开发者
-
-report-creator 专为机器间协作设计，其他智能体和技能可以直接调用它。
-
-**从其他技能或智能体调用 `/report`：**
+其他智能体和技能可以直接调用 report-creator：
 
 ```
 # 从文档生成
 /report --from ./analysis.md --output summary.html
 
-# 从 URL 生成（Claude 自动抓取并分析页面内容）
+# 从 URL 生成
 /report --from https://example.com/report-page --theme data-story
 
-# 两步流程（支持中间审查）
+# 两步流程 + review
 /report --plan "市场分析" --from ./raw-data.md
-# （如需要，编辑生成的 .report.md 文件）
 /report --generate market-analysis.report.md
-/report --review report-2026-04-06-market-analysis.html
+/report --review report.html
 ```
 
-**以编程方式读取报告输出：**
-
-每份生成的 HTML 都内嵌了三层机器可读结构：
-
-```
-第一层 — <script type="application/json" id="report-summary">
-          文档级：标题、作者、摘要、所有 KPI 汇总
-          → 单次 JSON 解析即可获取完整文档概览
-
-第二层 — data-section="..." data-summary="..."  挂载在每个 <section> 上
-          章节级：每个章节的标题和一句话摘要
-          → 遍历章节，构建结构化目录
-
-第三层 — data-component="kpi" data-raw='{...}'  挂载在每个组件上
-          组件级：每个 KPI、图表、表格的原始结构化数据
-          → 按需查询特定组件，供下游数据处理使用
-```
-
-**示例：从生成的报告中提取第一层摘要**
-
+**提取结构化数据：**
 ```python
 from bs4 import BeautifulSoup
 import json
 
 soup = BeautifulSoup(open("report.html"), "html.parser")
 summary = json.loads(soup.find("script", {"id": "report-summary"}).string)
-print(summary["title"], summary["abstract"])
-print(summary["kpis"])  # 所有 KPI 数据
+print(summary["title"], summary["kpis"])
 ```
 
-**推荐调用模式：**
-
-| 场景 | 命令 |
-|------|------|
-| 将长文档汇总为报告 | `/report --from doc.md --theme minimal` |
-| 将抓取数据转为看板 | `/report --from data.json --theme dark-board` |
-| 在流水线中生成报告 | `/report --generate plan.report.md --output out.html` |
-| 离线交付 | `/report --bundle --from doc.md` |
-
-## 设计理念
-
-本节介绍 report-creator 的设计原则——既包括作为用户工具的设计，也包括作为 Claude Code 技能的设计。理解这些原则，有助于你构建更好的技能和更好的报告。
-
-### 一、技能的渐进式披露
-
-技能文件每次被调用时，会完整加载到 AI 的上下文窗口中。这意味着技能文件的大小直接影响 AI 的专注程度。
-
-report-creator 的解法是：**规则放在技能里，资产放在文件里**。
-
-- **`--plan` 模式** — 只需要 IR 规则和组件语法，不涉及任何 CSS 或 HTML Shell，技能保持专注。
-- **`--generate` 模式** — 只读取一个主题 CSS 文件（`templates/themes/[theme].css`）和一个共享 CSS 文件，其他 5 套主题保留在磁盘上，不进入上下文。
-- **`--themes` 模式** — 直接读取预构建的预览 HTML 文件，技能不需要知道文件内部的细节。
-
-最终效果：每条命令只加载它需要的内容。`--plan` 调用从不接触 CSS；单主题生成从不加载其他 5 套主题。
-
-这是渐进式披露原则在 AI 上下文管理中的应用：**在需要信息的那一刻才披露，而不是提前全部加载**。
-
-### 二、IR 作为人与 AI 的协作界面
-
-`.report.md` 中间表示（Intermediate Representation）是人类意图与 AI 渲染之间的契约。
-
-它有三个层次，各司其职：
-
-```
----                         ← Frontmatter：文档身份
-title: Q3 销售报告             这是什么？谁写的？应该如何呈现？
-theme: corporate-blue          声明意图，不包含内容。
-abstract: "..."
 ---
 
-## 章节标题               ← 正文：人类叙述
-普通 Markdown 文本...        自然书写，AI 渲染为语义化 HTML。
+## 导出
 
-:::kpi                     ← 组件块：结构化数据
-- 营收: ¥2,450万 ↑12%       机器可解析，AI 按确定性模板渲染。
-:::                           每种块类型有明确的输出契约。
-```
+每份报告右下角有内置 **↓ Export** 按钮：
 
-这种分层设计带来三个好处：
-- 人类可以自然地书写和编辑 IR，无需了解 HTML
-- AI 对每个层次使用不同的渲染规则——正文做 Markdown 转换，组件块做确定性模板渲染
-- 在生成 HTML 之前，IR 文件是可检查、可版本管理的
+| 选项 | 说明 |
+|------|------|
+| Print / PDF | 调起浏览器打印对话框，目标选择"另存为 PDF" |
+| PNG (Desktop) | 以 2× 分辨率截取完整页面 |
+| PNG (Mobile) | 截取报告正文并缩放至 1170px 宽 |
 
-### 三、Frontmatter 是文档身份，章节是文档正文
+**提示：** 打印对话框中取消勾选"页眉和页脚"，可避免浏览器打印网址和日期。
 
-Frontmatter 和章节内容回答的是不同的问题：
+---
 
-| 层次 | 回答的问题 | 示例 |
-|------|------------|------|
-| Frontmatter | *这是什么文档？* | 标题、作者、主题、语言、摘要 |
-| 章节 | *这份文档说了什么？* | 标题、正文、KPI、图表 |
-
-`abstract` 字段是最重要的桥梁：它让下游 AI 智能体无需阅读每一个章节，就能从一句话中理解整份报告的核心内容。这驱动了每份生成 HTML 中内嵌的**三层 AI 可读结构**的第一层：
+## 使用案例：每日工作日报 → Telegram
 
 ```
-第一层 — <script type="application/json" id="report-summary">
-          文档级：标题、作者、摘要、所有 KPI 汇总
-
-第二层 — data-section="..." data-summary="..."  挂载在每个 <section> 上
-          章节级：每个章节的标题和一句话摘要
-
-第三层 — data-component="kpi" data-raw='{...}'  挂载在每个组件上
-          组件级：每个 KPI、图表、表格的原始结构化数据
+将今天的工作情况用 dark-board 风格生成报告，导出为 IM 图片，通过 Telegram 发给我。
 ```
 
-AI 智能体读取报告时，可以从第一层用 3 秒完成全局概览，进入第二层获取章节级理解，仅在需要特定数据时才访问第三层。——同样的渐进式披露原则，这次是为机器读取报告而设计的。
-
-### 四、视觉节奏即认知节拍
-
-优秀的报告在结构上遵循一种节奏：**正文建立背景，数据组件传递信息，正文再做解读**。
-
-技能中强制执行了视觉节奏规则：不允许连续出现 3 个以上只有纯文字的章节，每 4-5 个章节必须包含一个"视觉锚点"——KPI 网格、图表或流程图。这不是美学偏好，而是认知节拍的需要。大段密集的文字让读者疲惫；没有背景的数据让读者迷失。交替出现才能形成阅读流。
-
-这也是 IR 组件块语法（`:::tag ... :::`）被设计得如此直观的原因：作者扫一眼 IR 文件就能看出数据密集的章节在哪里，无需解析 HTML 或 YAML。
-
-### 五、报告是异步决策支持，而不是陪同讲解
-
-幻灯片默认有讲述者在场，报告没有。报告必须独立承受第一次阅读：读者通常只会扫开头、看标题、瞥一眼数据，然后在不到一分钟内决定这份文档值不值得继续读。
-
-这个约束直接改变了产品设计：
-
-- `--review` 被设计成**一次性自动优化阶段**，而不是交互式反复编辑回路
-- `--generate` 在写出 HTML 前，会执行同一套 **静默终审**
-- 检查体系被拆成 **L0 视觉/渲染质量** 和 **L1 内容/阅读质量**
-- 只有 AI 能稳定判断、且能稳定修复的规则，才会进入系统
-
-因此，这次的 review checklist 才会聚焦在 BLUF 开场、标题栈逻辑、去模板腔章节标题、文字砖块拆解、数据后的 takeaway，以及扫读锚点覆盖。这些都是最常破坏异步阅读体验的问题，同时也是自动流程真正能高置信修复的问题。
-
-判断标准很简单：一份生成报告不能只是“看起来更完整”，而应该显著降低读者理解成本。只要决策者能通过快速扫读看明白结论、证据和下一步动作，这份报告就达标了。
-
-### 六、设计质量基线：反 AI 审美规则
-
-生成报告最大的敌人，是让人一眼就看出"这是 AI 做的"——每个元素都用相同的圆角、主色泛滥在六种元素上、KPI 不管几个都是三列、章节标题听起来像模板（"概述"、"关键发现"、"下一步"）。
-
-v1.5.0 引入了 `references/design-quality.md`，一份共享的设计质量基线，在 `--generate` 阶段与渲染规则一起加载。它编码了四个维度的约束：
-
-**90/8/2 配色法则。** 报告的颜色分三档分配：90% 中性面（背景、正文）、8% 结构色（一个强调色块、边框）、2% 弹点（最多 1-2 处精准命中）。当 `--primary` 同时出现在标题、KPI 数值、图表条、callout 边框、目录链接和标签上时，它就不再是信号，而是噪音。
-
-**字号张力：10:1 比例。** 页面上最大的元素应该是最小可读元素的 10 倍以上。报告标题应该有"锚点感"而非"标签感"——最小 2.8rem，理想 3.2-4rem 配合紧行距。当所有元素都集中在 15-22px 区间时，页面没有层次，看起来像表格导出。
-
-**KPI 网格分列规则。** 默认不是 3 列。4 个 KPI 应该是 2×2。英雄指标应该用 `grid-template-columns: 2fr 1fr 1fr`。7 个以上需要视觉分组分隔线。无论几个都用三列是模板气息——说明 AI 没有真正关注数据。
-
-**内容气质色调校准。** 哲学研究报告和季度商业数据看板有不同的情绪基调。`--plan` 模式现在会在 frontmatter 中建议与气质匹配的 `primary_color` 覆盖值：
-
-| 内容气质 | `primary_color` | 感受 |
-|---|---|---|
-| 思辨 / 研究 | `#7C6853` 暖棕 | 沉稳，编辑感 |
-| 技术 / 工程 | `#3D5A80` 藏蓝 | 精准，权威感 |
-| 商业 / 数据 | `#0F7B6C` 深青绿 | 自信，向前感 |
-| 叙事 / 年度 | `#B45309` 琥珀 | 温暖，势能感 |
-
-`design-quality.md` 的输出前自检以一条终极关卡结束：*"如果告诉别人这是 AI 写的，他们会立刻相信吗？如果会——找出最像模板的那个地方，重新设计它。"*
-
-## 使用案例
-
-### 通过 OpenClaw 生成每日工作日报，发送到 Telegram / Discord
-
-每天下班时对 OpenClaw 说一句：
-
-```
-将你今天的工作情况用 dark-board 风格生成报告，并生成图片通过 Telegram（或 Discord）发给我。
-```
-
-OpenClaw 会自动完成以下步骤：
+OpenClaw 会自动：
 1. 整理今日完成的工作、关键决策和后续计划
-2. 渲染成带 KPI 卡片和时间线的 `dark-board` 风格 HTML 报告
-3. 截图为 800px 宽的 JPEG 长图（IM 格式，动画自动禁用）
-4. 直接发送到你的 Telegram 或 Discord 频道
-
-收到的是一张视觉丰富的日报图片，直接在聊天窗口里查看，无需打开浏览器。
-
-> **为什么能正常截图：** 所有生成的报告在检测到无头浏览器环境时（`navigator.webdriver`），会立即禁用入场动画，确保表格、时间线、KPI 卡片等内容在截图中完整显示。
+2. 渲染成带 KPI 卡片和时间线的 `dark-board` 风格报告
+3. 截图为 800px 宽的 JPEG（动画自动禁用）
+4. 直接发送到你的 Telegram 频道
 
 ---
 
@@ -403,15 +388,48 @@ OpenClaw 会自动完成以下步骤：
 
 | 文件 | 说明 |
 |------|------|
-| [examples/en/business-report.html](examples/en/business-report.html) | 2024 Q3 Sales Performance Report（英文）|
-| [examples/en/business-report-reviewed-demo.html](examples/en/business-report-reviewed-demo.html) | 强化 BLUF、标题和 takeaway 的 reviewed demo（英文） |
-| [examples/en/monthly-progress-reviewed-demo.html](examples/en/monthly-progress-reviewed-demo.html) | 月报 reviewed demo（英文） |
 | [examples/zh/business-report.html](examples/zh/business-report.html) | 2024 Q3 销售业绩报告（中文）|
-| [examples/zh/monthly-progress-reviewed-demo.html](examples/zh/monthly-progress-reviewed-demo.html) | 月报 reviewed demo（中文） |
-| [examples/review-reports/monthly-progress-demo-review-report.md](examples/review-reports/monthly-progress-demo-review-report.md) | 结构化 review report 示例（英文） |
-| [examples/review-reports/monthly-progress-zh-review-report.md](examples/review-reports/monthly-progress-zh-review-report.md) | 结构化 review report 示例（中文） |
-| [examples/review-reports/business-report-demo-review-report.md](examples/review-reports/business-report-demo-review-report.md) | 图表型报告 review report 示例（英文） |
+| [examples/zh/monthly-progress-reviewed-demo.html](examples/zh/monthly-progress-reviewed-demo.html) | 月报 reviewed demo（中文）|
+| [examples/en/business-report.html](examples/en/business-report.html) | Q3 Sales Report（英文）|
+| [examples/review-reports/](examples/review-reports/) | 结构化 review report 示例 |
 
-## 许可证
+---
 
-MIT
+## 依赖要求
+
+无依赖。任何现代浏览器均可打开。
+
+`--bundle` 模式需要一次网络连接以获取 CDN 资源。
+
+---
+
+## 兼容性
+
+| 平台 | 版本 | 安装路径 |
+|------|------|----------|
+| Claude Code | 任意 | `~/.claude/skills/report-creator/` |
+| OpenClaw | ≥ 0.9 | `~/.openclaw/skills/report-creator/` |
+
+---
+
+## 版本日志
+
+**v1.9.0** — Report Review 系统：`--review` 8 项检查点；`--generate` 静默终审；L0/L1 质量分层。
+
+**v1.8.3** — KPI 溢出修复：`.kpi-suffix` 处理长单位。
+
+**v1.8.2** — 克制配色系统：共享 badge 默认中性色；`data-report-mode="comparison"` 启用实体颜色。
+
+**v1.8.1** — 导出背景修复：优先解析 `--bg`。
+
+**v1.8.0** — 自定义主题：`--theme <name>` 加载 `themes/<name>/`。
+
+**v1.6.0** — 桑基图：`:::chart type=sankey` 流向图。
+
+**v1.5.0** — 设计质量基线：90/8/2 配色、KPI 网格规则、内容气质色调。
+
+**v1.4.0** — 摘要卡片：KPI + 章节标签。
+
+**v1.3.0** — 零依赖动画：KPI 弹入、时间线滑入。
+
+**v1.0.0** — 初始发布，6 套主题 + 9 种组件。
