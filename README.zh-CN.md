@@ -1,6 +1,8 @@
 # kai-report-creator
 
 > 你有数据、决策和截止日期，但决策者没时间读完所有材料。AI 能生成报告，但往往一眼就能看出是模板产物——章节标题像填空、主色泛滥在六种元素上、KPI 不管几个都是三列。kai-report-creator 一行命令输出"异步友好"的报告：扔一个文档或链接，选个主题，得到单文件 HTML——决策者扫 30 秒就能抓住要点。下游 AI 智能体也能解析：输出内嵌三层机器可读结构。
+>
+> **[看这份指南本身生成的报告 →](examples/zh/kai-report-creator-guide.html)** — 本文档由 kai-report-creator 自己生成。
 
 适用于 [Claude Code](https://claude.ai/claude-code) 和 [OpenClaw](https://openclaw.ai) 的报告生成技能，将文档或结构化大纲转换为精美的独立 HTML 报告。
 
