@@ -1,6 +1,6 @@
 # kai-report-creator
 
-> Generate beautiful, single-file HTML reports — zero dependencies, mobile responsive, AI-readable.
+> You have data, decisions, and deadlines — but decision makers don't have time to read everything. AI can generate reports, but they often look instantly AI-made: template headings, primary color flooding every element, 3-column KPI grids regardless of count. kai-report-creator gives you polished, async-friendly reports in one command: drop a document or URL, pick a theme, and get a single HTML file that survives first-contact reading. Downstream AI agents can also parse it — the output embeds a 3-layer machine-readable structure.
 
 A skill for [Claude Code](https://claude.ai/claude-code) and [OpenClaw](https://openclaw.ai) that turns plain text or structured outlines into polished HTML reports.
 
