@@ -29,6 +29,11 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         @media (min-width: 1100px) { .report-wrapper { padding: 2.5rem 3rem; } }
         .report-meta { color: var(--text-muted); font-size: .9rem; margin-top: -.5rem; margin-bottom: 1.5rem; }
 
+        /* Watermark footer */
+        .report-footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--report-border, var(--border)); text-align: center; color: var(--text-muted); font-size: .7rem; opacity: .5; letter-spacing: .03em; }
+        @media print { .report-footer { display: none; } }
+        @media (max-width: 768px) { .report-footer { margin-top: 1.5rem; } }
+
         /* KPI */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .75rem; margin: 1.1rem 0; }
         .kpi-card { background: var(--report-surface, var(--surface)); border: 1px solid var(--report-border, var(--border)); border-radius: var(--radius); padding: .9rem; text-align: center; border-top: 2px solid var(--report-structure, var(--primary)); display: flex; flex-direction: column; align-items: center; }
@@ -344,6 +349,8 @@ When generating the final HTML report, produce a complete self-contained HTML fi
           <!-- </section> -->
 
           [All rendered section content here]
+
+          <div class="report-footer">By kai-report-creator v[version]</div>
 
         </div>
       </div>

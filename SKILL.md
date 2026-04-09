@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from <file>, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.9.0
+version: 1.10.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -291,7 +291,7 @@ When the user runs `/report --generate [file]`:
 3. Select the appropriate theme CSS.
 4. Render all components according to Component Rendering Rules.
 5. Apply chart library selection rule.
-6. Build the HTML shell with TOC, AI summary, animations.
+6. Build the HTML shell with TOC, AI summary, animations. **Replace `[version]` in the footer with the current skill version from SKILL.md frontmatter** (e.g. `1.9.0`).
 7. Load `references/review-checklist.md` and run a **silent final review pass** before writing. Use the same report review rules as `--review`, but keep the behavior silent inside `--generate`.
 8. **Pre-write validation:** Before writing, mentally scan the assembled HTML for any occurrence of `:::`. If found, locate the unconverted directive and fix it by converting it to the correct HTML component. The final HTML MUST NOT contain any `:::` sequences.
 9. Write to `[output_filename].html` using the Write tool.
@@ -303,7 +303,7 @@ When building the HTML shell, you MUST follow the template structure from `refer
 
 **CSS Assembly Order** (see `references/theme-css.md`):
 1. Theme CSS (part before `/* === POST-SHARED OVERRIDE */`)
-2. Shared component CSS (entire `shared.css`)
+2. Shared component CSS (entire `templates/themes/shared.css`)
 3. Theme CSS (part after `/* === POST-SHARED OVERRIDE */`)
 4. **TOC CSS** (inline, defined in `html-shell-template.md` — DO NOT SKIP THIS)
 5. Theme overrides (if `theme_overrides` in frontmatter)
