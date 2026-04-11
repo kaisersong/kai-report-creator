@@ -3,6 +3,7 @@
 When generating the final HTML report, produce a complete self-contained HTML file using this structure. Replace all `[...]` placeholders with actual content.
 
     <!DOCTYPE html>
+    <!-- kai-report-creator v[version] -->
     <html lang="[lang]">
     <head>
       <meta charset="UTF-8">

@@ -68,6 +68,15 @@ Extract the numeric part of Value into `data-target-value`, set `data-prefix` an
     <!-- ❌ Never combine data-target-value with kpi-suffix span — countUp will overwrite the span -->
     <div class="kpi-value" data-target-value="1000">1,000<span class="kpi-suffix">commits/hour</span></div>
 
+**KPI value length rule (MANDATORY):** The `.kpi-value` must contain ONLY a short numeric value or very brief phrase. Maximum length:
+- Numeric/currency/percentage: `128K`, `¥2,450万`, `8.6%`, `72`, `↑18%` — ✅
+- Short phrase (≤8 Chinese chars / ≤3 English words): `全场景`, `行业领先`, `Top 3` — ✅
+- Descriptive sentences or paragraphs: `支持CSV/Excel等表格文件的统计汇总、趋势分析、数据可视化` — ❌
+
+If the content is a full sentence or descriptive paragraph, it belongs in prose, a `:::callout`, or a table cell — **NEVER** in a KPI card. The `:::kpi` block is for at-a-glance metrics, not explanations. When planning a report, if the source content has no short numbers to extract, use `:::callout` or `:::timeline` instead of forcing a `:::kpi` block.
+
+**Summary card KPI value rule:** The `report-summary` JSON `kpis[].value` field feeds the summary card's `.sc-kpi-row-v` (1.15rem, compact). If a KPI value exceeds the length rule above, use the kpi-label or a separate callout for the explanation, and keep the KPI value short for the card.
+
 **Column count rule (from design-quality.md):** Do NOT default all grids to 3 columns. Match to KPI count:
 - 1–2 KPIs → `grid-template-columns: repeat(2, 1fr)`
 - 3 KPIs → `grid-template-columns: repeat(3, 1fr)`
@@ -100,6 +109,24 @@ Extract the numeric part of Value into `data-target-value`, set `data-prefix` an
     </div>
 
 **Badges / chips** (`.badge .badge--[color]`): Generic badge classes remain valid input, but they should render through one neutral linen chip system by default, including in prose, table cells, and timeline items.
+
+**Badge generation requirement (MANDATORY):** Reports MUST use `.badge` elements in at least 2 distinct locations. Place badges where they provide at-a-glance status, category, or tag information:
+
+| Location | Example | Recommended badge |
+|----------|---------|-------------------|
+| Section `##` heading | `## 核心能力 <span class="badge badge--teal">核心</span>` | `badge--teal`, `badge--blue`, `badge--purple` |
+| `:::kpi` card label | `<div class="kpi-label">转化率 <span class="badge badge--green">已上线</span></div>` | `badge--green`, `badge--orange`, `badge--blue` |
+| `:::table` cell | `<td><span class="badge badge--wip">进行中</span></td>` | `badge--wip`, `badge--done`, `badge--todo` |
+| `:::timeline` item | `<div class="timeline-content"><span class="badge badge--blue">里程碑</span> 内容</div>` | `badge--blue`, `badge--purple` |
+| Callout header area | Before callout body content as a category tag | `badge--orange`, `badge--teal` |
+
+**Badge color selection:** Choose color based on semantic meaning, not aesthetics:
+- Status/progress: `badge--done` (completed), `badge--wip` (in progress), `badge--todo` (planned)
+- Severity: `badge--warn` (caution), `badge--err` (error/blocker)
+- Category/tag: `badge--teal` (capability), `badge--blue` (priority/important), `badge--purple` (feature/special), `badge--orange` (highlight), `badge--green` (positive/verified), `badge--gray` (misc/neutral)
+- Entity comparison (only in `data-report-mode="comparison"`): `badge--entity-a`, `badge--entity-b`, `badge--entity-c`
+
+**Do NOT overuse:** Maximum 3 badges per section. More than 3 dilutes their signal value.
 
 **Entity badges:** Only in explicit comparison reports should entity identity use `.badge--entity-a`, `.badge--entity-b`, and `.badge--entity-c`.
 
@@ -258,7 +285,13 @@ layout=full (default): full width, centered.
 
 ## :::timeline
 
-Each item: `- Date: Description` or `- Label: Description`
+Each item: `- Date: Description`
+
+**Temporal content rule (MANDATORY):** The `:::timeline` component is ONLY for content with actual dates, timestamps, or sequential time markers (e.g. `2024-07`, `Q1 2025`, `Day 1`, `Week 3`). It represents chronological progression — items must have a clear before/after relationship.
+
+**Prohibited:** Do NOT use `:::timeline` for parallel, non-sequential items like principles, rules, features, or categories (e.g. "真诚服务", "安全可信", "专业高效" — these are并列关系, not chronological). For parallel items, use `:::list` or prose with `:::callout` instead.
+
+**When in doubt:** If the items could be reordered without changing meaning, they are NOT timeline content.
 
     <div data-component="timeline" class="timeline fade-in-up">
       <div class="timeline-item">
@@ -310,7 +343,7 @@ For dark-tech theme use `github-dark.min.css` instead of `github.min.css`.
       <div class="callout-body">[content]</div>
     </div>
 
-Default icons: note→ℹ️, tip→💡, warning→⚠️, danger→🚫
+Default icons: note→ℹ, tip→💡, warning→⚠, danger→🚫
 
 ## Custom Blocks
 

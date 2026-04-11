@@ -95,7 +95,7 @@ Plain Markdown between blocks renders as rich text (headings, paragraphs, bold, 
 | `:::table` | (none — Markdown table in body) | `caption` |
 | `:::list` | (none — list items in body) | `style` (ordered\|unordered) |
 | `:::image` | `src` | `layout` (left\|right\|full), `caption`, `alt` |
-| `:::timeline` | (none — list items in body) | (none) |
+| `:::timeline` | Timeline (requires dates/timestamps — NOT for parallel items) | (none — list items in body) | (none) |
 | `:::diagram` | `type` (sequence\|flowchart\|tree\|mindmap) | (none) |
 | `:::code` | `lang` | `title` |
 | `:::callout` | `type` (note\|tip\|warning\|danger) | `icon` |
@@ -170,6 +170,7 @@ Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5
    - Complete frontmatter with all relevant fields filled in
    - At least 3–5 sections with `##` headings
    - A mix of component types (kpi, chart, table, timeline, callout, etc.)
+   - **Badge placement plan:** Identify at least 2 locations for `.badge` elements — section headers, KPI labels, table cells, or timeline items. See `references/rendering-rules.md` for badge generation rules.
    - Placeholder values for data: use `[数据待填写]` (zh) or `[INSERT VALUE]` (en) — **never fabricate numbers**
    - Comments for fields the user should customize
    - **Content-tone color hint:** Based on topic keywords, add a `theme_overrides` block in the frontmatter with a commented `primary_color` suggestion matching the content tone (see `references/design-quality.md` § Content-Tone Color Calibration). Example for a research report:
@@ -195,6 +196,8 @@ Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5
 **narrative strict rule:** Never generate a `:::kpi` or `:::chart` block where all values are `[数据待填写]` / `[INSERT VALUE]`. If a section has no numbers, use `:::callout`, `:::timeline`, or `:::diagram` instead.
 
 **mixed rule:** A `:::kpi` block is only allowed if at least one value in that block is a real number extracted from the source content.
+
+**KPI value content rule:** KPI values must be short numbers or brief phrases (≤8 Chinese chars / ≤3 English words). Never put descriptive sentences or paragraphs in KPI values. If the source content has long descriptions, extract the key number/phrase for the KPI value and put the full explanation in prose or a callout.
 
 4. **Apply visual rhythm rules** when laying out sections:
    - Never place 3 or more consecutive sections containing only plain Markdown prose (no components)
@@ -258,7 +261,7 @@ When the report is explicitly comparing named vendors, models, or tools, set `da
 | `:::table` | Data tables | (none — Markdown table in body) | `caption` |
 | `:::list` | Styled lists | (none — list items in body) | `style` (ordered\|unordered) |
 | `:::image` | Images with captions | `src` | `layout` (left\|right\|full), `caption`, `alt` |
-| `:::timeline` | Timeline visualization | (none — list items in body) | (none) |
+| `:::timeline` | Timeline (dates only — parallel items use `:::list`) | (none — list items in body) | (none) |
 | `:::diagram` | Diagrams (sequence/flowchart/tree/mindmap) | `type` | (none) |
 | `:::code` | Syntax-highlighted code blocks | `lang` | `title` |
 | `:::callout` | Callout boxes | `type` (note\|tip\|warning\|danger) | `icon` |
