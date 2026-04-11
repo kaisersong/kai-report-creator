@@ -33,6 +33,8 @@ The largest text element on any page must be ≥ 10× the smallest readable elem
 
 **Apply to section headings:** `h2` gets a subtle left border or underline using `--primary` at 8% allocation — not a background color.
 
+**Letter-spacing upper limit:** Body text and prose must never exceed `letter-spacing: 0.05em`. Wide letter-spacing on body text (>0.05em) breaks word shape recognition and slows reading. Negative letter-spacing is acceptable for titles (`-0.03em`) and headings (`-0.02em`).
+
 ## 3. KPI Grid Column Rules
 
 Do not default all KPI grids to 3 columns. Match columns to KPI count for better proportion:
@@ -64,6 +66,13 @@ These patterns make a report look instantly AI-generated. Do not produce them:
 | `:::kpi` block where every value is `[INSERT VALUE]` / `[数据待填写]` in a narrative report | Use `:::callout` or `:::timeline` as the visual anchor instead |
 | `:::kpi` value contains a full sentence or descriptive paragraph (e.g. "支持CSV/Excel等表格文件的统计汇总、趋势分析、数据可视化") | KPI value = short number/phrase only (≤8 Chinese chars / ≤3 English words). Explanations go in prose, callout, or table cell |
 | `:::chart` with all-placeholder data in a text-heavy (narrative/mixed) section | Use `:::diagram` (flowchart/mindmap) or a `highlight-sentence` paragraph |
+| Nested cards (card inside a card) | Flatten hierarchy — use indentation, sub-lists, or adjacent blocks instead |
+| Default text alignment centered everywhere | Left-align body text; center only the title and hero metrics |
+| Glassmorphism (blur/backdrop-filter) as decoration | Solid or subtly tinted backgrounds; blur signals no information |
+| `text-align: justify` on body text | Left-align — justified text creates rivers of whitespace |
+| Using monospace fonts to signal "technical/developer" vibes | System sans-serif for all prose; reserve monospace for actual code blocks only |
+| Icon tile (small rounded-square icon container) stacked above section heading | Inline icon in heading or skip entirely — decorative icon squares add no information |
+| `text-transform: uppercase` on body text (all-caps paragraphs) | Normal case for body; all-caps only for small labels or chips |
 
 ## 5. Content-Tone Color Calibration
 
@@ -120,6 +129,13 @@ Before writing the final HTML, answer each question. Fix any "no":
 - [ ] Does any `.kpi-value` contain a sentence or paragraph longer than 8 Chinese chars / 3 English words? If yes → move explanation to prose/callout, keep KPI value short
 - [ ] Does the report use `.badge` elements in at least 2 locations (section headers, KPI cards, table cells, timeline items)? If no → add badges at appropriate locations
 - [ ] **If you told someone "an AI wrote this", would they immediately believe it?** If yes → find the most generic-looking part and redesign it
+- [ ] Is any prose line wider than ~75 characters (Chinese: ~50 chars)? If yes → constrain with `max-width` or `max-inline-size` in CSS
+- [ ] Is any `text-align: justify` applied to body text? If yes → change to left-align
+- [ ] Is any background `#000000` or `#000`? If yes → use `#111` or `#181818` instead — pure black is harsh and unnatural
+- [ ] Is any gray text (`#888`, `#999`, `var(--text-muted)`) placed on a colored background? If yes → darken text or lighten background for WCAG AA contrast
+- [ ] Is any body text `letter-spacing` greater than `0.05em`? If yes → reduce or remove
+- [ ] Are there nested cards (a `.kpi-card`, `.callout`, or `.table-wrapper` inside another card)? If yes → flatten hierarchy
+- [ ] Is any card or container padding less than `0.75rem` (data elements) or `0.9rem` (prose)? If yes → increase — cramped padding makes reports feel cheap
 
 ## L1 Content Review
 

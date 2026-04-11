@@ -119,7 +119,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         /* Chart */
         [data-component="chart"] { margin: 1.1rem 0; }
 
-        /* Animations */
+        /* Animations — all easing uses cubic-bezier(0.22,1,0.36,1) (ease-out-expo). Never use bounce (overshoot >1) or elastic (spring oscillation) easing — they read as dated and tacky. */
         .fade-in-up { opacity: 0; transform: translateY(18px); transition: opacity .5s cubic-bezier(0.22,1,0.36,1), transform .5s cubic-bezier(0.22,1,0.36,1); }
         .fade-in-up.visible { opacity: 1; transform: translateY(0); }
         body.no-animations .fade-in-up { opacity: 1; transform: none; transition: none; }
@@ -192,6 +192,8 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         @media (max-width: 768px) {
           .report-wrapper { padding: 1.5rem 1rem; }
         }
+        /* Responsive rule: never hide critical functionality (export, edit toggle, KPI values, charts) on mobile.
+           Only decorative/progressive-enhancement elements (animations, TOC overlay) may be suppressed. */
         body.no-toc .toc-sidebar, body.no-toc .toc-toggle { display: none; }
         body.no-toc .main-with-toc { margin-left: 0; }
 

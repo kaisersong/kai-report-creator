@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from <file>, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.11.0
+version: 1.12.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -338,6 +338,10 @@ When the user runs `/report --generate [file]`:
    - Search `.timeline-date` → verify each contains a date/timestamp, not a label
    - Search `\uFE0F` → remove all variant selectors from callout icons
    - Search `report-summary` JSON `kpis[].value` → verify each is short (Rule 5)
+   - Search `text-align: justify` in CSS → replace with left-align
+   - Search `#000000` or `#000` as background color → replace with `#111` or `#18181B`
+   - Search `letter-spacing` values > `0.05em` on body text → reduce
+   - Check `@media (max-width)` rules → ensure no critical functionality is hidden on mobile
 9. **Silent review pass** — apply `references/review-checklist.md` checkpoints (Category 0: visual hard rules, then Category 1: hard rules 1.1–1.5). Auto-fix violations.
 10. Write to `[output_filename].html` using the Write tool.
 11. Tell the user the file path and a 1-sentence summary of the report.
