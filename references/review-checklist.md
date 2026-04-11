@@ -91,14 +91,14 @@ Bad patterns:
 
 **Detection:** Flag headings such as:
 
-- `Overview`
-- `Background`
-- `Key Findings`
-- `Summary`
-- `Next Steps`
+- `Overview` / `概述` / `简介` / `背景`
+- `Background` / `背景`
+- `Key Findings` / `关键发现`
+- `Summary` / `总结` / `结论`
+- `Next Steps` / `下一步` / `展望`
+- `身份定位` / `核心能力` / `核心原则` / `使用场景` / `方法论`
 - `问题分析`
-- `关键发现`
-- `总结`
+- Any heading that is a generic label without content-specific information
 
 when they do not carry section-specific information.
 

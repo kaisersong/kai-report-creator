@@ -83,6 +83,9 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         .callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
         .callout-body { flex: 1; min-width: 0; line-height: 1.6; font-size: .93rem; }
 
+        /* Semantic highlight extraction — from design-quality.md §6 */
+        .highlight-sentence { font-size: 1.15rem; font-weight: 700; color: var(--primary); border-left: 3px solid var(--primary); padding-left: 1rem; margin: 1.5rem 0; line-height: 1.5; }
+
         /* Timeline */
         .timeline { position: relative; padding-left: 2rem; margin: 1.1rem 0; }
         .timeline::before { content: ''; position: absolute; left: .45rem; top: 0; bottom: 0; width: 2px; background: var(--border); }

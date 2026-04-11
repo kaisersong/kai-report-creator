@@ -244,9 +244,37 @@ When the user runs `/report --review [file]`:
 
 When rendering IR to HTML, apply component-specific rendering rules. Each component must be wrapped with `data-component` attribute for AI readability.
 
-**Detailed rendering rules are in `references/rendering-rules.md`** — load when generating HTML.
+**Load `references/rendering-rules.md` and `references/design-quality.md` before generating any HTML.** These files contain the detailed rendering rules and design quality baseline.
 
-**Design quality rules are in `references/design-quality.md`** — load alongside rendering-rules.md. Apply the 90/8/2 color law, KPI column rules, anti-slop patterns, and run the pre-output self-check before writing.
+### HARD RULES (must be enforced before writing HTML)
+
+These rules are non-negotiable. After assembling the full HTML, search for violations and fix them before writing the file.
+
+**Rule 1 — KPI value length:** Every `.kpi-value` element must contain ≤8 Chinese characters OR ≤3 English words. If any KPI value is a sentence or paragraph, move the explanation to prose/callout and keep only the short number/phrase in the KPI.
+
+**Rule 2 — Badge coverage:** The HTML must contain at least 5 `<span class="badge` elements across ≥2 distinct sections. Place badges in section headings, KPI labels, table cells, or list items.
+
+**Rule 3 — Timeline validity:** Every `.timeline-item` must have a `.timeline-date` with an actual date/timestamp. If any timeline item uses a generic label (e.g. a principle name or feature description) as its "date", convert the entire timeline to `:::list` or `:::callout`.
+
+**Rule 4 — No U+FE0F in output:** The final HTML must contain zero U+FE0F characters. Default callout icons use base emoji without variant selectors (ℹ not ℹ️, ⚠ not ⚠️).
+
+**Rule 5 — KPI summary values are short:** The `report-summary` JSON `kpis[].value` field feeds the compact summary card. If a value exceeds Rule 1 length, use a short phrase and move the explanation elsewhere.
+
+### Heading quality rules
+
+**Do NOT use these generic labels as h2 headings:** 身份定位, 核心能力, 核心原则, 使用场景, Overview, Background, Key Findings, Summary, Next Steps, 问题分析, 关键发现, 总结, 简介, 概述, 结论, 展望, 背景, 方法论.
+
+**Instead, use information-bearing headings that state a claim or implication:**
+- ❌ `## 身份定位` → ✅ `## 不是搜索框，是办公搭档`
+- ❌ `## 核心能力` → ✅ `## 四大能力覆盖办公全场景`
+- ❌ `## 核心原则` → ✅ `## 真诚、安全、专业 — 三条底线加一条准则`
+- ❌ `## 使用场景` → ✅ `## 六大场景，从信息查询到汇报全覆盖`
+
+**Template for h2 headings:** Choose one pattern based on content:
+- "不是 X，是 Y" — identity/positioning sections
+- "N 个 [noun] 覆盖/支撑/驱动 [scope]" — capability/capacity sections
+- "[A]、[B]、[C] — N 条底线/准则/支柱" — principle/rules sections
+- "N 大场景，从 [X] 到 [Y]" — scenario/coverage sections
 
 When the report is explicitly comparing named vendors, models, or tools, set `data-report-mode="comparison"` on the outer report container and use `.badge--entity-a/.badge--entity-b/.badge--entity-c` only for entity identity. Do not use entity colors on generic KPI values or generic badges.
 
@@ -289,16 +317,30 @@ Generate a complete self-contained HTML file with embedded CSS/JS.
 ## --generate Mode
 
 When the user runs `/report --generate [file]`:
-1. If a file is specified, read it with the Read tool. If no file given, look for IR in context (starts with `---`).
-2. Parse the frontmatter to get metadata and settings.
-3. Select the appropriate theme CSS.
-4. Render all components according to Component Rendering Rules.
-5. Apply chart library selection rule.
-6. Build the HTML shell with TOC, AI summary, animations. **Replace `[version]` in the footer with the current skill version from SKILL.md frontmatter** (e.g. `1.9.0`).
-7. Load `references/review-checklist.md` and run a **silent final review pass** before writing. Use the same report review rules as `--review`, but keep the behavior silent inside `--generate`.
-8. **Pre-write validation:** Before writing, mentally scan the assembled HTML for any occurrence of `:::`. If found, locate the unconverted directive and fix it by converting it to the correct HTML component. The final HTML MUST NOT contain any `:::` sequences.
-9. Write to `[output_filename].html` using the Write tool.
-10. Tell the user the file path and a 1-sentence summary of the report.
+
+1. **Read the IR file** — read the specified `.report.md` file (or IR from context).
+2. **Load reference files** — read ALL of these before generating any HTML:
+   - `references/rendering-rules.md` — component rendering rules
+   - `references/design-quality.md` — design quality baseline + anti-slop rules
+   - `references/html-shell-template.md` — HTML shell structure
+   - `references/theme-css.md` — CSS assembly rules
+   - `references/review-checklist.md` — review checklist
+3. Parse the frontmatter to get metadata and settings.
+4. Select the appropriate theme CSS.
+5. Render all components according to Component Rendering Rules (including HARD RULES).
+6. Apply chart library selection rule.
+7. Build the HTML shell with TOC, AI summary, animations. **Replace `[version]` in the footer with the current skill version from SKILL.md frontmatter.**
+8. **Pre-write validation** — scan the assembled HTML for these violations and fix each one found:
+   - Search `:::` in HTML → convert unconverted directives
+   - Search for generic h2 headings from the forbidden list → rewrite with information-bearing text
+   - Search `.kpi-value` elements → verify each ≤8 Chinese chars / ≤3 English words
+   - Search `<span class="badge"` → count must be ≥5 across ≥2 sections
+   - Search `.timeline-date` → verify each contains a date/timestamp, not a label
+   - Search `\uFE0F` → remove all variant selectors from callout icons
+   - Search `report-summary` JSON `kpis[].value` → verify each is short (Rule 5)
+9. **Silent review pass** — apply `references/review-checklist.md` checkpoints (Category 0: visual hard rules, then Category 1: hard rules 1.1–1.5). Auto-fix violations.
+10. Write to `[output_filename].html` using the Write tool.
+11. Tell the user the file path and a 1-sentence summary of the report.
 
 **CRITICAL: Follow `references/html-shell-template.md` EXACTLY**
 
