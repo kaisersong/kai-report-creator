@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from FILE, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.13.0
+version: 1.14.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -331,17 +331,28 @@ When the user runs `/report --generate [file]`:
 6. Apply chart library selection rule.
 7. Build the HTML shell with TOC, AI summary, animations. **Replace `[version]` in the footer with the current skill version from SKILL.md frontmatter.**
 8. **Pre-write validation** — scan the assembled HTML for these violations and fix each one found:
-   - Search `:::` in HTML → convert unconverted directives
-   - Search for generic h2 headings from the forbidden list → rewrite with information-bearing text
-   - Search `.kpi-value` elements → verify each ≤8 Chinese chars / ≤3 English words
-   - Search `<span class="badge"` → count must be ≥5 across ≥2 sections
-   - Search `.timeline-date` → verify each contains a date/timestamp, not a label
-   - Search `\uFE0F` → remove all variant selectors from callout icons
-   - Search `report-summary` JSON `kpis[].value` → verify each is short (Rule 5)
-   - Search `text-align: justify` in CSS → replace with left-align
-   - Search `#000000` or `#000` as background color → replace with `#111` or `#18181B`
-   - Search `letter-spacing` values > `0.05em` on body text → reduce
-   - Check `@media (max-width)` rules → ensure no critical functionality is hidden on mobile
+   - **L0: Content checks**
+     - Search `:::` in HTML → convert unconverted directives
+     - Search for generic h2 headings from the forbidden list → rewrite with information-bearing text
+     - Search `.kpi-value` elements → verify each ≤8 Chinese chars / ≤3 English words
+     - Search `<span class="badge"` → count must be ≥5 across ≥2 sections
+     - Search `.timeline-date` → verify each contains a date/timestamp, not a label
+     - Search `\uFE0F` → remove all variant selectors from callout icons
+     - Search `report-summary` JSON `kpis[].value` → verify each is short (Rule 5)
+   - **L1: Design quality checks**
+     - Search `text-align: justify` in CSS → replace with left-align
+     - Search `#000000` or `#000` as background color → replace with `#111` or `#18181B`
+     - Search `letter-spacing` values > `0.05em` on body text → reduce
+     - Check `@media (max-width)` rules → ensure no critical functionality is hidden on mobile
+   - **L2: HTML Shell Structure (MANDATORY — see `references/design-quality.md` §8)**
+     - Search `id="toc-toggle-btn"` → must exist
+     - Search `id="toc-sidebar"` → must exist
+     - Search `id="card-mode-btn"` → must exist
+     - Search `id="sc-overlay"` → must exist
+     - Search `id="export-btn"` → must exist
+     - Search `id="export-menu"` → must exist
+     - Search `id="report-summary"` → must exist (JSON summary block)
+     - Any missing → reconstruct from `references/html-shell-template.md` and re-inject
 9. **Silent review pass** — apply `references/review-checklist.md` checkpoints (Category 0: visual hard rules, then Category 1: hard rules 1.1–1.5). Auto-fix violations.
 10. Write to `[output_filename].html` using the Write tool.
 11. Tell the user the file path and a 1-sentence summary of the report.

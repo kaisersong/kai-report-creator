@@ -137,14 +137,60 @@ Before writing the final HTML, answer each question. Fix any "no":
 - [ ] Are there nested cards (a `.kpi-card`, `.callout`, or `.table-wrapper` inside another card)? If yes → flatten hierarchy
 - [ ] Is any card or container padding less than `0.75rem` (data elements) or `0.9rem` (prose)? If yes → increase — cramped padding makes reports feel cheap
 
+## 8. L2 HTML Shell Structure (MANDATORY)
+
+These checks verify the HTML shell was built according to `references/html-shell-template.md`. **This is NOT about content quality — it's about the container itself.**
+
+**Root cause:** BUG-001 (2026-04-13). AI skipped template structure, generated obsolete TOC implementation and lost summary card + export buttons. Prevention: check the shell before writing.
+
+### 8.1 Required Elements
+
+Every generated report HTML **MUST** contain these elements. If any are missing, reconstruct from `html-shell-template.md`:
+
+| Element | Required ID/class | Purpose |
+|---------|------------------|---------|
+| TOC toggle button | `id="toc-toggle-btn"` + class `toc-toggle` | Visible `☰` button, top-left corner |
+| TOC sidebar nav | `id="toc-sidebar"` + class `toc-sidebar` | Sliding sidebar with section links |
+| Summary card button | `id="card-mode-btn"` + class `card-mode-btn` | `⊞ 摘要卡` button next to h1 title |
+| Summary card overlay | `id="sc-overlay"` + class `sc-overlay` | Modal overlay for summary card |
+| Summary card | `id="sc-card"` + class `sc-card` | Two-panel summary card (injected by JS) |
+| Export button | `id="export-btn"` + class `export-btn` | `↓ 导出` button, bottom-right |
+| Export menu | `id="export-menu"` + class `export-menu` | Dropdown with Print/PNG/IM options |
+| JSON summary block | `type="application/json" id="report-summary"` | Machine-readable report metadata |
+| Report mode attribute | `data-report-mode="[default\|comparison]"` on `<body>` | Semantic mode flag |
+
+### 8.2 TOC JavaScript Contract
+
+The TOC JS logic **MUST** include:
+
+- `scheduleClose` function with **≥100ms delay** (prevents instant-close bug)
+- Both `tocBtn` and `tocSidebar` must have `mouseenter` / `mouseleave` handlers
+- `locked` state with click-to-lock toggle on `tocBtn`
+
+### 8.3 Edit Mode (always present)
+
+- `id="edit-hotzone"` — bottom-left corner hotzone
+- `id="edit-toggle"` — edit toggle button
+
+### 8.4 CSS Assembly Verification
+
+Before writing, verify CSS includes:
+
+- `.toc-toggle` and `.toc-sidebar` styles (from html-shell-template.md §163-198)
+- `.sc-card`, `.sc-left`, `.sc-right`, `.sc-overlay` styles (summary card)
+- `.export-btn`, `.export-menu`, `.export-item` styles
+- `.edit-hotzone`, `.edit-toggle` styles
+- `@media print` rules hiding UI chrome
+
 ## L1 Content Review
 
 For content, structure, and reading-flow checks, see [review-checklist.md](review-checklist.md).
 
 **L0 (Visual)**: This file — color, typography, layout, anti-slop presentation rules.
 **L1 (Content)**: `review-checklist.md` — BLUF opening, heading logic, prose walls, takeaways, scan anchors.
+**L2 (Shell Structure)**: This file §8 — HTML shell element existence, TOC JS contract, edit mode, CSS assembly.
 
 **When to apply:**
 
-- `--generate`: run a **silent final review pass** using the L1 checklist before writing HTML
+- `--generate`: run a **silent final review pass** using the L1 checklist before writing HTML, then run L2 shell structure checks before writing
 - `--review`: run the same one-pass automatic refinement explicitly against an existing report

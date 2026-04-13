@@ -143,37 +143,82 @@ If the content is a full sentence or descriptive paragraph, it belongs in prose,
 
 ## :::chart
 
-Choose library: Chart.js for bar/line/pie/scatter; ECharts for radar/funnel/heatmap/multi-axis. If any chart in report needs ECharts, use ECharts for ALL charts. Never load both libraries.
+Use **ECharts** for ALL charts in the report. ECharts covers bar/line/pie/scatter/radar/funnel/heatmap/multi-axis/sankey with a single library, avoiding the pitfalls of mixed-library switching (rotated label clipping, artificial data splits, HTML shell rewrites).
 
-    <div data-component="chart" data-type="bar" data-raw='{"labels":[...],"datasets":[...]}' class="fade-in-up">
-      <canvas id="chart-[unique-id]"></canvas>
-      <script>
-        new Chart(document.getElementById('chart-[unique-id]'), {
-          type: 'bar',
-          data: { labels: [...], datasets: [{ label: '...', data: [...], backgroundColor: 'rgba(26,86,219,0.8)' }] },
-          options: { responsive: true, plugins: { legend: { position: 'top' } } }
-        });
-      </script>
-    </div>
+Add `<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>` in `<head>` (or inline if `--bundle`).
 
-Use theme's `--primary` color for chart colors. Add `<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>` in `<head>` (or inline if `--bundle`).
+**Chart.js is NOT used in the standard template.** Do NOT generate Chart.js chart code.
 
-**ECharts rendering** (used when any chart in the report requires radar/funnel/heatmap/multi-axis):
+### ECharts bar chart
 
-    <div data-component="chart" data-type="radar" data-raw='{"legend":["..."],"series":[{"name":"...","data":[...]}]}' class="fade-in-up">
+    <div data-component="chart" data-type="bar" class="fade-in-up">
       <div id="chart-[unique-id]" style="height:300px"></div>
       <script>
         var chart = echarts.init(document.getElementById('chart-[unique-id]'));
         chart.setOption({
-          legend: { data: ['...'] },
-          series: [{ type: 'radar', data: [{ value: [...], name: '...' }] }]
+          title: { text: '[title]', textStyle: { color: '#94A3B8', fontSize: 13 } },
+          grid: { top: 50, right: 30, bottom: 30, left: 60 },
+          xAxis: { type: 'category', data: ['...'], axisLabel: { color: '#94A3B8' }, axisLine: { lineStyle: { color: '#334155' } } },
+          yAxis: { type: 'value', axisLabel: { color: '#94A3B8' }, splitLine: { lineStyle: { color: '#334155' } } },
+          series: [{ name: '[series]', type: 'bar', data: [...], barWidth: '50%', label: { show: true, position: 'top', color: '#E2E8F0', formatter: '{c}' } }],
+          tooltip: { trigger: 'item', backgroundColor: '#1E293B', borderColor: '#334155', textStyle: { color: '#E2E8F0' } }
         });
       </script>
     </div>
 
-Add `<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>` in `<head>` (or inline if `--bundle`). The `data-raw` attribute for ECharts uses `series` format matching the ECharts `setOption` data structure.
+**Grid bottom rule (MANDATORY):** If x-axis labels are rotated (`rotate > 0`), `grid.bottom` MUST be ≥ 60. Without rotation, `bottom: 30` is sufficient.
 
-**Sankey rendering** (triggered by `type=sankey`; requires ECharts):
+### ECharts radar chart
+
+    <div data-component="chart" data-type="radar" class="fade-in-up">
+      <div id="chart-[unique-id]" style="height:300px"></div>
+      <script>
+        var chart = echarts.init(document.getElementById('chart-[unique-id]'));
+        chart.setOption({
+          title: { text: '[title]', textStyle: { color: '#94A3B8', fontSize: 13 } },
+          legend: { data: ['...'], bottom: 0, textStyle: { color: '#94A3B8', fontSize: 11 } },
+          radar: { indicator: [{ name: '...' }], axisName: { color: '#E2E8F0', fontSize: 11 }, splitLine: { lineStyle: { color: '#334155' } }, splitArea: { areaStyle: { color: ['rgba(30,41,59,0.6)', 'rgba(15,23,42,0.8)'] } } },
+          series: [{ type: 'radar', data: [{ value: [...], name: '...' }] }],
+          tooltip: { trigger: 'item', backgroundColor: '#1E293B', borderColor: '#334155', textStyle: { color: '#E2E8F0' } }
+        });
+      </script>
+    </div>
+
+### ECharts line chart
+
+    <div data-component="chart" data-type="line" class="fade-in-up">
+      <div id="chart-[unique-id]" style="height:300px"></div>
+      <script>
+        var chart = echarts.init(document.getElementById('chart-[unique-id]'));
+        chart.setOption({
+          title: { text: '[title]', textStyle: { color: '#94A3B8', fontSize: 13 } },
+          grid: { top: 50, right: 30, bottom: 50, left: 55 },
+          xAxis: { type: 'category', data: ['...'], axisLabel: { color: '#94A3B8', interval: 0 }, axisLine: { lineStyle: { color: '#334155' } } },
+          yAxis: { type: 'value', axisLabel: { color: '#94A3B8' }, splitLine: { lineStyle: { color: '#334155' } } },
+          series: [{ name: '[series]', type: 'line', data: [...], smooth: true, lineStyle: { color: '#818CF8', width: 2 }, itemStyle: { color: '#818CF8' }, areaStyle: { color: 'rgba(129,140,248,0.1)' } }],
+          legend: { data: ['[series]'], bottom: 0, textStyle: { color: '#94A3B8', fontSize: 11 } },
+          tooltip: { trigger: 'item', backgroundColor: '#1E293B', borderColor: '#334155', textStyle: { color: '#E2E8F0' } }
+        });
+      </script>
+    </div>
+
+**Line data rule (MANDATORY):** If the IR provides a single `data` array, render as a **single series**. Do NOT split into multiple series with `null` values unless the IR explicitly defines separate series via `series:` YAML key.
+
+### ECharts pie chart
+
+    <div data-component="chart" data-type="pie" class="fade-in-up">
+      <div id="chart-[unique-id]" style="height:300px"></div>
+      <script>
+        var chart = echarts.init(document.getElementById('chart-[unique-id]'));
+        chart.setOption({
+          title: { text: '[title]', textStyle: { color: '#94A3B8', fontSize: 13 } },
+          series: [{ type: 'pie', radius: ['40%', '70%'], data: [{ name: 'A', value: 10 }, ...], label: { formatter: '{b}: {d}%' }, emphasis: { itemStyle: { shadowBlur: 10 } } }],
+          tooltip: { trigger: 'item', backgroundColor: '#1E293B', borderColor: '#334155', textStyle: { color: '#E2E8F0' } }
+        });
+      </script>
+    </div>
+
+### ECharts sankey rendering (triggered by `type=sankey`)
 
 IR input format:
 ```

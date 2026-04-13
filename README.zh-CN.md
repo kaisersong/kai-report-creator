@@ -419,6 +419,10 @@ OpenClaw 会自动：
 
 ## 版本日志
 
+**v1.14.0** — ECharts 统一标准：所有图表统一使用 ECharts（告别 Chart.js 混用），新增 bar/line/radar/pie ECharts 模板，旋转标签 grid bottom 规则，折线图数据完整性规则，14 个图表渲染契约测试。
+
+**v1.13.0** — L2 HTML shell 结构校验：SKILL.md pre-write 新增 10 项结构检查，design-quality.md §8，30 个 HTML shell 契约测试（BUG-001 修复）。
+
 **v1.9.0** — Report Review 系统：`--review` 8 项检查点；`--generate` 静默终审；L0/L1 质量分层。
 
 **v1.8.3** — KPI 溢出修复：`.kpi-suffix` 处理长单位。

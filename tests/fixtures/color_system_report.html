@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-report-mode="default">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -55,10 +55,99 @@
       margin: 0 0 12px;
       font-size: 16px;
     }
+
+    /* TOC */
+    .toc-toggle {
+      position: fixed; top: .75rem; left: .75rem; z-index: 200;
+      background: var(--primary); color: #fff; border: none; border-radius: 6px;
+      padding: .45rem .7rem; cursor: pointer; font-size: 1rem;
+    }
+    .toc-toggle.locked { box-shadow: 0 0 0 2px #fff, 0 2px 8px rgba(0,0,0,.2); }
+    .toc-sidebar {
+      position: fixed; top: 0; left: 0; width: 240px; height: 100vh;
+      overflow-y: auto; padding: 3rem 1rem 1.5rem; background: var(--surface);
+      border-right: 1px solid var(--border); z-index: 100;
+      transform: translateX(-100%); transition: transform .28s ease;
+    }
+    .toc-sidebar.open { transform: translateX(0); }
+    .toc-sidebar h4 { font-size: .72rem; text-transform: uppercase; color: var(--text-muted); margin: 0 0 .75rem; }
+    .toc-sidebar a { display: block; color: var(--text-muted); text-decoration: none; padding: .28rem .5rem; border-radius: 4px; margin-bottom: 1px; }
+
+    /* Summary card */
+    .title-row { display: flex; align-items: flex-end; gap: 1rem; }
+    .card-mode-btn {
+      flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+      padding: .28rem .65rem; font-size: .76rem; cursor: pointer; color: var(--text-muted);
+    }
+    .sc-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,.4); align-items: center; justify-content: center; }
+    body.card-mode .sc-overlay { display: flex; }
+    .sc-card { display: flex; width: min(600px, 90vw); background: #fff; border-radius: 8px; padding: 2rem; }
+    .sc-close { position: absolute; top: .5rem; right: .5rem; background: none; border: 1px solid var(--border); width: 24px; height: 24px; cursor: pointer; }
+    .sc-left { flex: 0 0 44%; padding: 1rem; background: var(--primary); color: #fff; border-radius: 6px; margin-right: 1rem; }
+    .sc-right { flex: 1; }
+
+    /* Export */
+    .export-btn { position: fixed; bottom: 16px; right: 16px; background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: .45rem .9rem; cursor: pointer; }
+    .export-menu { display: none; position: fixed; bottom: 56px; right: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; }
+    .export-menu.open { display: block; }
+    .export-item { display: block; width: 100%; padding: .55rem 1rem; background: none; border: none; cursor: pointer; border-bottom: 1px solid var(--border); color: var(--text); }
+    .export-item:last-child { border-bottom: none; }
+
+    /* Edit mode */
+    .edit-hotzone { position: fixed; bottom: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+    .edit-toggle { position: fixed; bottom: 16px; left: 16px; background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: .45rem .9rem; cursor: pointer; opacity: 0; }
+    .edit-toggle.show { opacity: 1; }
   </style>
-  <link rel="stylesheet" href="../../templates/themes/shared.css" />
 </head>
 <body>
+
+  <!-- JSON Summary Block -->
+  <script type="application/json" id="report-summary">
+  {
+    "title": "Color System Fixture",
+    "author": "",
+    "date": "2026-04-13",
+    "abstract": "Tests color rendering across badge/KPI/entity variants.",
+    "sections": ["Default mode", "Comparison mode"],
+    "kpis": [{"label": "Growth", "value": "38%", "trend": "↑ 18%"}]
+  }
+  </script>
+
+  <!-- Edit mode -->
+  <div class="edit-hotzone" id="edit-hotzone"></div>
+  <button class="edit-toggle" id="edit-toggle">✏ Edit</button>
+
+  <!-- Export -->
+  <div class="export-menu" id="export-menu">
+    <button class="export-item" id="export-png-desktop">Desktop</button>
+    <button class="export-item" id="export-png-mobile">Mobile</button>
+    <button class="export-item" id="export-im-share">IM</button>
+  </div>
+  <button class="export-btn" id="export-btn">↓ Export</button>
+
+  <!-- TOC -->
+  <button class="toc-toggle" id="toc-toggle-btn">☰</button>
+  <nav class="toc-sidebar" id="toc-sidebar">
+    <h4>目录</h4>
+    <a href="#default" data-section="Default mode">Default mode</a>
+    <a href="#comparison" data-section="Comparison mode">Comparison mode</a>
+  </nav>
+
+  <!-- Title row -->
+  <div class="title-row">
+    <h1>Color System Fixture</h1>
+    <button class="card-mode-btn" id="card-mode-btn">⊞ 摘要卡</button>
+  </div>
+
+  <!-- Summary card overlay -->
+  <div class="sc-overlay" id="sc-overlay">
+    <div class="sc-card" id="sc-card">
+      <button class="sc-close" id="sc-close">✕</button>
+      <div class="sc-left"><div class="sc-title">COLOR</div></div>
+      <div class="sc-right"><p>Color system fixture.</p></div>
+    </div>
+  </div>
+
   <section id="default" class="scene">
     <h2>Default mode</h2>
     <div class="kpi-grid">
@@ -95,5 +184,20 @@
       <span class="badge badge--blue">Still Neutral</span>
     </div>
   </section>
+
+  <script>
+    // TOC: delayed close
+    const tocBtn = document.getElementById('toc-toggle-btn');
+    const tocSidebar = document.getElementById('toc-sidebar');
+    let locked = false, closeTimer;
+    function openToc() { clearTimeout(closeTimer); tocSidebar.classList.add('open'); }
+    function scheduleClose() { closeTimer = setTimeout(() => { if (!locked) tocSidebar.classList.remove('open'); }, 150); }
+    tocBtn.addEventListener('mouseenter', openToc);
+    tocSidebar.addEventListener('mouseenter', openToc);
+    tocBtn.addEventListener('mouseleave', scheduleClose);
+    tocSidebar.addEventListener('mouseleave', scheduleClose);
+    tocBtn.addEventListener('click', () => { locked = !locked; tocBtn.classList.toggle('locked', locked); if (locked) openToc(); else scheduleClose(); });
+  </script>
+
 </body>
 </html>

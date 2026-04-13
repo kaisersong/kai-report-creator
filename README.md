@@ -234,7 +234,7 @@ Run `--review` to improve existing reports with 8 checkpoints:
 
 - **Zero dependencies** — single `.html` file, works offline with `--bundle`
 - **6 built-in themes** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper
-- **9 component types** — KPIs, charts, tables, timelines, diagrams, code blocks, callouts, images, lists
+- **9 component types** — KPIs, charts (ECharts), tables, timelines, diagrams, code blocks, callouts, images, lists
 - **Report Review System** — 8-checkpoint automatic refinement
 - **AI-readable output** — 3-layer machine-readable structure for downstream agents
 
@@ -420,6 +420,10 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 ---
 
 ## Version History
+
+**v1.14.0** — ECharts standard: unified all charts on ECharts (was Chart.js), added bar/line/radar/pie ECharts templates, grid bottom rule for rotated labels, line data integrity rule, 14 new chart rendering contract tests.
+
+**v1.13.0** — L2 HTML shell structure validation: 10 mandatory elements check in SKILL.md pre-write, design-quality.md §8, 30 new HTML shell contract tests (BUG-001 fix).
 
 **v1.9.0** — Report Review System: `--review` with 8 checkpoints; silent final review in `--generate`; L0/L1 quality layering.
 
