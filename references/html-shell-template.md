@@ -122,11 +122,14 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         /* Animations — all easing uses cubic-bezier(0.22,1,0.36,1) (ease-out-expo). Never use bounce (overshoot >1) or elastic (spring oscillation) easing — they read as dated and tacky. */
         .fade-in-up { opacity: 0; transform: translateY(18px); transition: opacity .5s cubic-bezier(0.22,1,0.36,1), transform .5s cubic-bezier(0.22,1,0.36,1); }
         .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+        .print-exporting .fade-in-up { opacity: 1 !important; transform: none !important; transition: none !important; }
         body.no-animations .fade-in-up { opacity: 1; transform: none; transition: none; }
         .kpi-grid.stagger-ready .kpi-card { opacity: 0; transform: translateY(20px) scale(0.95); transition: opacity .45s cubic-bezier(0.34,1.56,0.64,1), transform .45s cubic-bezier(0.34,1.56,0.64,1); }
         .kpi-grid.stagger-ready .kpi-card.visible { opacity: 1; transform: none; }
+        .print-exporting .kpi-grid .kpi-card { opacity: 1 !important; transform: none !important; transition: none !important; }
         .timeline.stagger-ready .timeline-item { opacity: 0; transform: translateX(-12px); transition: opacity .4s cubic-bezier(0.22,1,0.36,1), transform .4s cubic-bezier(0.22,1,0.36,1); }
         .timeline.stagger-ready .timeline-item.visible { opacity: 1; transform: none; }
+        .print-exporting .timeline .timeline-item { opacity: 1 !important; transform: none !important; transition: none !important; }
         body.no-animations .kpi-grid .kpi-card,
         body.no-animations .timeline .timeline-item { opacity: 1 !important; transform: none !important; transition: none !important; }
 
@@ -149,6 +152,10 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         @page { size: A4; margin: 1.5cm; }
         @media print {
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          html, body {
+            background: var(--print-bg-color, var(--report-bg, var(--bg, #ffffff))) !important;
+            color: var(--report-text, var(--text, #111111)) !important;
+          }
           .toc-toggle, .toc-sidebar, .edit-hotzone, .edit-toggle, .export-btn, .export-menu { display: none !important; }
           h2 { break-after: avoid; }
           .kpi-grid, .kpi-card, .callout, .timeline, .timeline-item,
@@ -309,7 +316,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       <!-- lang:en labels: "↓ Export" / "🖨 Print / PDF" / "🖥 Save PNG (Desktop)" / "📱 Save PNG (Mobile)" / "💬 IM Image" -->
       <!-- lang:zh labels: "↓ 导出"  / "🖨 打印 / PDF"  / "🖥 保存图片（桌面）"    / "📱 保存图片（手机）"  / "💬 IM 分享长图"   -->
       <div class="export-menu" id="export-menu">
-        <button class="export-item" onclick="window.print()">[🖨 Print / PDF|🖨 打印 / PDF]</button>
+        <button class="export-item" id="export-print">[🖨 Print / PDF|🖨 打印 / PDF]</button>
         <button class="export-item" id="export-png-desktop">[🖥 Save PNG (Desktop)|🖥 保存图片（桌面）]</button>
         <button class="export-item" id="export-png-mobile">[📱 Save PNG (Mobile)|📱 保存图片（手机）]</button>
         <button class="export-item" id="export-im-share">[💬 IM Image|💬 IM 长图]</button>
@@ -510,18 +517,20 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       </script>
 
       <script>
-        // Export: Print/PDF via window.print(); images via html2canvas (preloaded on page open)
+        // Export: Print/PDF via prepared print mode; images via html2canvas (preloaded on page open)
         // Desktop PNG : full-page, adaptive scale (2× short / 1.5× long pages), PNG
         // Mobile PNG  : .report-wrapper 750px wide (iPhone 2× Retina), JPEG 92%
         // IM Share    : .report-wrapper 800px wide (WeChat/Feishu/DingTalk), JPEG 92%
         (function() {
           const exportBtn  = document.getElementById('export-btn');
           const exportMenu = document.getElementById('export-menu');
+          const printBtn   = document.getElementById('export-print');
           const pngDesktop = document.getElementById('export-png-desktop');
           const pngMobile  = document.getElementById('export-png-mobile');
           const pngIM      = document.getElementById('export-im-share');
           if (!exportBtn || !exportMenu) return;
           const LABEL = exportBtn.textContent;
+          const PRINT_MODE_CLASS = 'print-exporting';
 
           exportBtn.addEventListener('click', e => { e.stopPropagation(); exportMenu.classList.toggle('open'); });
           document.addEventListener('click', e => {
@@ -544,6 +553,18 @@ When generating the final HTML report, produce a complete self-contained HTML fi
           loadLib(); /* fire immediately */
 
           function restore() { exportBtn.style.visibility = ''; exportBtn.textContent = LABEL; }
+          function preparePrintExport() {
+            exportMenu.classList.remove('open');
+            exportBtn.style.visibility = 'hidden';
+            exportBtn.textContent = '…';
+            document.documentElement.classList.add(PRINT_MODE_CLASS);
+            document.documentElement.style.setProperty('--print-bg-color', exportBackgroundColor());
+          }
+          function cleanupPrintExport() {
+            document.documentElement.classList.remove(PRINT_MODE_CLASS);
+            document.documentElement.style.removeProperty('--print-bg-color');
+            restore();
+          }
           function filename(suffix, ext) {
             const d = new Date(), pad = n => String(n).padStart(2,'0');
             const date = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
@@ -594,6 +615,16 @@ When generating the final HTML report, produce a complete self-contained HTML fi
               saveBlob(c, fname, jpeg);
             }));
           }
+          window.addEventListener('afterprint', cleanupPrintExport);
+
+          printBtn && printBtn.addEventListener('click', () => {
+            preparePrintExport();
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                window.print();
+              });
+            });
+          });
 
           pngDesktop && pngDesktop.addEventListener('click', () => {
             const H = document.documentElement.scrollHeight;

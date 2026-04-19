@@ -212,9 +212,13 @@ Run `--review` to improve existing reports with 8 checkpoints:
 3. Apply AI-advised rules when confidence is high
 4. Save refined HTML back to file
 
+If you want a structured change summary after review, use `references/review-report-template.md`.
+
 **One-pass automatic refinement** — not interactive approval.
 
-`--generate` also runs this checklist as a **silent final pass** before writing HTML.
+`--generate` also runs this checklist as a **silent final review** before writing HTML.
+
+This review flow is the built-in **8-checkpoint review system**.
 
 **8 Checkpoints:**
 - BLUF opening (Bottom Line Up Front)
@@ -420,6 +424,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 ---
 
 ## Version History
+
+**v1.14.1** — Print/PDF export fix: preserve report background and force animated KPI/data blocks visible during print export; add print export regression coverage.
 
 **v1.14.0** — ECharts standard: unified all charts on ECharts (was Chart.js), added bar/line/radar/pie ECharts templates, grid bottom rule for rotated labels, line data integrity rule, 14 new chart rendering contract tests.
 

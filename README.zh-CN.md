@@ -212,6 +212,8 @@ git clone https://github.com/kaisersong/report-creator ~/.openclaw/skills/report
 3. 高置信度时应用 ai-advised rules
 4. 将优化后的 HTML 写回原文件
 
+如果你想输出结构化修改摘要，可使用 `references/review-report-template.md`。
+
 这是**一次性自动优化**流程，不是交互式确认流程。
 
 `--generate` 也会在写出 HTML 前执行同一套 **静默终审**。
@@ -418,6 +420,8 @@ OpenClaw 会自动：
 ---
 
 ## 版本日志
+
+**v1.14.1** — Print/PDF 导出修复：保留报告背景，并在打印导出时强制显示动画态下的 KPI/数据组件；新增打印导出回归测试。
 
 **v1.14.0** — ECharts 统一标准：所有图表统一使用 ECharts（告别 Chart.js 混用），新增 bar/line/radar/pie ECharts 模板，旋转标签 grid bottom 规则，折线图数据完整性规则，14 个图表渲染契约测试。
 
