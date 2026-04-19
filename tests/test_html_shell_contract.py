@@ -44,6 +44,15 @@ REQUIRED_ELEMENTS = [
     ('id="edit-toggle"', "Edit mode toggle button"),
 ]
 
+REQUIRED_EXPORT_ITEMS = [
+    ('id="export-print"', "Print / PDF export entry"),
+    ('id="export-png-desktop"', "Desktop image export entry"),
+    ('id="export-png-mobile"', "Mobile long-image export entry"),
+    ('id="export-im-share"', "IM long-image export entry"),
+]
+
+TEMPLATE_PATH = REPO_ROOT / "references" / "html-shell-template.md"
+
 
 class TestRequiredElements:
     """Every generated report MUST contain these structural elements."""
@@ -68,6 +77,55 @@ class TestColorSystemReportElements:
         assert element_id in html, (
             f"MISSING: {element_id} ({purpose}) in color_system_report.html"
         )
+
+
+class TestExportMenuContract:
+    """Export menu must always expose the full four-option contract."""
+
+    @pytest.mark.parametrize("element_id,purpose", REQUIRED_EXPORT_ITEMS)
+    def test_minimal_report_has_all_export_entries(self, element_id, purpose):
+        html = load_html("minimal_report.html")
+        assert element_id in html, (
+            f"MISSING: {element_id} ({purpose}) in minimal_report.html.\n"
+            "Export menus must include print, desktop, mobile, and IM variants."
+        )
+
+    @pytest.mark.parametrize("element_id,purpose", REQUIRED_EXPORT_ITEMS)
+    def test_color_report_has_all_export_entries(self, element_id, purpose):
+        html = load_html("color_system_report.html")
+        assert element_id in html, (
+            f"MISSING: {element_id} ({purpose}) in color_system_report.html.\n"
+            "Export menus must include print, desktop, mobile, and IM variants."
+        )
+
+
+class TestTemplateExportContract:
+    """The shell template itself must carry the complete export contract."""
+
+    @staticmethod
+    def template_source() -> str:
+        return TEMPLATE_PATH.read_text(encoding="utf-8")
+
+    @pytest.mark.parametrize("element_id,purpose", REQUIRED_EXPORT_ITEMS)
+    def test_template_has_all_export_entries(self, element_id, purpose):
+        src = self.template_source()
+        assert element_id in src, (
+            f"MISSING: {element_id} ({purpose}) in references/html-shell-template.md.\n"
+            "If the template loses an export item, generated reports will silently regress."
+        )
+
+    def test_template_wires_all_export_buttons(self):
+        src = self.template_source()
+        required_bindings = [
+            "const printBtn   = document.getElementById('export-print');",
+            "const pngDesktop = document.getElementById('export-png-desktop');",
+            "const pngMobile  = document.getElementById('export-png-mobile');",
+            "const pngIM      = document.getElementById('export-im-share');",
+        ]
+        for binding in required_bindings:
+            assert binding in src, (
+                f"Missing export binding in html-shell-template.md: {binding}"
+            )
 
 
 # ── L2: TOC JavaScript Contract ──────────────────────────────────────────────

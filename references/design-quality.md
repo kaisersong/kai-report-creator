@@ -156,8 +156,14 @@ Every generated report HTML **MUST** contain these elements. If any are missing,
 | Summary card | `id="sc-card"` + class `sc-card` | Two-panel summary card (injected by JS) |
 | Export button | `id="export-btn"` + class `export-btn` | `↓ 导出` button, bottom-right |
 | Export menu | `id="export-menu"` + class `export-menu` | Dropdown with Print/PNG/IM options |
+| Export item: print | `id="export-print"` | `打印 / PDF` entry |
+| Export item: desktop | `id="export-png-desktop"` | `桌面截图` entry |
+| Export item: mobile | `id="export-png-mobile"` | `手机长图` entry |
+| Export item: IM | `id="export-im-share"` | `IM 长图` entry |
 | JSON summary block | `type="application/json" id="report-summary"` | Machine-readable report metadata |
 | Report mode attribute | `data-report-mode="[default\|comparison]"` on `<body>` | Semantic mode flag |
+
+**Important:** `id="export-menu"` by itself is not enough. The menu is incomplete unless all four export items above exist. If any one is missing, rebuild the entire export block from `html-shell-template.md` rather than leaving a partial menu.
 
 ### 8.2 TOC JavaScript Contract
 
@@ -181,6 +187,7 @@ Before writing, verify CSS includes:
 - `.export-btn`, `.export-menu`, `.export-item` styles
 - `.edit-hotzone`, `.edit-toggle` styles
 - `@media print` rules hiding UI chrome
+- Export JS bindings for all four entries: `export-print`, `export-png-desktop`, `export-png-mobile`, `export-im-share`
 
 ## L1 Content Review
 

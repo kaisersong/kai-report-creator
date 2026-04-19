@@ -12,7 +12,7 @@ The report review system keeps only the rules that fit `kai-report-creator`'s op
 - the AI can fix it directly with a rewrite or structural adjustment
 - the rule does not depend on outside human feedback or image-level interpretation
 
-The system has **8 checkpoints**:
+The system has **9 checkpoints**:
 
 - **Category 1: Hard Rules (5)** — auto-apply when violated
 - **Category 2: AI-Advised Rules (3)** — apply only when confidence is high
@@ -44,6 +44,26 @@ These are structural checks from `references/design-quality.md` §7 (Pre-Output 
 **Detection:** If timeline items use generic labels instead of actual dates/timestamps (e.g. "真诚服务" as a date), it fails. If items could be reordered without changing meaning, they are not timeline content.
 
 **Auto-fix:** Convert to `:::list` or prose with `:::callout`. Preserve the content, change the component type.
+
+### 0.4 Export Menu Completeness
+
+**Trigger:** Every generated HTML report.
+
+**Detection:** The shell fails if any of these are missing:
+
+- `id="export-btn"`
+- `id="export-menu"`
+- `id="export-print"`
+- `id="export-png-desktop"`
+- `id="export-png-mobile"`
+- `id="export-im-share"`
+- JS bindings for all four export entries
+
+An export menu with only some items still fails.
+
+**Auto-fix:** Reconstruct the entire export button/menu + JS wiring block from `references/html-shell-template.md`. Do not patch the menu incrementally if one item is missing.
+
+**Fallback:** None. This is a shell integrity failure.
 
 ## Category 1: Hard Rules
 
@@ -205,7 +225,7 @@ These ideas were considered and intentionally excluded from the automated system
 
 Run the review in this order:
 
-0. **Visual Hard Rules** (KPI Value Length, Badge Coverage, Timeline Content Validity)
+0. **Visual Hard Rules** (KPI Value Length, Badge Coverage, Timeline Content Validity, Export Menu Completeness)
 1. BLUF Opening
 2. Heading Stack Logic
 3. Anti-Template Section Headings

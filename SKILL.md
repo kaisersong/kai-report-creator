@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from FILE, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.14.1
+version: 1.14.2
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -351,8 +351,17 @@ When the user runs `/report --generate [file]`:
      - Search `id="sc-overlay"` → must exist
      - Search `id="export-btn"` → must exist
      - Search `id="export-menu"` → must exist
+     - Search `id="export-print"` → must exist
+     - Search `id="export-png-desktop"` → must exist
+     - Search `id="export-png-mobile"` → must exist
+     - Search `id="export-im-share"` → must exist
      - Search `id="report-summary"` → must exist (JSON summary block)
-     - Any missing → reconstruct from `references/html-shell-template.md` and re-inject
+     - Search `const printBtn   = document.getElementById('export-print');` → must exist
+     - Search `const pngDesktop = document.getElementById('export-png-desktop');` → must exist
+     - Search `const pngMobile  = document.getElementById('export-png-mobile');` → must exist
+     - Search `const pngIM      = document.getElementById('export-im-share');` → must exist
+     - Any missing export item or binding → reconstruct the full export block from `references/html-shell-template.md` instead of patching a partial menu
+     - Any other missing shell element → reconstruct from `references/html-shell-template.md` and re-inject
 9. **Silent final review pass** — apply `references/review-checklist.md` checkpoints (Category 0: visual hard rules, then Category 1: hard rules 1.1–1.5). Auto-fix violations. This exact step is the `silent final review pass`.
 10. Write to `[output_filename].html` using the Write tool.
 11. Tell the user the file path and a 1-sentence summary of the report.

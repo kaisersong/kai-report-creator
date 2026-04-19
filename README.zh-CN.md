@@ -421,6 +421,8 @@ OpenClaw 会自动：
 
 ## 版本日志
 
+**v1.14.2** — 导出菜单完整性进入标准生成流程：在写出前 shell 校验和 silent final review 中强制要求 print / desktop / mobile / IM 四个导出入口及其 JS 绑定齐全，避免生成报告退化成残缺导出菜单。
+
 **v1.14.1** — Print/PDF 导出修复：保留报告背景，并在打印导出时强制显示动画态下的 KPI/数据组件；新增打印导出回归测试。
 
 **v1.14.0** — ECharts 统一标准：所有图表统一使用 ECharts（告别 Chart.js 混用），新增 bar/line/radar/pie ECharts 模板，旋转标签 grid bottom 规则，折线图数据完整性规则，14 个图表渲染契约测试。

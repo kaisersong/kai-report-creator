@@ -425,6 +425,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 
 ## Version History
 
+**v1.14.2** — Export menu completeness enforced in the standard generate flow: require print/desktop/mobile/IM export entries plus JS bindings during pre-write shell validation and silent final review; add shell contract coverage so reports no longer regress to partial export menus.
+
 **v1.14.1** — Print/PDF export fix: preserve report background and force animated KPI/data blocks visible during print export; add print export regression coverage.
 
 **v1.14.0** — ECharts standard: unified all charts on ECharts (was Chart.js), added bar/line/radar/pie ECharts templates, grid bottom rule for rotated labels, line data integrity rule, 14 new chart rendering contract tests.
