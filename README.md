@@ -95,7 +95,7 @@ An AI agent reads Layer 1 for a 3-second overview, drills to Layer 2 for section
 
 Reports that work follow a rhythm: **prose sets context, components deliver data, prose interprets it**.
 
-The skill enforces this: never 3+ consecutive prose-only sections. Every 4–5 sections must include a visual anchor — KPI grid, chart, or diagram. Dense prose fatigues; data without context loses. Alternation creates flow.
+The skill enforces this: never 3+ consecutive prose-only sections. Every 4–5 sections must include a visual anchor chosen for the content type — callout, timeline, diagram, KPI grid, or chart. Dense prose fatigues; data without context loses. Alternation creates flow.
 
 This is why IR's component syntax (`:::tag ... :::`) is visually obvious: authors scan IR files and see data-heavy sections immediately.
 
@@ -141,11 +141,11 @@ The enemy: instantly recognizable AI output — uniform borders, primary color f
 
 ### Claude Code
 
-Tell Claude: "Install https://github.com/kaisersong/report-creator"
+Tell Claude: "Install https://github.com/kaisersong/kai-report-creator"
 
 Or manually:
 ```bash
-git clone https://github.com/kaisersong/report-creator ~/.claude/skills/report-creator
+git clone https://github.com/kaisersong/kai-report-creator ~/.claude/skills/kai-report-creator
 ```
 
 Restart Claude Code. Use as `/report`.
@@ -157,7 +157,7 @@ Restart Claude Code. Use as `/report`.
 clawhub install kai-report-creator
 
 # Or manually
-git clone https://github.com/kaisersong/report-creator ~/.openclaw/skills/report-creator
+git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/kai-report-creator
 ```
 
 ---
@@ -229,6 +229,33 @@ This review flow is the built-in **8-checkpoint review system**.
 - Insight-over-data
 - Scan-anchor coverage
 - Conditional reader guidance
+
+---
+
+## Eval Workflow
+
+This repo now includes a small, repo-contained eval harness focused on **async reading quality**, not slide-style presenter flow.
+
+Run it with:
+
+```bash
+python scripts/run-report-evals.py --root . --packet-dir .tmp/eval-packets
+```
+
+What it does:
+
+- Runs deterministic checks for `compression`, `ir_contract`, and `render_integrity`
+- Emits rubric-ready JSON packets for `async_readability` instead of hiding quality behind vibes
+- Uses repo-contained cases from `evals/report-cases.csv`
+
+Key files:
+
+- `evals/report-cases.csv` — living case set
+- `evals/rubric.schema.json` — structured grader output contract
+- `evals/failure-map.md` — where to fix each layer when a case fails
+- `evals/cases/*` — source + IR artifacts for each case
+
+For complex reports, keep these IR frontmatter fields so evals can measure compression quality directly: `report_class`, `audience`, `decision_goal`, `must_include`, `must_avoid`.
 
 ---
 
@@ -315,8 +342,13 @@ abstract: "Q3 revenue grew 12% YoY with record new customer acquisition."
 **Component blocks:**
 ```
 :::kpi
-- Revenue: $2.45M ↑12%
-- New Clients: 183 ↑8%
+items:
+  - label: Revenue
+    value: $2.45M
+    delta: ↑12%
+  - label: New Clients
+    value: 183
+    delta: ↑8%
 :::
 
 :::chart type=line title="Monthly Revenue"
@@ -335,6 +367,8 @@ datasets:
 Key insight goes here.
 :::
 ```
+
+Badges remain optional HTML chips for scanability; they are not standalone IR tags. Timelines are strict chronological components and should use explicit time tokens such as `2024-10-15` or `Q4 2024`.
 
 ---
 
@@ -418,12 +452,14 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 
 | Platform | Version | Install path |
 |----------|---------|--------------|
-| Claude Code | any | `~/.claude/skills/report-creator/` |
-| OpenClaw | ≥ 0.9 | `~/.openclaw/skills/report-creator/` |
+| Claude Code | any | `~/.claude/skills/kai-report-creator/` |
+| OpenClaw | ≥ 0.9 | `~/.openclaw/skills/kai-report-creator/` |
 
 ---
 
 ## Version History
+
+**v1.15.0** — IR contract hardening and eval foundation: split failures into `invalid_syntax` / `invalid_semantics` / `contract_conflict`, formalize `kpi` / `chart` / `timeline` / `diagram` schemas, demote `badge` to optional enhancement, add repo-contained eval cases plus `run-report-evals.py`, fix install paths to `kai-report-creator`, and bring the Windows release suite to 125 passing tests.
 
 **v1.14.2** — Export menu completeness enforced in the standard generate flow: require print/desktop/mobile/IM export entries plus JS bindings during pre-write shell validation and silent final review; add shell contract coverage so reports no longer regress to partial export menus.
 

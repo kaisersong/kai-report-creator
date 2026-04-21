@@ -56,6 +56,93 @@
       font-size: 16px;
     }
 
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .kpi-card {
+      background: var(--report-surface);
+      border: 1px solid var(--report-border);
+      border-top: 2px solid var(--report-structure);
+      border-radius: var(--radius);
+      padding: 12px;
+    }
+    .kpi-label {
+      color: var(--text-muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .kpi-value {
+      color: var(--report-text);
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+    .kpi-delta {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .kpi-delta--up { background: var(--report-delta-up-bg); color: var(--report-delta-up-text); }
+    .kpi-delta--info { background: var(--report-delta-flat-bg); color: var(--report-delta-flat-text); }
+    .kpi-card[data-accent] { border-top-color: var(--report-structure); }
+    .kpi-card[data-accent] .kpi-value { color: var(--report-text); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: .18rem .55rem;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 600;
+      white-space: nowrap;
+      border: 1px solid var(--report-chip-border);
+      margin-right: 6px;
+    }
+    .badge--blue,
+    .badge--green,
+    .badge--purple,
+    .badge--orange,
+    .badge--red,
+    .badge--teal,
+    .badge--done {
+      background: var(--report-chip-bg);
+      color: var(--report-chip-text);
+      border-color: var(--report-chip-border);
+    }
+    .badge--warn {
+      background: var(--report-delta-up-bg);
+      color: var(--report-delta-up-text);
+      border-color: transparent;
+    }
+    .badge--err {
+      background: var(--report-delta-down-bg);
+      color: var(--report-delta-down-text);
+      border-color: transparent;
+    }
+    [data-report-mode="comparison"] .badge--entity-a {
+      background: rgba(47, 107, 80, .12);
+      color: var(--entity-a);
+      border-color: rgba(47, 107, 80, .18);
+    }
+    [data-report-mode="comparison"] .badge--entity-b {
+      background: rgba(111, 106, 124, .12);
+      color: var(--entity-b);
+      border-color: rgba(111, 106, 124, .18);
+    }
+    [data-report-mode="comparison"] .badge--entity-c {
+      background: rgba(92, 118, 138, .12);
+      color: var(--entity-c);
+      border-color: rgba(92, 118, 138, .18);
+    }
+
     /* TOC */
     .toc-toggle {
       position: fixed; top: .75rem; left: .75rem; z-index: 200;

@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from FILE, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.14.2
+version: 1.15.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -64,6 +64,13 @@ The Intermediate Representation (IR) is a `.report.md` file with three parts:
     author: Name                           # Optional
     date: YYYY-MM-DD                       # Optional. Default: today
     lang: zh                               # Optional. zh | en. Auto-detected from content if omitted.
+    report_class: mixed                    # Optional but strongly recommended. narrative | mixed | data
+    audience: "Busy decision-maker"        # Optional but strongly recommended for async reading + evals.
+    decision_goal: "Decide next move"      # Optional but strongly recommended for async reading + evals.
+    must_include:                          # Optional. Source truths that must survive compression.
+      - Key fact that must remain
+    must_avoid:                            # Optional. Known traps to block during generation/review.
+      - Decorative placeholder chart
     charts: cdn                            # Optional. cdn | bundle. Default: cdn
     toc: true                              # Optional. true | false. Default: true
     animations: true                       # Optional. true | false. Default: true
@@ -78,6 +85,8 @@ The Intermediate Representation (IR) is a `.report.md` file with three parts:
         <div class="my-class">{{content}}</div>
     ---
 
+For simple reports these metadata fields can be omitted. For complex or high-stakes reports, keep `report_class`, `audience`, `decision_goal`, `must_include`, and `must_avoid` in the IR so review and eval can measure whether the async-reading intent survived.
+
 ### Component Block Syntax
 
     :::tag [param=value ...]
@@ -86,23 +95,103 @@ The Intermediate Representation (IR) is a `.report.md` file with three parts:
 
 Plain Markdown between blocks renders as rich text (headings, paragraphs, bold, lists, links).
 
+### IR Validity Taxonomy
+
+Use these four terms consistently when describing bad IR:
+
+- `invalid_syntax` — the parser cannot deterministically recover the intended structure.
+- `invalid_semantics` — the block is structurally parseable but expresses the wrong thing for that component.
+- `contract_conflict` — `SKILL.md`, `references/`, examples, or templates disagree about the contract.
+- `auto_downgrade_target` — the safer fallback component when the original block should not survive as-is.
+
+`examples/` are illustrative, not canonical. If examples disagree with `SKILL.md` or `references/rendering-rules.md`, that is a `contract_conflict` and must be fixed before expanding the rules further.
+
 ### Built-in Tag Reference
 
-| Tag | Required params | Optional params |
-|-----|----------------|-----------------|
-| `:::kpi` | (none — list items in body) | (none) |
-| `:::chart` | `type` (bar\|line\|pie\|scatter\|radar\|funnel\|sankey) | `title`, `height` |
-| `:::table` | (none — Markdown table in body) | `caption` |
-| `:::list` | (none — list items in body) | `style` (ordered\|unordered) |
-| `:::image` | `src` | `layout` (left\|right\|full), `caption`, `alt` |
-| `:::timeline` | Timeline (requires dates/timestamps — NOT for parallel items) | (none — list items in body) | (none) |
-| `:::diagram` | `type` (sequence\|flowchart\|tree\|mindmap) | (none) |
-| `:::code` | `lang` | `title` |
-| `:::callout` | `type` (note\|tip\|warning\|danger) | `icon` |
+| Tag | Canonical body schema | Compatibility | Auto downgrade target |
+|-----|-----------------------|---------------|-----------------------|
+| `:::kpi` | `items:` list of `{label, value, delta?, note?}` | Short-line `- Label: Value Delta` accepted for compatibility only | `callout` |
+| `:::chart` | By `type`: standard charts use `labels + datasets`; `funnel` uses `stages`; `sankey` uses `nodes + links` | None | `table` |
+| `:::table` | Markdown table body | None | — |
+| `:::list` | Multiline Markdown list body | Single-line `:::list ... :::` accepted for compatibility only | — |
+| `:::image` | Param-driven + caption text | None | — |
+| `:::timeline` | Multiline `- Date: Description` with whitelist date tokens | None | `list` |
+| `:::diagram` | YAML body that matches the selected `type` schema | None | `callout` |
+| `:::code` | Plain text body | None | — |
+| `:::callout` | Plain text / Markdown body | `icon` override allowed only from whitelist | — |
 
 **Plain text (default):** Any Markdown outside a `:::` block is rendered as rich text — no explicit `:::text` tag needed.
 
-**Chart library rule:** Default to Chart.js (bar/line/pie/scatter). If ANY chart in the report uses radar, funnel, heatmap, multi-axis, or **sankey**, use ECharts for ALL charts in the report. Never load both libraries.
+**Chart library rule:** Use **ECharts** for ALL charts. `Chart.js` is not part of the active contract.
+
+### Canonical Contracts for High-Risk Tags
+
+#### `:::kpi`
+
+Canonical input:
+
+```md
+:::kpi
+items:
+  - label: 总营收
+    value: ¥2,450万
+    delta: ↑12%
+    note: 同比
+:::
+```
+
+Compatibility input:
+
+```md
+:::kpi
+- 总营收: ¥2,450万 ↑12%
+:::
+```
+
+- Allowed input: short numeric values or short phrases in `value`; optional `delta` may be `↑12%`, `↓2%`, `→`, or short contextual text such as `↑12% MoM`.
+- Prohibited input: descriptive sentences in `value`; placeholder-only KPI blocks in `narrative` reports; placeholder-only KPI blocks in `mixed` reports with no real numbers.
+- `invalid_syntax`: body is neither canonical `items:` YAML nor the compatibility short-line format.
+- `invalid_semantics`: `value` contains a sentence/paragraph, or the entire KPI block fabricates a visual anchor with placeholders.
+- `contract_conflict`: none.
+- `auto_downgrade_target`: `callout`.
+
+#### `:::chart`
+
+- Allowed `type`: `bar`, `line`, `pie`, `scatter`, `radar`, `funnel`, `sankey`.
+- Canonical body schemas:
+  - Standard charts (`bar|line|pie|radar`) use `labels:` plus `datasets:`.
+  - `scatter` uses `datasets:` where each dataset provides `points: [[x, y], ...]`.
+  - `funnel` uses `stages:` with `{label, value}` objects.
+  - `sankey` uses `nodes:` plus `links:`.
+- Prohibited input: free-form YAML that invents undeclared keys; placeholder-only charts in `narrative` reports; placeholder-only charts in `mixed` reports with no real numbers.
+- `invalid_syntax`: body does not match the schema required by its `type`.
+- `invalid_semantics`: the chart shape is parseable but mismatched to the content, or the chart is only decorative placeholder data.
+- `contract_conflict`: prior Chart.js/ECharts split. Resolved now: ECharts-only.
+- `auto_downgrade_target`: `table` (preferred) or `callout` when the source has no chartable data.
+
+#### `:::timeline`
+
+- Canonical input: multiline `- Date: Description`.
+- Allowed `Date` tokens: `YYYY-MM-DD`, `YYYY-MM`, `YYYY`, `Q[1-4] YYYY`, `Day N`, `Week N`, `Month N`.
+- Prohibited input: principles, categories, capability buckets, or any parallel items that are not genuinely chronological.
+- `invalid_syntax`: not in `- Date: Description` form.
+- `invalid_semantics`: syntactically valid but `Date` is not actually a time marker.
+- `contract_conflict`: none.
+- `auto_downgrade_target`: `list`.
+
+#### `:::diagram`
+
+- Allowed `type`: `sequence`, `flowchart`, `tree`, `mindmap`.
+- Canonical body schemas:
+  - `sequence` → `actors:` + `steps:` with `{from, to, msg}`
+  - `flowchart` → `nodes:` + `edges:` with `{from, to, label?}`
+  - `tree` → `root:` + recursive `children:`
+  - `mindmap` → `center:` + `branches:`
+- Prohibited input: ad-hoc YAML invented per document without a declared per-type schema.
+- `invalid_syntax`: body missing the required keys for the chosen `type`.
+- `invalid_semantics`: structure is parseable but the chosen diagram type misrepresents the content.
+- `contract_conflict`: examples acting as hidden spec. Resolved now: schema is declared here and in `references/rendering-rules.md`.
+- `auto_downgrade_target`: `callout`.
 
 ## Language Auto-Detection
 
@@ -168,9 +257,10 @@ Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5
 1. Think about the report structure: appropriate sections, data the user likely has.
 2. Generate a complete `.report.md` IR file containing:
    - Complete frontmatter with all relevant fields filled in
+   - Explicit async-reading metadata for non-trivial reports: `report_class`, `audience`, `decision_goal`, `must_include`, `must_avoid`
    - At least 3–5 sections with `##` headings
    - A mix of component types (kpi, chart, table, timeline, callout, etc.)
-   - **Badge placement plan:** Identify at least 2 locations for `.badge` elements — section headers, KPI labels, table cells, or timeline items. See `references/rendering-rules.md` for badge generation rules.
+   - **Optional emphasis plan:** If badges would materially improve scanability, note 1–2 possible `.badge` placements. Badges are optional visual enhancements, not first-class IR tags.
    - Placeholder values for data: use `[数据待填写]` (zh) or `[INSERT VALUE]` (en) — **never fabricate numbers**
    - Comments for fields the user should customize
    - **Content-tone color hint:** Based on topic keywords, add a `theme_overrides` block in the frontmatter with a commented `primary_color` suggestion matching the content tone (see `references/design-quality.md` § Content-Tone Color Calibration). Example for a research report:
@@ -189,7 +279,7 @@ Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5
 
 | Class | Preferred visual anchors | Prohibited |
 |-------|--------------------------|------------|
-| `narrative` | `:::callout`, `:::timeline`, `:::diagram`, `highlight-sentence` | `:::kpi` and `:::chart` with all-placeholder values |
+| `narrative` | `:::callout`, `:::timeline`, `:::diagram`, highlighted prose (`.highlight-sentence`, not an IR tag) | `:::kpi` and `:::chart` with all-placeholder values |
 | `mixed` | `:::callout`/`:::timeline` by default; `:::kpi`/`:::chart` only when that section contains real numbers from the source | `:::kpi` or `:::chart` where every value is a placeholder |
 | `data` | `:::kpi` > `:::chart` > others | — (existing behavior) |
 
@@ -202,7 +292,7 @@ Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5
 4. **Apply visual rhythm rules** when laying out sections:
    - Never place 3 or more consecutive sections containing only plain Markdown prose (no components)
    - Every 4–5 sections, insert a "visual anchor" — type depends on content class from Step 1.5:
-     - `narrative`: use `:::callout`, `:::timeline`, `:::diagram`, or a `highlight-sentence` paragraph
+     - `narrative`: use `:::callout`, `:::timeline`, `:::diagram`, or a highlighted prose paragraph (`.highlight-sentence`, not an IR tag)
      - `mixed`: use `:::callout`/`:::timeline` by default; use `:::kpi`/`:::chart` only if that section has real numbers
      - `data`: use `:::kpi` or `:::chart` (existing behavior)
    - Ideal rhythm by class:
@@ -252,9 +342,9 @@ These rules are non-negotiable. After assembling the full HTML, search for viola
 
 **Rule 1 — KPI value length:** Every `.kpi-value` element must contain ≤8 Chinese characters OR ≤3 English words. If any KPI value is a sentence or paragraph, move the explanation to prose/callout and keep only the short number/phrase in the KPI.
 
-**Rule 2 — Badge coverage:** The HTML must contain at least 5 `<span class="badge` elements across ≥2 distinct sections. Place badges in section headings, KPI labels, table cells, or list items.
+**Rule 2 — Timeline validity:** Every `.timeline-item` must have a `.timeline-date` with an actual whitelist date/timestamp. If any timeline item uses a generic label (e.g. a principle name or feature description) as its "date", convert the entire timeline to `:::list` or `:::callout`.
 
-**Rule 3 — Timeline validity:** Every `.timeline-item` must have a `.timeline-date` with an actual date/timestamp. If any timeline item uses a generic label (e.g. a principle name or feature description) as its "date", convert the entire timeline to `:::list` or `:::callout`.
+**Rule 3 — Callout icon normalization:** `icon` may only render from the whitelist in `references/rendering-rules.md`. Strip U+FE0F if present; if the icon is still outside the whitelist, ignore it and fall back to the default icon for that callout type.
 
 **Rule 4 — No U+FE0F in output:** The final HTML must contain zero U+FE0F characters. Default callout icons use base emoji without variant selectors (ℹ not ℹ️, ⚠ not ⚠️).
 
@@ -278,6 +368,8 @@ These rules are non-negotiable. After assembling the full HTML, search for viola
 
 When the report is explicitly comparing named vendors, models, or tools, set `data-report-mode="comparison"` on the outer report container and use `.badge--entity-a/.badge--entity-b/.badge--entity-c` only for entity identity. Do not use entity colors on generic KPI values or generic badges.
 
+**Badges are optional visual enhancements, not a first-class IR tag.** Only emit badge HTML when it clarifies status, category, or entity identity. Never insert badges just to satisfy a quota.
+
 **CRITICAL: The final HTML must contain zero `:::` sequences.** Any `:::tag`, param line, or closing `:::` appearing in the output means a directive was not converted — find it and fix it before writing the file.
 
 ### Component Overview
@@ -296,7 +388,7 @@ When the report is explicitly comparing named vendors, models, or tools, set `da
 
 Plain Markdown outside `:::` blocks renders as rich text (headings, paragraphs, bold, lists, links).
 
-**Chart library rule:** Default to Chart.js (bar/line/pie/scatter). If ANY chart in the report uses radar, funnel, heatmap, or multi-axis, use ECharts for ALL charts. Never load both libraries.
+**Chart library rule:** Use **ECharts** for ALL charts. Do not generate `Chart.js` branches.
 
 ## Theme CSS
 

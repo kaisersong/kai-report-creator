@@ -30,8 +30,13 @@ def load_html(name: str) -> str:
 
 
 def load_project_report(name: str) -> str:
-    """Load a report from the user's project directory."""
-    return (REPO_ROOT.parent / name).read_text(encoding="utf-8")
+    """Load a project report fixture, then fall back to the user's project directory."""
+    path = FIXTURES_DIR / name
+    if not path.exists():
+        path = REPO_ROOT.parent / name
+    if not path.exists():
+        pytest.skip(f"project report fixture missing: {path}")
+    return path.read_text(encoding="utf-8")
 
 
 # ── L2: Chart Library Standard ───────────────────────────────────────────────

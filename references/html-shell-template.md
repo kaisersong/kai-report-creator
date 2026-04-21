@@ -11,9 +11,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       <title>[title]</title>
 
       <!-- CDN libraries (add only what's needed; omit if --bundle, inline instead) -->
-      <!-- If any :::chart blocks present AND using Chart.js: -->
-      <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script> -->
-      <!-- If any :::chart blocks present AND using ECharts: -->
+      <!-- If any :::chart blocks present: -->
       <!-- <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script> -->
       <!-- If any :::code blocks present: -->
       <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github.min.css"> -->

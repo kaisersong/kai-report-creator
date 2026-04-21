@@ -26,7 +26,18 @@ A `:::` directive block has this structure:
 
 When the opening and closing `:::` appear on the same line, treat everything between the tag/params and the trailing `:::` as the block body, split on the item separators (numbered or bullet items).
 
+**Compatibility only:** Do not generate new single-line blocks as the primary format. They are accepted only to keep older IR renderable.
+
 **NEVER pass `:::` lines through to HTML as `<p>` tags or any other text node.** If in doubt: parse it as a block, not as prose.
+
+## IR Validity Taxonomy
+
+Use these labels consistently when reasoning about IR failures:
+
+- `invalid_syntax` — the body cannot be deterministically parsed into the component's contract.
+- `invalid_semantics` — the structure parses, but the component is still the wrong choice for the content.
+- `contract_conflict` — repository docs disagree about the same contract.
+- `auto_downgrade_target` — the safer component to emit instead.
 
 ## Plain Markdown (default)
 
@@ -41,10 +52,40 @@ Convert using standard Markdown rules. Wrap each `##` section in:
 
 For `###` headings: `<h3 id="section-[slug]">[heading text]</h3>`
 
+`highlight-sentence` is a prose pattern, not an IR tag. If a paragraph deserves emphasized treatment, render it as prose upgraded to `<p class="highlight-sentence">...</p>`; do not invent `:::highlight-sentence`.
+
 ## :::kpi
 
-Each list item format: `- Label: Value TrendSymbol`
+Canonical input:
+
+```md
+:::kpi
+items:
+  - label: 总营收
+    value: ¥2,450万
+    delta: ↑12%
+    note: 同比
+:::
+```
+
+Compatibility input:
+
+```md
+:::kpi
+- 总营收: ¥2,450万 ↑12%
+:::
+```
+
 Trend: `↑` = positive (green), `↓` = negative (red), `→` = neutral (gray).
+
+**Allowed input:** `value` must be a short numeric value or brief phrase. `delta` may be a symbol alone (`→`) or a short status like `↑12% MoM`.
+
+**Compatibility note:** Labels containing literal colons should use the canonical YAML form, not the short-line form.
+
+- `invalid_syntax`: body is neither canonical `items:` YAML nor the compatibility short-line format.
+- `invalid_semantics`: `value` is a sentence/paragraph, or the whole block exists only as placeholder decoration.
+- `contract_conflict`: none.
+- `auto_downgrade_target`: `callout`.
 
 Extract the numeric part of Value into `data-target-value`, set `data-prefix` and `data-suffix`.
 
@@ -110,7 +151,7 @@ If the content is a full sentence or descriptive paragraph, it belongs in prose,
 
 **Badges / chips** (`.badge .badge--[color]`): Generic badge classes remain valid input, but they should render through one neutral linen chip system by default, including in prose, table cells, and timeline items.
 
-**Badge generation requirement (MANDATORY):** Reports MUST use `.badge` elements in at least 2 distinct locations. Place badges where they provide at-a-glance status, category, or tag information:
+**Badges are optional visual enhancements, not a first-class IR tag.** Use them only when they materially improve scanability:
 
 | Location | Example | Recommended badge |
 |----------|---------|-------------------|
@@ -148,6 +189,20 @@ Use **ECharts** for ALL charts in the report. ECharts covers bar/line/pie/scatte
 Add `<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>` in `<head>` (or inline if `--bundle`).
 
 **Chart.js is NOT used in the standard template.** Do NOT generate Chart.js chart code.
+
+Body schema by `type`:
+
+| Type | Required body keys | Notes |
+|------|--------------------|-------|
+| `bar`, `line`, `pie`, `radar` | `labels`, `datasets` | Each dataset must provide `label` and `data`. |
+| `scatter` | `datasets` | Each dataset must provide `label` and `points: [[x, y], ...]`. |
+| `funnel` | `stages` | Each stage is `{label, value}`. |
+| `sankey` | `nodes`, `links` | `links` encode quantified flows. |
+
+- `invalid_syntax`: body keys do not match the selected `type`.
+- `invalid_semantics`: chart is parseable but wrong for the content, or all data is placeholder-only decoration.
+- `contract_conflict`: prior Chart.js/ECharts split. Resolved here as ECharts-only.
+- `auto_downgrade_target`: `table` (preferred) or `callout` when the source has no chartable data.
 
 ### ECharts bar chart
 
@@ -302,7 +357,7 @@ Body is a Markdown table. Convert to HTML. If `caption` param is provided, emit 
 
 Body is a Markdown list (ordered `1. Item` or unordered `- Item`). `style=ordered` → `<ol>`, default → `<ul>`.
 
-**Single-line format:** `:::list style=ordered 1. A 2. B :::` — split on `N. ` or `- ` separators to recover individual items; render the same HTML below.
+**Single-line format (compatibility only):** `:::list style=ordered 1. A 2. B :::` — split on `N. ` or `- ` separators to recover individual items; render the same HTML below. Do not generate this as the primary syntax.
 
     <div data-component="list" class="report-list">
       <ul class="styled-list">  <!-- or <ol> if style=ordered -->
@@ -332,11 +387,26 @@ layout=full (default): full width, centered.
 
 Each item: `- Date: Description`
 
+Whitelist for `Date`:
+
+- `YYYY-MM-DD`
+- `YYYY-MM`
+- `YYYY`
+- `Q[1-4] YYYY`
+- `Day N`
+- `Week N`
+- `Month N`
+
 **Temporal content rule (MANDATORY):** The `:::timeline` component is ONLY for content with actual dates, timestamps, or sequential time markers (e.g. `2024-07`, `Q1 2025`, `Day 1`, `Week 3`). It represents chronological progression — items must have a clear before/after relationship.
 
 **Prohibited:** Do NOT use `:::timeline` for parallel, non-sequential items like principles, rules, features, or categories (e.g. "真诚服务", "安全可信", "专业高效" — these are并列关系, not chronological). For parallel items, use `:::list` or prose with `:::callout` instead.
 
 **When in doubt:** If the items could be reordered without changing meaning, they are NOT timeline content.
+
+- `invalid_syntax`: the item is not in `- Date: Description` form.
+- `invalid_semantics`: the item is syntactically valid but `Date` is not actually chronological.
+- `contract_conflict`: none.
+- `auto_downgrade_target`: `list`.
 
     <div data-component="timeline" class="timeline fade-in-up">
       <div class="timeline-item">
@@ -357,6 +427,47 @@ Generate inline SVG. All SVGs must be self-contained (no external refs). Wrap in
     </div>
 
 **viewBox height rule:** Always add 30px of bottom padding beyond the last drawn element's bottom edge. For example, if the lowest element ends at y=346, set viewBox height to 376. This prevents content clipping.
+
+Schema by `type`:
+
+- `sequence`:
+  ```yaml
+  actors: [A, B, C]
+  steps:
+    - from: A
+      to: B
+      msg: 请求
+  ```
+- `flowchart`:
+  ```yaml
+  nodes:
+    - id: start
+      kind: oval
+      label: 开始
+  edges:
+    - from: start
+      to: step1
+      label: 可选
+  ```
+- `tree`:
+  ```yaml
+  root: 平台
+  children:
+    - name: 数据层
+      children: []
+  ```
+- `mindmap`:
+  ```yaml
+  center: 协同能力
+  branches:
+    - name: 流程
+      items: [采集, 编排]
+  ```
+
+- `invalid_syntax`: body is missing the required keys for the chosen `type`.
+- `invalid_semantics`: the structure parses but the chosen diagram type misrepresents the content.
+- `contract_conflict`: examples previously acted as hidden spec. The schema above is now canonical.
+- `auto_downgrade_target`: `callout`.
 
 **type=sequence:** Draw vertical lifelines for each actor, horizontal arrows for each step. Actors as columns at top with labels, steps numbered on left, arrows with labels between lifelines.
 Sizing: width = 180 × (actor count), height = 80 + 50 × (step count).
@@ -389,6 +500,12 @@ For dark-tech theme use `github-dark.min.css` instead of `github.min.css`.
     </div>
 
 Default icons: note→ℹ, tip→💡, warning→⚠, danger→🚫
+
+`icon` overrides must be normalized before rendering:
+
+- Allowed whitelist: `ℹ`, `💡`, `⚠`, `🚫`, `✓`, `!`, `→`
+- Strip U+FE0F if present.
+- If the icon is still outside the whitelist after normalization, ignore it and fall back to the default icon for that callout type.
 
 ## Custom Blocks
 
