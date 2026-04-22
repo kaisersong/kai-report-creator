@@ -200,7 +200,7 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Review 模式
 
-运行 `--review`，用 8 项检查点对已有报告做一次性自动优化：
+运行 `--review`，用 13 项检查点对已有报告做一次性自动优化：
 
 ```
 /report --review market-analysis.html
@@ -218,7 +218,12 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 `--generate` 也会在写出 HTML 前执行同一套 **静默终审**。
 
-**8 项检查点：**
+**13 项检查点：**
+- KPI 值长度
+- badge 覆盖位置
+- 摘要卡海报层级
+- timeline 内容有效性
+- 导出菜单完整性
 - BLUF 开场（结论先行）
 - 标题栈逻辑
 - 去模板腔章节标题
@@ -255,6 +260,12 @@ python scripts/run-report-evals.py --root . --packet-dir .tmp/eval-packets
 
 对复杂报告，建议在 IR frontmatter 里保留这些字段，方便直接评估压缩质量：`report_class`、`audience`、`decision_goal`、`must_include`、`must_avoid`。
 
+维护者可以用一个入口跑完整发布校验链：
+
+```bash
+python scripts/verify-release.py --root .
+```
+
 ---
 
 ## 功能特性
@@ -264,12 +275,12 @@ python scripts/run-report-evals.py --root . --packet-dir .tmp/eval-packets
 - **零依赖** — 单个 `.html` 文件，`--bundle` 模式支持离线
 - **6 套内置主题** — corporate-blue、minimal、dark-tech、dark-board、data-story、newspaper
 - **9 种组件类型** — KPI 指标、图表、表格、时间线、流程图、代码块、标注、图片、列表
-- **Report Review 系统** — 8 项检查点自动优化
+- **Report Review 系统** — 13 项检查点自动优化
 - **AI 可读输出** — 三层机器可读结构
 
 ### 交互功能
 
-- **摘要卡片** — 标题旁 `⊞ 摘要卡` 按钮，展示 KPI 和章节标签
+- **摘要卡片** — 标题旁 `⊞ 摘要卡` 按钮，展示海报式标题卡、摘要、KPI 和章节摘要
 - **内置导出** — ↓ Export 按钮，支持 Print/PDF、PNG (Desktop)、PNG (Mobile)
 - **移动端自适应** — 适配任意屏幕尺寸
 - **中英双语** — 自动检测语言
@@ -455,6 +466,10 @@ OpenClaw 会自动：
 
 ## 版本日志
 
+**v1.16.1** — 收紧海报式摘要卡护栏：保持 summary-card poster mode 为显式 opt-in，把左栏收回为“标题层级 + 底部一句收束”，重新平衡主标题字号与可用宽度，修掉错误换行与宽度浪费，并新增摘要卡与 narrative rhythm 的回归测试。
+
+**v1.16.0** — 最小化借鉴 Kami 方案全部落地：新增硬规则文档 `anti-patterns.md` 与 `diagram-decision-rules.md`，补上静默分类用的 `spec-loading-matrix.md` 和可选 `archetype` 提示，新增维护侧统一发布校验入口 `scripts/verify-release.py`，并将 Windows 发布测试集提升到 134 项全部通过。
+
 **v1.15.0** — IR 契约加固与 eval 基础设施：将失败类型拆分为 `invalid_syntax` / `invalid_semantics` / `contract_conflict`，正式写清 `kpi` / `chart` / `timeline` / `diagram` schema，把 `badge` 降级为可选增强，新增 repo 内置 eval cases 与 `run-report-evals.py`，修正安装路径到 `kai-report-creator`，并将 Windows 发布测试集提升到 125 项全部通过。
 
 **v1.14.2** — 导出菜单完整性进入标准生成流程：在写出前 shell 校验和 silent final review 中强制要求 print / desktop / mobile / IM 四个导出入口及其 JS 绑定齐全，避免生成报告退化成残缺导出菜单。
@@ -465,7 +480,7 @@ OpenClaw 会自动：
 
 **v1.13.0** — L2 HTML shell 结构校验：SKILL.md pre-write 新增 10 项结构检查，design-quality.md §8，30 个 HTML shell 契约测试（BUG-001 修复）。
 
-**v1.9.0** — Report Review 系统：`--review` 8 项检查点；`--generate` 静默终审；L0/L1 质量分层。
+**v1.9.0** — Report Review 系统：`--review` 13 项检查点；`--generate` 静默终审；L0/L1 质量分层。
 
 **v1.8.3** — KPI 溢出修复：`.kpi-suffix` 处理长单位。
 
@@ -479,7 +494,7 @@ OpenClaw 会自动：
 
 **v1.5.0** — 设计质量基线：90/8/2 配色、KPI 网格规则、内容气质色调。
 
-**v1.4.0** — 摘要卡片：KPI + 章节标签。
+**v1.4.0** — 摘要卡片：海报式标题卡 + KPI/章节摘要。
 
 **v1.3.0** — 零依赖动画：KPI 弹入、时间线滑入。
 

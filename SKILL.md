@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from FILE, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.15.0
+version: 1.16.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -65,6 +65,7 @@ The Intermediate Representation (IR) is a `.report.md` file with three parts:
     date: YYYY-MM-DD                       # Optional. Default: today
     lang: zh                               # Optional. zh | en. Auto-detected from content if omitted.
     report_class: mixed                    # Optional but strongly recommended. narrative | mixed | data
+    archetype: research                    # Optional lightweight archetype hint for silent classification. `brief`, `research`, `comparison`, `update`
     audience: "Busy decision-maker"        # Optional but strongly recommended for async reading + evals.
     decision_goal: "Decide next move"      # Optional but strongly recommended for async reading + evals.
     must_include:                          # Optional. Source truths that must survive compression.
@@ -75,6 +76,9 @@ The Intermediate Representation (IR) is a `.report.md` file with three parts:
     toc: true                              # Optional. true | false. Default: true
     animations: true                       # Optional. true | false. Default: true
     abstract: "One-sentence summary"       # Optional. Used in AI summary block.
+    poster_title: "Short poster headline"  # Optional. Poster summary mode is opt-in; use only when H1 is too literal.
+    poster_subtitle: "Subtitle below the poster title"  # Optional. Only use with poster_title. Never infer or merge from title punctuation.
+    poster_note: "One short closing sentence"  # Optional. Summary-card left panel should end with one short sentence, not a paragraph block.
     template: ./my-template.html           # Optional. Custom HTML template path.
     theme_overrides:                       # Optional. Override theme CSS variables.
       primary_color: "#E63946"
@@ -85,7 +89,9 @@ The Intermediate Representation (IR) is a `.report.md` file with three parts:
         <div class="my-class">{{content}}</div>
     ---
 
-For simple reports these metadata fields can be omitted. For complex or high-stakes reports, keep `report_class`, `audience`, `decision_goal`, `must_include`, and `must_avoid` in the IR so review and eval can measure whether the async-reading intent survived.
+For simple reports these metadata fields can be omitted. For complex or high-stakes reports, keep `report_class`, `audience`, `decision_goal`, `must_include`, and `must_avoid` in the IR so review and eval can measure whether the async-reading intent survived. `archetype` remains optional; use it only as a lightweight hint when the structure clearly matches `brief`, `research`, `comparison`, or `update`.
+
+Poster summary mode is opt-in. Do not infer `poster_title` or `poster_subtitle` from punctuation in `title`.
 
 ### Component Block Syntax
 
@@ -252,12 +258,16 @@ Announce the classification to the user. Examples:
 
 Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5 (component routing) and item 4 (visual rhythm rules).
 
+**Silent classify with `references/spec-loading-matrix.md`.** Keep this internal. Optionally add `archetype` only when the report clearly behaves like `brief`, `research`, `comparison`, or `update`. Never turn this into a separate user-facing phase.
+
 **Step 2 — Plan the structure.**
 
 1. Think about the report structure: appropriate sections, data the user likely has.
 2. Generate a complete `.report.md` IR file containing:
    - Complete frontmatter with all relevant fields filled in
    - Explicit async-reading metadata for non-trivial reports: `report_class`, `audience`, `decision_goal`, `must_include`, `must_avoid`
+   - Add `poster_title` and `poster_subtitle` only when the report truly needs a stronger poster headline than the document title, and only if that stronger headline stays faithful to the source
+   - If you use poster summary mode, keep the left panel minimal: title hierarchy plus one short closing sentence (`poster_note`) near the bottom
    - At least 3–5 sections with `##` headings
    - A mix of component types (kpi, chart, table, timeline, callout, etc.)
    - **Optional emphasis plan:** If badges would materially improve scanability, note 1–2 possible `.badge` placements. Badges are optional visual enhancements, not first-class IR tags.
@@ -296,9 +306,16 @@ Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5
      - `mixed`: use `:::callout`/`:::timeline` by default; use `:::kpi`/`:::chart` only if that section has real numbers
      - `data`: use `:::kpi` or `:::chart` (existing behavior)
    - Ideal rhythm by class:
-     - `narrative`: `prose → callout → prose → timeline → prose → diagram → ...`
+     - `narrative`: `lead-block/claim → explanation → scan anchor → explanation → quote/action-grid → ...`
      - `mixed`: `prose → callout → prose → kpi(if numbers) → prose → timeline → ...`
      - `data`: `prose → kpi → chart/table → callout/timeline → prose → ...`
+   - For `narrative` and `mixed`, prefer the cadence `claim -> explanation -> scan anchor` over a uniform stack of ordinary paragraphs.
+   - These are optional prose upgrades, not default required blocks.
+   - When a section opens with a decisive statement, upgrade it into a `lead-block` or `highlight-sentence` instead of leaving it as plain body text.
+   - When a section resolves into 2–5 concrete implications or actions, prefer an `action-grid` / `action-card` pattern over one long paragraph or a weak unordered list.
+   - When a single sentence carries the section's strongest judgment, render it as a `section-quote` instead of burying it inside prose.
+   - Do not add more than one of `lead-block` / `section-quote` / `action-grid` by default inside the same section unless the source material clearly warrants it.
+   - If uncertain, keep normal paragraphs and add one clearer scan anchor instead of forcing a cadence block.
    - **Never** break up consecutive prose sections by inserting a `:::kpi` with placeholder values in `narrative` or `mixed` reports — use `:::callout` instead
 5. Save to `report-<slug>.report.md` using the Write tool.
 6. Tell the user:
@@ -335,6 +352,12 @@ When the user runs `/report --review [file]`:
 When rendering IR to HTML, apply component-specific rendering rules. Each component must be wrapped with `data-component` attribute for AI readability.
 
 **Load `references/rendering-rules.md` and `references/design-quality.md` before generating any HTML.** These files contain the detailed rendering rules and design quality baseline.
+
+**Always load `references/anti-patterns.md` before `--generate`.** Use it to reject report-specific failure modes such as fake KPI anchors, decorative charts, pseudo timelines, template headings, badge quota thinking, color flood, summary without judgment, and action without decision context.
+
+**Load `references/diagram-decision-rules.md` whenever a diagram or diagram-like structure is being considered.** Use it to decide whether the content should stay prose/list/callout instead of becoming `:::diagram`.
+
+**Load `references/spec-loading-matrix.md` before `--plan` and `--generate` as a silent classifier.** Use it to keep routing minimal: determine `report_class`, optionally add `archetype`, then load only the references that materially help the current report.
 
 ### HARD RULES (must be enforced before writing HTML)
 
@@ -412,11 +435,14 @@ When the user runs `/report --generate [file]`:
 
 1. **Read the IR file** — read the specified `.report.md` file (or IR from context).
 2. **Load reference files** — read ALL of these before generating any HTML:
+   - `references/spec-loading-matrix.md` — silent classification + minimal spec routing
    - `references/rendering-rules.md` — component rendering rules
    - `references/design-quality.md` — design quality baseline + anti-slop rules
+   - `references/anti-patterns.md` — report-specific failure modes to reject before render
    - `references/html-shell-template.md` — HTML shell structure
    - `references/theme-css.md` — CSS assembly rules
    - `references/review-checklist.md` — review checklist
+   - `references/diagram-decision-rules.md` — load whenever a diagram or diagram-like structure is being considered
 3. Parse the frontmatter to get metadata and settings.
 4. Select the appropriate theme CSS.
 5. Render all components according to Component Rendering Rules (including HARD RULES).
@@ -427,7 +453,7 @@ When the user runs `/report --generate [file]`:
      - Search `:::` in HTML → convert unconverted directives
      - Search for generic h2 headings from the forbidden list → rewrite with information-bearing text
      - Search `.kpi-value` elements → verify each ≤8 Chinese chars / ≤3 English words
-     - Search `<span class="badge"` → count must be ≥5 across ≥2 sections
+     - Search `<span class="badge"` → if badges exist, verify each one clarifies status, category, or entity identity instead of filling a quota
      - Search `.timeline-date` → verify each contains a date/timestamp, not a label
      - Search `\uFE0F` → remove all variant selectors from callout icons
      - Search `report-summary` JSON `kpis[].value` → verify each is short (Rule 5)

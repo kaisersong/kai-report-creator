@@ -83,6 +83,49 @@ When generating the final HTML report, produce a complete self-contained HTML fi
 
         /* Semantic highlight extraction — from design-quality.md §6 */
         .highlight-sentence { font-size: 1.15rem; font-weight: 700; color: var(--primary); border-left: 3px solid var(--primary); padding-left: 1rem; margin: 1.5rem 0; line-height: 1.5; }
+        .lead-block {
+          margin: 1.1rem 0 1rem;
+          padding: 1rem 1.15rem;
+          border-left: 4px solid var(--primary);
+          border-radius: 16px;
+          background: rgba(255,255,255,.72);
+          font-size: 1.02rem;
+          line-height: 1.72;
+          max-width: 60rem;
+        }
+        .section-quote {
+          margin: 1rem 0;
+          padding: 1rem 1.15rem;
+          border-radius: 18px;
+          background: linear-gradient(135deg, rgba(255,255,255,.78), rgba(0,0,0,.03));
+          border: 1px solid var(--border);
+          font-family: var(--font-display);
+          font-size: 1.18rem;
+          line-height: 1.58;
+        }
+        .action-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: .8rem;
+          margin: 1rem 0;
+        }
+        .action-card {
+          padding: 1rem;
+          border-radius: 18px;
+          border: 1px solid var(--border);
+          background: rgba(255,255,255,.78);
+        }
+        .action-card strong {
+          display: block;
+          margin-bottom: .45rem;
+          color: var(--primary);
+        }
+        .action-card p {
+          margin: 0;
+          font-size: .92rem;
+          line-height: 1.62;
+          color: var(--text-muted);
+        }
 
         /* Timeline */
         .timeline { position: relative; padding-left: 2rem; margin: 1.1rem 0; }
@@ -237,7 +280,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         }
         /* Left panel */
         .sc-left {
-          flex: 0 0 44%; display: flex; flex-direction: column;
+          flex: 0 0 46%; display: flex; flex-direction: column;
           padding: 1.8rem 2rem 1.6rem;
           background: var(--primary); color: #fff;
         }
@@ -246,18 +289,29 @@ When generating the final HTML report, produce a complete self-contained HTML fi
           opacity: .5; margin-bottom: .55rem; display: flex; align-items: center; gap: .45rem;
         }
         .sc-label::before { content: ''; display: inline-block; width: 20px; height: 1px; background: currentColor; }
-        .sc-title {
-          font-size: 3.6rem; font-weight: 900; line-height: .96; letter-spacing: -.04em;
-          text-transform: uppercase; margin-bottom: .8rem; word-break: break-word;
+        /* poster title should dominate the card */
+        .sc-title-main {
+          font-size: clamp(3.45rem, 6.9vw, 5.25rem);
+          font-weight: 900;
+          line-height: .92;
+          letter-spacing: -.05em;
+          margin-bottom: .35rem;
+          word-break: break-word;
         }
-        .sc-abstract { font-size: .78rem; line-height: 1.6; opacity: .8; flex: 1; }
-        .sc-bottom { margin-top: 1rem; display: flex; flex-direction: column; gap: .3rem; }
-        .sc-byline { font-size: .6rem; opacity: .45; letter-spacing: .04em; }
-        .sc-tags { display: flex; flex-wrap: wrap; gap: .22rem; }
-        .sc-tag {
-          font-size: .56rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-          border: 1px solid rgba(255,255,255,.35); border-radius: 2px;
-          padding: .13rem .48rem; color: rgba(255,255,255,.8);
+        .sc-title-sub {
+          font-size: 1.08rem;
+          line-height: 1.5;
+          color: rgba(255,255,255,.88);
+          margin-bottom: .9rem;
+          max-width: 82%;
+        }
+        .sc-note {
+          margin-top: auto;
+          padding-top: 1.4rem;
+          width: 72%;
+          font-size: .84rem;
+          line-height: 1.68;
+          opacity: .9;
         }
         /* Right panel */
         .sc-right {
@@ -286,6 +340,11 @@ When generating the final HTML report, produce a complete self-contained HTML fi
           transition: background .15s;
         }
         .sc-close:hover { background: rgba(255,255,255,.28); }
+        @media (max-width: 900px) {
+          .action-grid { grid-template-columns: 1fr; }
+          .sc-card { flex-direction: column; width: min(92vw, 640px); }
+          .sc-right { border-left: none; border-top: 1px solid var(--border); }
+        }
         @media print { .sc-overlay, .card-mode-btn { display: none !important; } }
       </style>
     </head>
@@ -299,6 +358,9 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         "author": "[author or empty string]",
         "date": "[date]",
         "abstract": "[abstract from frontmatter, or auto-generate a 1-sentence summary of the report content]",
+        "poster_title": "[optional stronger summary-card title; opt-in only when the core judgment should read like a poster headline]",
+        "poster_subtitle": "[optional subtitle shown below the poster title; only used when poster_title is present]",
+        "poster_note": "[optional one-sentence closing line for the left panel; falls back to a short sentence from abstract]",
         "sections": ["[heading of section 1]", "[heading of section 2]", "..."],
         "kpis": [
           {"label": "[label]", "value": "[display value]", "trend": "[trend text or empty]"}
@@ -662,25 +724,43 @@ When generating the final HTML report, produce a complete self-contained HTML fi
           const closeBtn = document.getElementById('sc-close');
           if (!btn || !overlay) return;
 
+          function splitPosterTitle(d) {
+            const explicitTitle = (d.poster_title || '').trim();
+            const explicitSubtitle = (d.poster_subtitle || '').trim();
+            const raw = (d.title || '').trim();
+            return { main: explicitTitle || raw, sub: explicitTitle ? explicitSubtitle : '' };
+          }
+
+          function summaryCardLabel() {
+            const lang = (document.documentElement.lang || '').toLowerCase();
+            return lang.startsWith('zh') ? '报告摘要' : 'Report Summary';
+          }
+
+          function posterNoteText(d) {
+            const explicit = (d.poster_note || '').trim();
+            if (explicit) return explicit;
+            const raw = (d.abstract || '').trim();
+            if (!raw) return '';
+            const sentence = raw.match(/^(.{0,72}?[。！？!?]|.{0,120})/)?.[1]?.trim() || raw;
+            return sentence.length > 72 ? sentence.slice(0, 72).trim() + '…' : sentence;
+          }
+
           function buildCard() {
             try {
               const d = JSON.parse(document.getElementById('report-summary').textContent);
-              const metaParts = [d.author, d.date].filter(Boolean);
+              const poster = splitPosterTitle(d);
+              const note = posterNoteText(d);
 
-              // Left panel: large uppercase title + abstract + rectangular tags at bottom
-              const tagsHtml = (d.sections || []).map(s => `<span class="sc-tag">${s}</span>`).join('');
+              // Left panel: poster title hierarchy + one short closing sentence near the bottom.
               const leftHtml = `
                 <div class="sc-left">
-                  <div class="sc-label">REPORT</div>
-                  <div class="sc-title">${d.title || ''}</div>
-                  ${d.abstract ? `<div class="sc-abstract">${d.abstract}</div>` : ''}
-                  <div class="sc-bottom">
-                    ${metaParts.length ? `<div class="sc-byline">${metaParts.join(' · ')}</div>` : ''}
-                    ${tagsHtml ? `<div class="sc-tags">${tagsHtml}</div>` : ''}
-                  </div>
+                  <div class="sc-label">${summaryCardLabel()}</div>
+                  <div class="sc-title-main">${poster.main || ''}</div>
+                  ${poster.sub ? `<div class="sc-title-sub">${poster.sub}</div>` : ''}
+                  ${note ? `<div class="sc-note">${note}</div>` : ''}
                 </div>`;
 
-              // Right panel: compact KPI rows + section summaries from data-summary attributes
+              // Right panel: compact KPI rows + section summaries only. Keep the card poster-like.
               const kpiRowsHtml = (d.kpis || []).slice(0, 6).map(k => `
                 <div class="sc-kpi-row">
                   <div class="sc-kpi-row-l">${k.label || ''}</div>
@@ -689,7 +769,8 @@ When generating the final HTML report, produce a complete self-contained HTML fi
               const sectionSummaries = Array.from(
                 document.querySelectorAll('section[data-section]')
               ).map(s => ({ name: s.dataset.section || '', text: s.dataset.summary || '' }))
-               .filter(s => s.name);
+               .filter(s => s.name)
+               .slice(0, 3);
               const summariesHtml = sectionSummaries.map(s => `
                 <div class="sc-sum-item">
                   <div class="sc-sum-name">${s.name}</div>

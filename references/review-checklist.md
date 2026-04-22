@@ -12,8 +12,9 @@ The report review system keeps only the rules that fit `kai-report-creator`'s op
 - the AI can fix it directly with a rewrite or structural adjustment
 - the rule does not depend on outside human feedback or image-level interpretation
 
-The system has **9 checkpoints**:
+The system has **13 checkpoints**:
 
+- **Category 0: Visual Hard Rules (5)** — auto-apply during the silent final pass
 - **Category 1: Hard Rules (5)** — auto-apply when violated
 - **Category 2: AI-Advised Rules (3)** — apply only when confidence is high
 
@@ -37,7 +38,20 @@ These are structural checks from `references/design-quality.md` §7 (Pre-Output 
 
 **Auto-fix:** Add badges at appropriate locations — section headers (category tags), KPI labels (status), table cells (progress), or timeline items (milestones). See `references/rendering-rules.md` for badge generation rules.
 
-### 0.3 Timeline Content Validity
+### 0.3 Summary Card Poster Hierarchy
+
+**Trigger:** Every generated report with a summary card.
+
+**Detection:** Flag summary cards that read like compact metadata panels instead of poster-style entry cards:
+
+- title is not visually dominant
+- title and subtitle are merged into one dense line
+- audience/byline/filler copy is injected into the card
+- the card exposes small tags but no clear poster headline
+
+**Auto-fix:** Only use `poster_title` / `poster_subtitle` when the report truly needs a stronger poster headline than the document title. Keep subtitle below the poster title, remove filler meta copy, and make the poster title dominate the card. Remove chips, bottom notes, and metadata filler if they weaken the poster read. If the left panel reads like a paragraph block instead of a poster, compress it to one short sentence at the bottom. If the left panel shows broken line wraps or wasted width, reduce title size and widen subtitle/note measure before changing content. If wrap quality is fixed but the title loses visual weight, increase the title within the available width before adding more copy.
+
+### 0.4 Timeline Content Validity
 
 **Trigger:** Every `:::timeline` / `.timeline` component.
 
@@ -45,7 +59,7 @@ These are structural checks from `references/design-quality.md` §7 (Pre-Output 
 
 **Auto-fix:** Convert to `:::list` or prose with `:::callout`. Preserve the content, change the component type.
 
-### 0.4 Export Menu Completeness
+### 0.5 Export Menu Completeness
 
 **Trigger:** Every generated HTML report.
 
@@ -136,7 +150,9 @@ when they do not carry section-specific information.
 - English paragraphs over ~120 words
 - or visually 5+ lines with no list, no sub-break, and no emphasis anchor
 
-**Auto-fix:** Split the text into shorter paragraphs, bullets, or a `claim -> explanation` structure.
+**Auto-fix:** Split the text into shorter paragraphs, bullets, or a `claim -> explanation` structure. When the section has a strong thesis, promote a decisive opening sentence into a lead block. In HTML terms, that means upgrading it into a `lead-block`. When one sentence carries the whole judgment, use a `section-quote`. When the section resolves into several concrete moves, use an `action-grid`.
+
+These are optional upgrades, not a quota. When unsure, prefer paragraph splits or one ordinary scan anchor over decorative cadence blocks.
 
 **Fallback:** If the text is a continuous argument, preserve the reasoning but add paragraph breaks and one scan anchor.
 

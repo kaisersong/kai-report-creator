@@ -55,7 +55,7 @@ def evaluate(root: Path) -> list[RuleResult]:
         readme_en,
         [
             "/report --review",
-            "8-checkpoint review system",
+            "13-checkpoint review system",
             "silent final review",
             "review-report-template.md",
         ],
@@ -66,7 +66,7 @@ def evaluate(root: Path) -> list[RuleResult]:
         readme_zh,
         [
             "/report --review",
-            "8 项检查点",
+            "13 项检查点",
             "静默终审",
             "review-report-template.md",
         ],

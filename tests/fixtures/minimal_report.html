@@ -49,10 +49,13 @@
     }
     .sc-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,.4); align-items: center; justify-content: center; }
     body.card-mode .sc-overlay { display: flex; }
-    .sc-card { position: relative; display: flex; width: min(600px, 90vw); background: #fff; border-radius: 8px; padding: 2rem; box-shadow: 0 24px 72px rgba(0,0,0,.3); }
+    .sc-card { position: relative; display: flex; width: min(760px, 92vw); background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 24px 72px rgba(0,0,0,.3); }
     .sc-close { position: absolute; top: .5rem; right: .5rem; background: none; border: 1px solid var(--border); border-radius: 3px; width: 24px; height: 24px; cursor: pointer; }
-    .sc-left { flex: 0 0 44%; padding: 1rem; background: var(--primary); color: #fff; border-radius: 6px; margin-right: 1rem; }
-    .sc-right { flex: 1; }
+    .sc-left { flex: 0 0 44%; padding: 1.8rem 2rem 1.6rem; background: var(--primary); color: #fff; }
+    .sc-right { flex: 1; padding: 1.6rem; border-left: 1px solid var(--border); }
+    .sc-title-main { font-size: clamp(4rem, 8vw, 6.2rem); font-weight: 900; line-height: .9; letter-spacing: -.05em; margin-bottom: .35rem; }
+    .sc-title-sub { font-size: 1.05rem; line-height: 1.45; color: rgba(255,255,255,.88); margin-bottom: .9rem; max-width: 18ch; }
+    .sc-abstract { font-size: .84rem; line-height: 1.72; opacity: .86; max-width: 26rem; }
 
     /* Export */
     .export-btn { position: fixed; bottom: 16px; right: 16px; }
@@ -117,6 +120,9 @@
     "author": "",
     "date": "2026-04-13",
     "abstract": "Minimal fixture for testing HTML shell structure.",
+    "poster_title": "Fixture",
+    "poster_subtitle": "Poster summary contract",
+    "poster_note": "One short sentence at the bottom.",
     "sections": ["Section A", "Section B"],
     "kpis": []
   }
@@ -156,8 +162,20 @@
       <div class="sc-overlay" id="sc-overlay">
         <div class="sc-card" id="sc-card">
           <button class="sc-close" id="sc-close">✕</button>
-          <div class="sc-left"><div class="sc-label">SUMMARY</div><div class="sc-title">FIXTURE</div></div>
-          <div class="sc-right"><p>Minimal fixture report for testing.</p></div>
+          <div class="sc-left">
+            <div class="sc-label">Report Summary</div>
+            <div class="sc-title-main">Fixture</div>
+            <div class="sc-title-sub">Poster summary contract</div>
+            <div class="sc-note">One short sentence at the bottom.</div>
+          </div>
+          <div class="sc-right">
+            <div class="sc-summaries">
+              <div class="sc-sum-item">
+                <div class="sc-sum-name">Section A</div>
+                <div class="sc-sum-text">Minimal fixture summary.</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

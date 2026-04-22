@@ -54,6 +54,15 @@ For `###` headings: `<h3 id="section-[slug]">[heading text]</h3>`
 
 `highlight-sentence` is a prose pattern, not an IR tag. If a paragraph deserves emphasized treatment, render it as prose upgraded to `<p class="highlight-sentence">...</p>`; do not invent `:::highlight-sentence`.
 
+`lead-block`, `section-quote`, and `action-grid` are also prose/HTML patterns, not IR tags. Use them only when the surrounding prose clearly supports them.
+
+- `lead-block` — decisive opening sentence that frames the section
+- `section-quote` — strongest judgment sentence in a prose-heavy section
+- `action-grid` — 2–5 implications, contrasts, or next actions that scan better as cards
+
+For `narrative` reports, prefer `claim -> explanation -> scan anchor` over leaving every section as plain paragraphs.
+If uncertain, stay with plain prose plus one callout/list/timeline rather than forcing a rhythm block.
+
 ## :::kpi
 
 Canonical input:
@@ -117,6 +126,8 @@ Extract the numeric part of Value into `data-target-value`, set `data-prefix` an
 If the content is a full sentence or descriptive paragraph, it belongs in prose, a `:::callout`, or a table cell — **NEVER** in a KPI card. The `:::kpi` block is for at-a-glance metrics, not explanations. When planning a report, if the source content has no short numbers to extract, use `:::callout` or `:::timeline` instead of forcing a `:::kpi` block.
 
 **Summary card KPI value rule:** The `report-summary` JSON `kpis[].value` field feeds the summary card's `.sc-kpi-row-v` (1.15rem, compact). If a KPI value exceeds the length rule above, use the kpi-label or a separate callout for the explanation, and keep the KPI value short for the card.
+
+**Summary card title hierarchy:** When building `report-summary` JSON, support `poster_title` and `poster_subtitle` as optional fields. Use them when the strongest summary-card headline should be more poster-like than the document H1. Render them into `.sc-title-main` and `.sc-title-sub`, with the subtitle below the title rather than merged into one dense line.
 
 **Column count rule (from design-quality.md):** Do NOT default all grids to 3 columns. Match to KPI count:
 - 1–2 KPIs → `grid-template-columns: repeat(2, 1fr)`

@@ -55,13 +55,13 @@ def test_doc_sync_checker_passes_for_valid_fixture():
         ),
         readme_en=(
             "/report --review\n"
-            "8-checkpoint review system\n"
+            "13-checkpoint review system\n"
             "silent final review\n"
             "review-report-template.md\n"
         ),
         readme_zh=(
             "/report --review\n"
-            "8 项检查点\n"
+            "13 项检查点\n"
             "静默终审\n"
             "review-report-template.md\n"
         ),

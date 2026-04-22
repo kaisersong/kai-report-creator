@@ -200,7 +200,7 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Review Mode
 
-Run `--review` to improve existing reports with 8 checkpoints:
+Run `--review` to improve existing reports with 13 checkpoints:
 
 ```
 /report --review market-analysis.html
@@ -218,9 +218,14 @@ If you want a structured change summary after review, use `references/review-rep
 
 `--generate` also runs this checklist as a **silent final review** before writing HTML.
 
-This review flow is the built-in **8-checkpoint review system**.
+This review flow is the built-in **13-checkpoint review system**.
 
-**8 Checkpoints:**
+**13 Checkpoints:**
+- KPI value length
+- Badge coverage
+- Summary card poster hierarchy
+- Timeline content validity
+- Export menu completeness
 - BLUF opening (Bottom Line Up Front)
 - Heading stack logic
 - Anti-template section headings
@@ -257,6 +262,12 @@ Key files:
 
 For complex reports, keep these IR frontmatter fields so evals can measure compression quality directly: `report_class`, `audience`, `decision_goal`, `must_include`, `must_avoid`.
 
+Maintainers can run the full release verification chain from one entry point:
+
+```bash
+python scripts/verify-release.py --root .
+```
+
 ---
 
 ## Features
@@ -266,12 +277,12 @@ For complex reports, keep these IR frontmatter fields so evals can measure compr
 - **Zero dependencies** — single `.html` file, works offline with `--bundle`
 - **6 built-in themes** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper
 - **9 component types** — KPIs, charts (ECharts), tables, timelines, diagrams, code blocks, callouts, images, lists
-- **Report Review System** — 8-checkpoint automatic refinement
+- **Report Review System** — 13-checkpoint automatic refinement
 - **AI-readable output** — 3-layer machine-readable structure for downstream agents
 
 ### Interaction
 
-- **Summary card overlay** — `⊞ Summary` button shows title, abstract, KPIs, section chips
+- **Summary card overlay** — `⊞ Summary` button opens a poster-style title card with abstract, KPIs, and section summaries
 - **Built-in export** — Print/PDF, PNG (Desktop), PNG (Mobile) via ↓ Export button
 - **Mobile responsive** — adapts to any screen size
 - **Bilingual** — full zh/en support with auto-detection
@@ -459,6 +470,10 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 
 ## Version History
 
+**v1.16.1** — Poster summary guardrails tightened: keep summary-card poster mode explicit, reduce the left panel to title hierarchy plus one short closing sentence, retune poster title width/size to fix broken wraps without losing visual weight, and add regression coverage for summary-card + narrative-rhythm guardrails.
+
+**v1.16.0** — Minimal Kami borrowing, fully landed: add hard `anti-patterns.md` and `diagram-decision-rules.md`, introduce silent `spec-loading-matrix.md` plus optional `archetype` routing hints, add maintainer-side `scripts/verify-release.py`, and raise the Windows release suite to 134 passing tests.
+
 **v1.15.0** — IR contract hardening and eval foundation: split failures into `invalid_syntax` / `invalid_semantics` / `contract_conflict`, formalize `kpi` / `chart` / `timeline` / `diagram` schemas, demote `badge` to optional enhancement, add repo-contained eval cases plus `run-report-evals.py`, fix install paths to `kai-report-creator`, and bring the Windows release suite to 125 passing tests.
 
 **v1.14.2** — Export menu completeness enforced in the standard generate flow: require print/desktop/mobile/IM export entries plus JS bindings during pre-write shell validation and silent final review; add shell contract coverage so reports no longer regress to partial export menus.
@@ -469,7 +484,7 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 
 **v1.13.0** — L2 HTML shell structure validation: 10 mandatory elements check in SKILL.md pre-write, design-quality.md §8, 30 new HTML shell contract tests (BUG-001 fix).
 
-**v1.9.0** — Report Review System: `--review` with 8 checkpoints; silent final review in `--generate`; L0/L1 quality layering.
+**v1.9.0** — Report Review System: `--review` with 13 checkpoints; silent final review in `--generate`; L0/L1 quality layering.
 
 **v1.8.3** — KPI overflow fix: `.kpi-suffix` for long units; rendering rules updated.
 
@@ -483,7 +498,7 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 
 **v1.5.0** — Design Quality Baseline: 90/8/2 color law, KPI grid rules, content-tone calibration.
 
-**v1.4.0** — Summary card overlay with KPIs and section chips.
+**v1.4.0** — Summary card overlay with poster entry card behavior and KPI/section summaries.
 
 **v1.3.0** — Zero-dependency animations: staggered KPI bounce, timeline slide-in.
 
