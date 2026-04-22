@@ -4,10 +4,11 @@ When generating the final HTML report, produce a complete self-contained HTML fi
 
     <!DOCTYPE html>
     <!-- kai-report-creator v[version] -->
-    <html lang="[lang]">
+    <html lang="[lang]" data-template="kai-report-creator" data-version="[version]" data-theme="[theme]">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="generator" content="kai-report-creator [theme-display] v[version]">
       <title>[title]</title>
 
       <!-- CDN libraries (add only what's needed; omit if --bundle, inline instead) -->
@@ -423,7 +424,13 @@ When generating the final HTML report, produce a complete self-contained HTML fi
 
           [All rendered section content here]
 
-          <div class="report-footer">By kai-report-creator v[version]</div>
+          <!-- Visible footer -->
+          <div class="report-footer">kai-report-creator [theme] v[version]</div>
+
+          <!-- Invisible watermark -->
+          <div style="display:none;visibility:hidden;opacity:0;font-size:0;line-height:0;height:0;overflow:hidden;" aria-hidden="true" data-watermark="kai-report-creator [theme] v[version]">
+            kai-report-creator [theme] v[version]
+          </div>
 
         </div>
       </div>
