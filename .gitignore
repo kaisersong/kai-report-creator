@@ -1,4 +1,5 @@
 .DS_Store
+docs/
 *.html
 !templates/zh/*.html
 !templates/en/*.html
