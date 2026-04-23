@@ -4,8 +4,9 @@
   --bg: #F7F5F1; --surface: #FFFFFF; --surface-2: #FAFAF8;
   --text: #202020; --text-muted: #949494;
   --border: #E5E7EB; --success: #059669; --warning: #F59E0B; --danger: #DC2626;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
-  --font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: 'Playfair Display', 'Noto Serif SC', Georgia, serif;
+  --font-sans-ui: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Courier Prime', 'Courier New', monospace;
   --radius: 12px;
   --status-ok: #059669;
   --status-warn: #F59E0B;
@@ -31,11 +32,14 @@ section[data-section] { margin-bottom: 1rem; }
 .report-wrapper { max-width: 920px; margin: 0 auto; padding: 2rem 1.5rem; }
 @media (min-width: 1100px) { .report-wrapper { padding: 2.5rem 3rem; } }
 
-/* Title meta line — 副标题 + 作者/日期 */
+/* Title meta line — 副标题 + 日期 */
 .report-subtitle { color: var(--text-muted); font-size: 1.1rem; line-height: 1.4; margin-top: .3rem; margin-bottom: .4rem; font-weight: 500; }
-.report-meta { color: var(--text-muted); font-size: .85rem; margin-top: -.3rem; margin-bottom: 1.2rem; }
+.report-meta { font-family: var(--font-sans-ui); color: var(--text-muted); font-size: .85rem; margin-top: -.3rem; margin-bottom: 1.2rem; }
 
 /* === POST-SHARED OVERRIDE (append AFTER shared.css) === */
+
+/* Title meta — 右对齐日期（覆盖 shared.css） */
+.report-meta { text-align: right; font-variant-numeric: lining-nums tabular-nums; }
 
 /* KPI grid — 紧凑 poster-style，适中数值 */
 .kpi-grid {
@@ -57,8 +61,8 @@ section[data-section] { margin-bottom: 1rem; }
 .kpi-card:hover {
   box-shadow: 0 4px 16px rgba(0,0,0,.12), 0 2px 4px rgba(0,0,0,.08);
 }
-.kpi-label { font-size: .7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .4rem; }
-.kpi-value { font-size: 2rem; font-weight: 700; font-variant-numeric: lining-nums tabular-nums; color: var(--text-black); line-height: 1; }
+.kpi-label { font-family: var(--font-sans-ui); font-size: .7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .4rem; }
+.kpi-value { font-family: var(--font-sans-ui); font-size: 2rem; font-weight: 700; font-variant-numeric: lining-nums tabular-nums; color: var(--text-black); line-height: 1; }
 .kpi-delta { font-size: .75rem; font-weight: 600; margin-top: .2rem; display: block; }
 .kpi-delta--up { color: var(--status-ok); }
 .kpi-delta--down { color: var(--status-err); }
@@ -137,5 +141,8 @@ section[data-section] { margin-bottom: 1rem; }
 
 /* Footer — 紧凑 */
 .report-footer { margin-top: 1.5rem; padding-top: .6rem; border-top: 1px solid var(--border); font-size: .65rem; color: var(--text-muted); opacity: .5; text-align: center; }
+
+/* Number style for body text — 正文数字使用等宽字体 */
+.number { font-family: var(--font-sans-ui); font-variant-numeric: lining-nums tabular-nums; }
 
 /* Note: regular-lumen uses github.min.css for code blocks (light theme) */

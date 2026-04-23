@@ -410,6 +410,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
             <h1>[title]</h1>
             <button class="card-mode-btn" id="card-mode-btn" title="[Summary card|摘要卡片]">[⊞ Summary|⊞ 摘要卡]</button>
           </div>
+          [if abstract: <p class="report-subtitle">[abstract]</p>]
           [if author or date: <p class="report-meta">[author] · [date]</p>]
 
           <!-- Summary card overlay (always present) — left+right panels injected by buildCard() -->

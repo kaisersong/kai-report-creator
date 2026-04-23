@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from FILE, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.18.0
+version: 1.19.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -62,7 +62,7 @@ The Intermediate Representation (IR) is a `.report.md` file with three parts:
     title: Report Title                    # Required
     theme: corporate-blue                  # Optional. Default: corporate-blue
     author: Name                           # Optional
-    date: YYYY-MM-DD                       # Optional. Default: today
+    date: YYYY-MM-DD                       # Optional. Auto-calculated based on report_class: weekly → YYYY-MM-DD～YYYY-MM-DD; monthly → YYYY-MM; daily → YYYY-MM-DD. Default: today
     lang: zh                               # Optional. zh | en. Auto-detected from content if omitted.
     report_class: mixed                    # Optional but strongly recommended. narrative | mixed | data
     archetype: research                    # Optional lightweight archetype hint for silent classification. `brief`, `research`, `comparison`, `update`
@@ -462,6 +462,14 @@ When the user runs `/report --generate [file]`:
    - `references/review-checklist.md` — review checklist
    - `references/diagram-decision-rules.md` — load whenever a diagram or diagram-like structure is being considered
 3. Parse the frontmatter to get metadata and settings.
+   **智能日期显示规则（仅适用于周期报告主题：regular-lumen、corporate-blue 等）**：
+   - 如果 `date` 字段已存在 → 直接使用
+   - 否则根据 `report_class` 和主题自动计算：
+     - **周报**：从标题/内容提取周信息，计算周一～周日范围，显示 `YYYY-MM-DD～YYYY-MM-DD`
+     - **月报**：显示 `YYYY-MM`
+     - **日报**：显示 `YYYY-MM-DD`
+     - **其他报告类型**：显示当天 `YYYY-MM-DD`
+   - 其他主题（dark-tech、minimal 等）使用默认日期显示 `YYYY-MM-DD`
 4. Select the appropriate theme CSS.
 5. Render all components according to Component Rendering Rules (including HARD RULES).
 6. Apply chart library selection rule.
@@ -470,7 +478,9 @@ When the user runs `/report --generate [file]`:
    - **L0: Content checks**
      - Search `:::` in HTML → convert unconverted directives
      - Search for generic h2 headings from the forbidden list → rewrite with information-bearing text
-     - Search `.kpi-value` elements → verify each ≤8 Chinese chars / ≤3 English words
+     - Search `.kpi-value` elements → verify each ≤8 Chinese chars / ≤3 English words AND has `font-variant-numeric: lining-nums tabular-nums` (or equivalent)
+     - Search `.number` in CSS → must exist with `font-variant-numeric: lining-nums tabular-nums` for body text numbers
+     - Search `<span class="number"` → verify numbers in body text use this class for consistent rendering
      - Search `<span class="badge"` → if badges exist, verify each one clarifies status, category, or entity identity instead of filling a quota
      - Search `.timeline-date` → verify each contains a date/timestamp, not a label
      - Search `\uFE0F` → remove all variant selectors from callout icons
