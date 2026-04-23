@@ -7,7 +7,6 @@
 !tests/fixtures/*.html
 .gstack/
 .superpowers/
-docs/
 outputs/
 __pycache__/
 tmp-*
@@ -15,7 +14,5 @@ tmp-*
 scripts/__pycache__/
 tests/__pycache__/
 .pytest_cache/
-.DS_Store
 *.pyc
 __pycache__/
-.pytest_cache/
