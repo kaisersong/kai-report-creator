@@ -27,6 +27,9 @@
 <td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/data-story.html"><img src="templates/screenshots/data-story.png" width="360" alt="data-story"/><br/><b>data-story</b></a><br/><sub>年度报告 · 增长叙事</sub></td>
 <td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/newspaper.html"><img src="templates/screenshots/newspaper.png" width="360" alt="newspaper"/><br/><b>newspaper</b></a><br/><sub>行业分析 · 通讯</sub></td>
 </tr>
+<tr>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/regular-lumen.html"><img src="templates/screenshots/regular-lumen.png" width="360" alt="regular-lumen"/><br/><b>regular-lumen</b></a><br/><sub>周期报告 · 周报/日报/月报</sub></td>
+</tr>
 </table>
 
 预览全部主题：`/report --themes` → 打开 `report-themes-preview.html`

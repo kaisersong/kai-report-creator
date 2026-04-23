@@ -27,6 +27,9 @@ Click any screenshot to open the live demo:
 <td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/data-story.html"><img src="templates/screenshots/data-story.png" width="360" alt="data-story"/><br/><b>data-story</b></a><br/><sub>Annual Reports · Growth</sub></td>
 <td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/newspaper.html"><img src="templates/screenshots/newspaper.png" width="360" alt="newspaper"/><br/><b>newspaper</b></a><br/><sub>Editorial · Industry Analysis</sub></td>
 </tr>
+<tr>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/regular-lumen.html"><img src="templates/screenshots/regular-lumen.png" width="360" alt="regular-lumen"/><br/><b>regular-lumen</b></a><br/><sub>Periodic Reports · Weekly/Daily/Monthly</sub></td>
+</tr>
 </table>
 
 Preview all themes: `/report --themes` → opens `report-themes-preview.html`
