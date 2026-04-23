@@ -27,10 +27,10 @@ When invoked as `/report [flags] [content]`, parse flags and route:
 | `--plan "topic"` | Generate a `.report.md` IR file only. Do NOT generate HTML. Save as `report-<slug>.report.md`. |
 | `--generate [file]` | Read the specified `.report.md` file (or IR from context if no file given), render to HTML. |
 | `--review [file]` | Read the specified HTML file and run one-pass automatic refinement using the report review checklist. |
-| `--themes` | Output `report-themes-preview.html` showing all 6 built-in themes. Do not generate a report. |
+| `--themes` | Output `report-themes-preview.html` showing all 7 built-in themes. Do not generate a report. |
 | `--bundle` | Generate HTML with all CDN libraries inlined. Overrides `charts: cdn` in frontmatter. |
 | `--from <file>` | If file's first line is `---`, treat as IR and render directly. Otherwise treat as raw content, generate IR first then render. If ambiguous, ask user to confirm. |
-| `--theme <name>` | Override theme. Built-in: `corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`. Custom: any folder name under `themes/` (e.g. `--theme my-brand` uses `themes/my-brand/`). See `themes/README.zh-CN.md`. |
+| `--theme <name>` | Override theme. Built-in: `corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`, `regular-lumen`. Custom: any folder name under `themes/` (e.g. `--theme my-brand` uses `themes/my-brand/`). See `themes/README.zh-CN.md`. |
 | `--template <file>` | Use a custom HTML template file. Read it and inject rendered content into placeholders. |
 | `--output <filename>` | Save HTML to this filename instead of the default. |
 | `--export-image [mode]` | After generating HTML, also export to image via `scripts/export-image.py`. Mode: `im` (default), `mobile`, `desktop`, `all`. Requires: `pip install playwright && playwright install chromium`. |
@@ -221,6 +221,7 @@ When no `--theme` is specified and no `theme:` in frontmatter, suggest a theme b
 | 新闻、行业、趋势、观察 / news, industry, trend, newsletter | `newspaper` | Editorial & news |
 | 年度、故事、增长、复盘 / annual, story, growth, retrospective | `data-story` | Data narrative |
 | 项目、看板、状态、进展、品牌、用研 / project, board, status, progress, brand, UX | `dark-board` | Project boards & system dashboards |
+| 日报、周报、月报、工作周报、团队周报 / daily, weekly, monthly, periodic report | `regular-lumen` | 周期性工作报告（本周期复盘 + 下周期规划）· 暖色调 Poster-style |
 
 When routing, output: *"推荐使用 `[theme]` 主题 ([theme description])，可用 `--theme` 覆盖。"* (or English equivalent).
 
@@ -261,6 +262,8 @@ Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5
 **Silent classify with `references/spec-loading-matrix.md`.** Keep this internal. Optionally add `archetype` only when the report clearly behaves like `brief`, `research`, `comparison`, or `update`. Never turn this into a separate user-facing phase.
 
 **Step 2 — Plan the structure.**
+
+**Pre-load content extraction rules:** If frontmatter `theme: regular-lumen` OR topic keywords match `日报|周报|月报|daily|weekly|monthly|periodic report`, read `references/regular-report-content-rules.md` before generating the IR. Apply periodic-specific extraction rules (KPI selection, timeline narrative, period divider) to refine user content into structured periodic report format.
 
 1. Think about the report structure: appropriate sections, data the user likely has.
 2. Generate a complete `.report.md` IR file containing:
@@ -489,11 +492,21 @@ When the user runs `/report --generate [file]`:
 When building the HTML shell, you MUST follow the template structure from `references/html-shell-template.md`:
 
 **CSS Assembly Order** (see `references/theme-css.md`):
-1. Theme CSS (part before `/* === POST-SHARED OVERRIDE */`)
-2. Shared component CSS (entire `templates/themes/shared.css`)
-3. Theme CSS (part after `/* === POST-SHARED OVERRIDE */`)
-4. **TOC CSS** (inline, defined in `html-shell-template.md` — DO NOT SKIP THIS)
-5. Theme overrides (if `theme_overrides` in frontmatter)
+
+**MANDATORY CSS Split Procedure:**
+1. Read theme file `templates/themes/[theme-name].css`
+2. Search for `/* === POST-SHARED OVERRIDE */` marker
+3. Split theme file into two parts: **before-marker** + **after-marker**
+4. Assemble `<style>` content in this exact order:
+   - **Theme before-marker** (variables + base styles)
+   - **Shared CSS** (entire `templates/themes/shared.css`)
+   - **Theme after-marker** (overrides + enhancements)
+   - **TOC CSS** (inline, from `html-shell-template.md`)
+   - **Theme overrides** (if `theme_overrides` in frontmatter)
+
+**Critical:** Do NOT embed the entire theme file in one block. The POST-SHARED section must load AFTER shared.css to override shared defaults (e.g., `.kpi-grid`, `.callout`, `.timeline`). Loading it before shared.css causes shared definitions to override theme-specific styles, breaking the design.
+
+**Pre-write CSS check:** Verify the assembled `<style>` follows the split order above. If a theme has POST-SHARED section, it must appear after shared.css content, not before.
 
 **JavaScript** (inline, NOT from external files):
 - Animation scripts (scroll-triggered fade-in, KPI counter)

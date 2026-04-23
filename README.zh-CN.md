@@ -273,7 +273,7 @@ python scripts/verify-release.py --root .
 ### 核心功能
 
 - **零依赖** — 单个 `.html` 文件，`--bundle` 模式支持离线
-- **6 套内置主题** — corporate-blue、minimal、dark-tech、dark-board、data-story、newspaper
+- **7 套内置主题** — corporate-blue、minimal、dark-tech、dark-board、data-story、newspaper、weekly-frost
 - **9 种组件类型** — KPI 指标、图表、表格、时间线、流程图、代码块、标注、图片、列表
 - **Report Review 系统** — 13 项检查点自动优化
 - **AI 可读输出** — 三层机器可读结构
@@ -304,6 +304,7 @@ python scripts/verify-release.py --root .
 | **dark-board** | 看板风格 | 架构图、指标看板 |
 | **data-story** | 叙事驱动 | 年度报告、增长故事 |
 | **newspaper** | 编辑感 | 行业分析、通讯 |
+| **regular-lumen** | Poster风格，暖色调 | 周期性工作报告（日报/周报/月报 · 本周期复盘 + 下周期规划）· Kami式阅读体验 |
 
 ### corporate-blue
 

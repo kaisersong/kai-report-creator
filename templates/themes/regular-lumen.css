@@ -1,0 +1,130 @@
+/* Theme: regular-lumen — Regular Lumen · 暖色调周期报告主题（日报/周报/月报，基于 Kami Tesla 风格） */
+:root {
+  --primary: #D97706; --primary-light: rgba(217,119,6,.12); --accent: #FBBF24;
+  --bg: #F7F5F1; --surface: #FFFFFF; --surface-2: #FAFAF8;
+  --text: #1F2937; --text-muted: #7C3AED;
+  --border: #E5E7EB; --success: #059669; --warning: #F59E0B; --danger: #DC2626;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --radius: 12px;
+  --status-ok: #059669;
+  --status-warn: #F59E0B;
+  --status-err: #DC2626;
+  --status-done: #6B7280;
+}
+body { font-family: var(--font-sans); color: var(--text); background: var(--bg); margin: 0; line-height: 1.8; }
+h1 { font-size: 2.8rem; font-weight: 900; color: var(--text); letter-spacing: -.03em; margin-bottom: .5rem; }
+h2 { font-size: 1.1rem; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .06em; padding: 1rem 0 .5rem; border-bottom: 2px solid var(--primary); margin-bottom: 1rem; margin-top: 0; }
+h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin-top: .8rem; margin-bottom: .4rem; }
+p { margin: .5rem 0; line-height: 1.8; }
+a { color: var(--primary); }
+strong { font-weight: 700; color: var(--text); }
+blockquote { border-left: 3px solid var(--primary); margin: 1rem 0; padding: .8rem 1.2rem; color: var(--text-muted); font-size: .9rem; line-height: 1.7; background: var(--surface-2); border-radius: var(--radius); }
+
+/* Section layout — 开阔留白，poster-style 排版 */
+section[data-section] { margin-bottom: 1.5rem; }
+
+/* === POST-SHARED OVERRIDE (append AFTER shared.css) === */
+
+/* KPI grid — poster-style 大卡片，柔和阴影 */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1.2rem;
+  margin: 1.5rem 0;
+}
+.kpi-card {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--radius);
+  padding: 1.5rem 1rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  border-top: none;
+  transition: box-shadow .2s ease;
+}
+.kpi-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,.12), 0 2px 4px rgba(0,0,0,.08);
+}
+.kpi-label { font-size: .75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .5rem; }
+.kpi-value { font-size: 2.2rem; font-weight: 900; font-variant-numeric: lining-nums tabular-nums; color: var(--primary); line-height: 1.2; }
+.kpi-delta { font-size: .82rem; font-weight: 600; margin-top: .3rem; }
+.kpi-delta--up { color: var(--status-ok); }
+.kpi-delta--down { color: var(--status-err); }
+.kpi-delta--info { color: var(--status-done); }
+
+/* Badge — 柔和配色，poster-style */
+.badge { font-size: .75rem; font-weight: 600; padding: .18rem .55rem; border-radius: 999px; letter-spacing: .02em; border: none; }
+.badge--blue { background: rgba(217,119,6,.12); color: var(--primary); }
+.badge--green { background: rgba(5,150,105,.12); color: var(--status-ok); }
+.badge--orange { background: rgba(245,158,11,.12); color: var(--status-warn); }
+.badge--red { background: rgba(220,38,38,.12); color: var(--status-err); }
+.badge--gray { background: rgba(107,114,128,.12); color: var(--status-done); }
+.badge--wip { background: rgba(217,119,6,.12); color: var(--primary); }
+.badge--warn { background: rgba(245,158,11,.12); color: var(--status-warn); }
+.badge--done { background: rgba(107,114,128,.12); color: var(--status-done); }
+
+/* Tables — 开阔留白，柔和行背景 */
+.table-wrapper { overflow-x: auto; margin: 1rem 0; }
+.report-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.report-table th {
+  text-align: left; color: var(--text); font-weight: 700; font-size: .82rem;
+  text-transform: uppercase; letter-spacing: .05em;
+  padding: .75rem 1rem; border-bottom: 2px solid var(--primary); background: var(--surface);
+}
+.report-table td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); }
+.report-table td:first-child { font-family: var(--font-mono); }
+.report-table tr:last-child td { border-bottom: none; }
+.report-table tr:nth-child(even) td { background: var(--surface-2); }
+
+/* Callout — 柔和背景，poster-style */
+.callout { display: flex; gap: .75rem; padding: 1rem 1.25rem; border-radius: var(--radius); margin: 1rem 0; border-left: 4px solid; align-items: flex-start; }
+.callout--note { background: rgba(217,119,6,.08); border-color: var(--primary); }
+.callout--tip { background: rgba(5,150,105,.08); border-color: var(--status-ok); }
+.callout--warning { background: rgba(245,158,11,.08); border-color: var(--status-warn); }
+.callout--danger { background: rgba(220,38,38,.08); border-color: var(--status-err); }
+.callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .1rem; }
+.callout--note .callout-icon { color: var(--primary); }
+.callout--tip .callout-icon { color: var(--status-ok); }
+.callout--warning .callout-icon { color: var(--status-warn); }
+.callout--danger .callout-icon { color: var(--status-err); }
+.callout-body { flex: 1; min-width: 0; line-height: 1.7; font-size: .9rem; color: var(--text); }
+
+/* Timeline — poster-style 开阔排版 */
+.timeline { position: relative; padding-left: 2rem; margin: 1rem 0; }
+.timeline::before { content: ''; position: absolute; left: .5rem; top: .5rem; bottom: .5rem; width: 2px; background: var(--border); }
+.timeline-item { position: relative; margin-bottom: 1.2rem; display: flex; gap: .8rem; align-items: baseline; }
+.timeline-dot {
+  position: absolute; left: -1.5rem; top: .4rem;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--primary); border: 3px solid var(--bg);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+.timeline-item.future .timeline-dot {
+  background: var(--border); border-color: var(--border);
+  box-shadow: none;
+}
+.timeline-date { font-size: .82rem; color: var(--text-muted); font-weight: 600; font-family: var(--font-mono); min-width: 6rem; flex-shrink: 0; }
+.timeline-content { font-size: .9rem; color: var(--text); line-height: 1.7; }
+.timeline-item.future .timeline-content { color: var(--text-muted); }
+
+/* Week divider — poster-style 本周期/下周期分界线 */
+.week-divider {
+  border: none;
+  border-top: 2px solid var(--primary);
+  opacity: .6;
+  margin: 2rem 0;
+  position: relative;
+}
+.week-divider::after {
+  content: '下周期 ▸';
+  position: absolute; right: 0; top: -.7rem;
+  background: var(--bg); padding: 0 .8rem;
+  font-size: .75rem; color: var(--primary); font-weight: 700; letter-spacing: .04em;
+  opacity: 1;
+}
+
+/* Footer */
+.report-footer { margin-top: 2rem; padding-top: .8rem; border-top: 1px solid var(--border); font-size: .7rem; color: var(--text-muted); opacity: .5; text-align: center; }
+
+/* Note: regular-lumen uses github.min.css for code blocks (light theme) */

@@ -80,7 +80,12 @@ When generating the final HTML report, produce a complete self-contained HTML fi
         .callout--warning { background: #FFFBEB; border-color: #F59E0B; }
         .callout--danger { background: #FEF2F2; border-color: #EF4444; }
         .callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
-        .callout-body { flex: 1; min-width: 0; line-height: 1.6; font-size: .93rem; }
+        .callout-body { flex: 1; min-width: 0; line-height: 1.6; font-size: .93rem; color: #1F2937; }
+        /* Callout icon color — ensure contrast on light backgrounds regardless of theme */
+        .callout--note .callout-icon { color: #3B82F6; }
+        .callout--tip .callout-icon { color: #22C55E; }
+        .callout--warning .callout-icon { color: #F59E0B; }
+        .callout--danger .callout-icon { color: #EF4444; }
 
         /* Semantic highlight extraction — from design-quality.md §6 */
         .highlight-sentence { font-size: 1.15rem; font-weight: 700; color: var(--primary); border-left: 3px solid var(--primary); padding-left: 1rem; margin: 1.5rem 0; line-height: 1.5; }

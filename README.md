@@ -275,7 +275,7 @@ python scripts/verify-release.py --root .
 ### Core
 
 - **Zero dependencies** — single `.html` file, works offline with `--bundle`
-- **6 built-in themes** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper
+- **7 built-in themes** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper, weekly-frost
 - **9 component types** — KPIs, charts (ECharts), tables, timelines, diagrams, code blocks, callouts, images, lists
 - **Report Review System** — 13-checkpoint automatic refinement
 - **AI-readable output** — 3-layer machine-readable structure for downstream agents
@@ -306,6 +306,7 @@ python scripts/verify-release.py --root .
 | **dark-board** | Dashboard style | Architecture, metrics dashboards |
 | **data-story** | Narrative-driven | Annual reports, growth stories |
 | **newspaper** | Editorial | Industry analysis, newsletters |
+| **regular-lumen** | Poster-style, warm-toned | Periodic work reports (日报/周报/月报 · 本周期复盘 + 下周期规划) · Kami-style reading experience |
 
 ### corporate-blue
 
