@@ -471,7 +471,11 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 
 ## Version History
 
-**v1.16.1** — Poster summary guardrails tightened: keep summary-card poster mode explicit, reduce the left panel to title hierarchy plus one short closing sentence, retune poster title width/size to fix broken wraps without losing visual weight, and add regression coverage for summary-card + narrative-rhythm guardrails.
+**v1.18.0** — Theme routing fixed for work reports: priority-ordered keyword matching now correctly routes weekly/daily/monthly reports to `regular-lumen` (first priority) and generic work progress reports to `corporate-blue` (fallback), instead of misrouting to dark-tech/dark-board due to overlapping keywords like "项目/进展/状态".
+
+**v1.17.1** — Resolve ClawHub version conflict (merge ClawHub v1.16.1 updates).
+
+**v1.17.0** — Merge ClawHub v1.16.1 updates + add watermark feature.
 
 **v1.16.0** — Minimal Kami borrowing, fully landed: add hard `anti-patterns.md` and `diagram-decision-rules.md`, introduce silent `spec-loading-matrix.md` plus optional `archetype` routing hints, add maintainer-side `scripts/verify-release.py`, and raise the Windows release suite to 134 passing tests.
 

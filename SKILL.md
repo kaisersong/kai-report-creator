@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from FILE, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.17.1
+version: 1.18.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -213,15 +213,18 @@ Apply `lang` to: the HTML `lang` attribute, placeholder text (`[数据待填写]
 
 When no `--theme` is specified and no `theme:` in frontmatter, suggest a theme based on the topic keywords. This is a recommendation only — the user can always override with `--theme`.
 
-| Topic keywords | Recommended theme | Use case |
-|---------------|-------------------|---------|
-| 季报、销售、业绩、营收、KPI、数据分析 / quarterly, sales, revenue, KPI, business | `corporate-blue` | Business & commercial |
-| 研究、调研、学术、白皮书、内部、团队 / research, survey, academic, whitepaper, internal, team | `minimal` | Academic & research & editorial |
-| 技术、架构、API、系统、性能、部署 / tech, architecture, API, system, performance | `dark-tech` | Technical documentation |
-| 新闻、行业、趋势、观察 / news, industry, trend, newsletter | `newspaper` | Editorial & news |
-| 年度、故事、增长、复盘 / annual, story, growth, retrospective | `data-story` | Data narrative |
-| 项目、看板、状态、进展、品牌、用研 / project, board, status, progress, brand, UX | `dark-board` | Project boards & system dashboards |
-| 日报、周报、月报、工作周报、团队周报 / daily, weekly, monthly, periodic report | `regular-lumen` | 周期性工作报告（本周期复盘 + 下周期规划）· 暖色调 Poster-style |
+**Routing priority (order matters — first match wins):**
+
+| Priority | Topic keywords | Recommended theme | Use case |
+|----------|----------------|-------------------|---------|
+| **1st** | 周报、日报、月报、工作汇报、进展汇报、团队汇报、本周、下周、本周期 / weekly, daily, monthly, work report, progress report, team report, this week, next week | `regular-lumen` | 周期性工作报告（本周期复盘 + 下周期规划）· 暖色调 Poster-style |
+| **2nd** | 季报、销售、业绩、营收、KPI、数据分析、商业、季度 / quarterly, sales, revenue, KPI, business | `corporate-blue` | Business & commercial |
+| **3rd** | 研究、调研、学术、白皮书、内部文档、团队文档 / research, survey, academic, whitepaper, internal, team | `minimal` | Academic & research & editorial |
+| **4th** | 技术、架构、API、系统、性能、部署、代码、工程 / tech, architecture, API, system, performance, engineering | `dark-tech` | Technical documentation |
+| **5th** | 新闻、行业、趋势、观察、报道 / news, industry, trend, newsletter | `newspaper` | Editorial & news |
+| **6th** | 年度、故事、增长、复盘、回顾 / annual, story, growth, retrospective | `data-story` | Data narrative |
+| **7th** | 项目看板、状态看板、进度看板、品牌、用研 / project board, status board, progress board, brand, UX | `dark-board` | Project boards & system dashboards |
+| **8th** | 项目进展、项目状态、项目完成、任务进展 / project progress, project status, task progress (通用工作报告关键词，不含看板) | `corporate-blue` | 通用工作报告 fallback — 当主题不明确时，使用商务风格而非暗色技术风格 |
 
 When routing, output: *"推荐使用 `[theme]` 主题 ([theme description])，可用 `--theme` 覆盖。"* (or English equivalent).
 
@@ -231,7 +234,19 @@ When the user runs `/report --plan "topic"`:
 
 **Step 0 — Auto-detect language.** Apply language auto-detection rules above.
 
-**Step 1 — Suggest theme.** Check content-type routing table. If a match is found, suggest the recommended theme in the IR frontmatter and inform the user.
+**Step 1 — Suggest theme.** Check content-type routing table using **priority order matching**:
+
+1. Scan topic for **周期报告关键词**（第1优先级）：周报、日报、月报、工作汇报、进展汇报、本周、下周 → if found, suggest `regular-lumen`
+2. If not found, scan for **商务关键词**（第2优先级）：季报、销售、业绩、营收、KPI → if found, suggest `corporate-blue`
+3. If not found, scan for **研究关键词**（第3优先级）：研究、调研、学术、白皮书 → if found, suggest `minimal`
+4. If not found, scan for **技术关键词**（第4优先级）：技术、架构、API、系统、性能 → if found, suggest `dark-tech`
+5. If not found, scan for **新闻关键词**（第5优先级）：新闻、行业、趋势、观察 → if found, suggest `newspaper`
+6. If not found, scan for **年度关键词**（第6优先级）：年度、故事、增长、复盘 → if found, suggest `data-story`
+7. If not found, scan for **看板关键词**（第7优先级）：看板、board、dashboard → if found, suggest `dark-board`
+8. **Fallback (第8优先级)**：如果包含"项目/进展/状态/任务"等通用工作关键词 → suggest `corporate-blue`（而非dark-tech/dark-board）
+9. If no keyword matches, default to `corporate-blue`
+
+**Important:** Report the match to user: *"推荐使用 `[theme]` 主题 ([theme description])，可用 `--theme` 覆盖。"* (or English equivalent).
 
 **Step 1.5 — Analyze content nature.**
 
@@ -263,7 +278,7 @@ Store the class (`narrative` / `mixed` / `data`) and apply it in Step 2 item 3.5
 
 **Step 2 — Plan the structure.**
 
-**Pre-load content extraction rules:** If frontmatter `theme: regular-lumen` OR topic keywords match `日报|周报|月报|daily|weekly|monthly|periodic report`, read `references/regular-report-content-rules.md` before generating the IR. Apply periodic-specific extraction rules (KPI selection, timeline narrative, period divider) to refine user content into structured periodic report format.
+**Pre-load content extraction rules:** If frontmatter `theme: regular-lumen` OR topic keywords match **周期报告关键词**（周报|日报|月报|工作汇报|进展汇报|本周|下周|daily|weekly|monthly|periodic report）, read `references/regular-report-content-rules.md` before generating the IR. Apply periodic-specific extraction rules (KPI selection, timeline narrative, period divider) to refine user content into structured periodic report format.
 
 1. Think about the report structure: appropriate sections, data the user likely has.
 2. Generate a complete `.report.md` IR file containing:
