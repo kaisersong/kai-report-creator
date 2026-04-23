@@ -307,6 +307,7 @@ python scripts/verify-release.py --root .
 | **data-story** | Narrative-driven | Annual reports, growth stories |
 | **newspaper** | Editorial | Industry analysis, newsletters |
 | **regular-lumen** | Poster-style, warm-toned | Periodic work reports (日报/周报/月报 · 本周期复盘 + 下周期规划) · Kami-style reading experience |
+| **fangsong** | Traditional Chinese, warm brown | Formal reports with FangSong typography (标题衬线仿宋 + 正文非衬线仿宋) |
 
 ### corporate-blue
 
