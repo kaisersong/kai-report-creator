@@ -472,6 +472,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 
 ## Version History
 
+**v1.19.0** — FangSong theme for formal reports + number font quality checks: Chinese FangSong (仿宋) theme for official/formal documents, `<span class="num">` wrapper for all numeric values with tabular-nums enforcement, smart date display (relative dates for recent items, absolute dates for older entries), and number font rendering validation in review pipeline.
+
 **v1.18.0** — Theme routing fixed for work reports: priority-ordered keyword matching now correctly routes weekly/daily/monthly reports to `regular-lumen` (first priority) and generic work progress reports to `corporate-blue` (fallback), instead of misrouting to dark-tech/dark-board due to overlapping keywords like "项目/进展/状态".
 
 **v1.17.1** — Resolve ClawHub version conflict (merge ClawHub v1.16.1 updates).

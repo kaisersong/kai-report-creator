@@ -305,6 +305,7 @@ python scripts/verify-release.py --root .
 | **data-story** | 叙事驱动 | 年度报告、增长故事 |
 | **newspaper** | 编辑感 | 行业分析、通讯 |
 | **regular-lumen** | Poster风格，暖色调 | 周期性工作报告（日报/周报/月报 · 本周期复盘 + 下周期规划）· Kami式阅读体验 |
+| **fangsong** | 传统中文，暖棕调 | 正式公文报告 · 标题衬线仿宋 + 正文非衬线仿宋 |
 
 ### corporate-blue
 
@@ -467,7 +468,15 @@ OpenClaw 会自动：
 
 ## 版本日志
 
-**v1.16.1** — 收紧海报式摘要卡护栏：保持 summary-card poster mode 为显式 opt-in，把左栏收回为“标题层级 + 底部一句收束”，重新平衡主标题字号与可用宽度，修掉错误换行与宽度浪费，并新增摘要卡与 narrative rhythm 的回归测试。
+**v1.19.0** — 仿宋主题 + 数字字体质量检查：新增 FangSong（仿宋）主题用于正式公文，`<span class=”num”>` 包裹所有数值强制 tabular-nums，智能日期显示（近期用相对时间，远期用绝对日期），review 流程新增数字字体渲染校验。
+
+**v1.18.0** — 主题路由修复：优先级关键词匹配现在正确将周报/日报/月报路由到 `regular-lumen`（第一优先级），将通用工作进展报告路由到 `corporate-blue`（兜底），而不是因为”项目/进展/状态”等重叠关键词误路由到 dark-tech/dark-board。
+
+**v1.17.1** — 解决 ClawHub 版本冲突（合并 ClawHub v1.16.1 更新）。
+
+**v1.17.0** — 合并 ClawHub v1.16.1 更新 + 新增水印功能。
+
+**v1.16.1** — 收紧海报式摘要卡护栏：保持 summary-card poster mode 为显式 opt-in，把左栏收回为”标题层级 + 底部一句收束”，重新平衡主标题字号与可用宽度，修掉错误换行与宽度浪费，并新增摘要卡与 narrative rhythm 的回归测试。
 
 **v1.16.0** — 最小化借鉴 Kami 方案全部落地：新增硬规则文档 `anti-patterns.md` 与 `diagram-decision-rules.md`，补上静默分类用的 `spec-loading-matrix.md` 和可选 `archetype` 提示，新增维护侧统一发布校验入口 `scripts/verify-release.py`，并将 Windows 发布测试集提升到 134 项全部通过。
 
