@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from FILE, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.19.0
+version: 1.20.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -471,12 +471,35 @@ When the user runs `/report --generate [file]`:
      - **其他报告类型**：显示当天 `YYYY-MM-DD`
    - 其他主题（dark-tech、minimal 等）使用默认日期显示 `YYYY-MM-DD`
 4. Select the appropriate theme CSS.
+4.5. **Run guard validation** — call Python guard before rendering (v4 guardrails):
+     - If file-backed: read IR file content → ir_text
+     - If context-backed: use IR string from context → ir_text
+     - Call guard: `python <skill-dir>/scripts/guard_validate.py` (pass ir_text via stdin or temp file)
+     - Guard resolves report_class using the same path as --generate (Step 1.5 density detection → default "mixed")
+     - Guard calls contract_checks validators with resolved class (zero drift)
+     - Read JSON output from guard
+     - If exit code 2 (fatal: missing title) → STOP generation, report error to user
+     - If exit code 1 (invalid blocks) → for each invalid block, apply auto_downgrade_target:
+       - `:::kpi` invalid → downgrade to `:::callout`
+       - `:::chart` invalid → downgrade to `:::table`
+       - `:::timeline` invalid → downgrade to `:::list`
+       - `:::diagram` invalid → downgrade to `:::callout`
+       - Tell user which blocks were downgraded and why (status field in JSON)
+     - If exit code 0 (valid) → continue generation normally
 5. Render all components according to Component Rendering Rules (including HARD RULES).
 6. Apply chart library selection rule.
 7. Build the HTML shell with TOC, AI summary, animations. **Replace `[version]` in the footer with the current skill version from SKILL.md frontmatter.**
+   **Embed IR hash meta tag:**
+   - Replace `[ir-hash]` placeholder in `<meta name="ir-hash" content="sha256:[ir-hash]">`
+   - HASH = sha256 of the IR text content (first 16 hex chars), prefixed with `sha256:`
+   - IR text 来源：
+     - File-backed: IR file content (`read_text()` from the `.report.md` file)
+     - Context-backed: IR string extracted directly from context (no file read)
+   - Both paths hash the same `ir_text` content, not the file path
 8. **Pre-write validation** — scan the assembled HTML for these violations and fix each one found:
    - **L0: Content checks**
      - Search `:::` in HTML → convert unconverted directives
+     - Search `<meta name="ir-hash"` → must exist with non-empty `sha256:` prefix content (validates IR hash embedded)
      - Search for generic h2 headings from the forbidden list → rewrite with information-bearing text
      - Search `.kpi-value` elements → verify each ≤8 Chinese chars / ≤3 English words AND has `font-variant-numeric: lining-nums tabular-nums` (or equivalent)
      - Search `.number` in CSS → must exist with `font-variant-numeric: lining-nums tabular-nums` for body text numbers

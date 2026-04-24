@@ -52,6 +52,9 @@ def test_doc_sync_checker_passes_for_valid_fixture():
             "references/review-report-template.md\n"
             "silent final review pass\n"
             "one-pass automatic refinement\n"
+            "no file given\n"  # v4 guardrails: context-backed generate prose
+            "IR from context\n"  # v4 guardrails: IR-from-context routing
+            "report_class: mixed\n"  # v4 guardrails: optional report_class prose
         ),
         readme_en=(
             "/report --review\n"

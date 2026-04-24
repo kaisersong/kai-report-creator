@@ -84,6 +84,24 @@ def evaluate(root: Path) -> list[RuleResult]:
     )
     results.append(RuleResult("checklist-contract", ok, detail))
 
+    # v4 guardrails: Doc drift protection (验收清单 #11, #12)
+    ok, detail = contains_all(
+        skill,
+        [
+            "no file given",  # SKILL.md must preserve context-backed generate prose
+            "IR from context",  # SKILL.md must preserve IR-from-context routing
+        ],
+    )
+    results.append(RuleResult("skill-context-backed-contract", ok, detail))
+
+    ok, detail = contains_all(
+        skill,
+        [
+            "report_class: mixed",  # SKILL.md must preserve optional report_class prose
+        ],
+    )
+    results.append(RuleResult("report_class-mixed-contract", ok, detail))
+
     return results
 
 

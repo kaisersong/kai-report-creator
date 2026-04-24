@@ -9,6 +9,7 @@ When generating the final HTML report, produce a complete self-contained HTML fi
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="generator" content="kai-report-creator [theme-display] v[version]">
+      <meta name="ir-hash" content="sha256:[ir-hash]">
       <title>[title]</title>
 
       <!-- CDN libraries (add only what's needed; omit if --bundle, inline instead) -->

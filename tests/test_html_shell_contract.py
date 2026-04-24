@@ -128,6 +128,37 @@ class TestTemplateExportContract:
             )
 
 
+# ── L2: IR Hash Meta Tag ───────────────────────────────────────────────────────
+
+class TestIRHashMetaContract:
+    """IR hash meta tag must be present in template (v4 guardrails)."""
+
+    @staticmethod
+    def template_source() -> str:
+        return TEMPLATE_PATH.read_text(encoding="utf-8")
+
+    def test_template_has_ir_hash_placeholder(self):
+        """Template must include ir-hash meta tag placeholder."""
+        src = self.template_source()
+        assert '<meta name="ir-hash" content="sha256:[ir-hash]">' in src, (
+            "MISSING: ir-hash meta tag in references/html-shell-template.md.\n"
+            "The template must include the placeholder for IR hash fingerprint."
+        )
+
+    def test_ir_hash_placeholder_format(self):
+        """Placeholder must use sha256:[ir-hash] format (not bare hash)."""
+        src = self.template_source()
+        # Accept either the full meta tag or just the placeholder pattern
+        has_valid_format = (
+            'content="sha256:[ir-hash]"' in src
+            or 'sha256:[ir-hash]' in src
+        )
+        assert has_valid_format, (
+            "Invalid ir-hash format — must use 'sha256:[ir-hash]' prefix, not bare hash.\n"
+            "This format ensures downstream agents can validate hash algorithm."
+        )
+
+
 # ── L2: TOC JavaScript Contract ──────────────────────────────────────────────
 # See design-quality.md §8.2
 

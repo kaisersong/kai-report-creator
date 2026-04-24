@@ -475,7 +475,7 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 
 ## Version History
 
-**v1.19.0** — FangSong theme for formal reports + number font quality checks: Chinese FangSong (仿宋) theme for official/formal documents, `<span class="num">` wrapper for all numeric values with tabular-nums enforcement, smart date display (relative dates for recent items, absolute dates for older entries), and number font rendering validation in review pipeline.
+**v1.20.0** — Guard validation pipeline: Python guard (`scripts/guard_validate.py`) runs before HTML rendering with zero-drift report_class resolution, auto-downgrade invalid blocks (kpi→callout, chart→table, timeline→list, diagram→callout), IR hash embedding in `<meta name="ir-hash">` for traceability, and guard integration tests.
 
 **v1.18.0** — Theme routing fixed for work reports: priority-ordered keyword matching now correctly routes weekly/daily/monthly reports to `regular-lumen` (first priority) and generic work progress reports to `corporate-blue` (fallback), instead of misrouting to dark-tech/dark-board due to overlapping keywords like "项目/进展/状态".
 
