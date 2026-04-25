@@ -31,6 +31,13 @@ def contains_all(text: str, snippets: list[str]) -> tuple[bool, str]:
     return True, "all expected markers present"
 
 
+def contains_none(text: str, snippets: list[str]) -> tuple[bool, str]:
+    present = [snippet for snippet in snippets if snippet in text]
+    if present:
+        return False, "unexpected: " + ", ".join(repr(item) for item in present)
+    return True, "no forbidden markers present"
+
+
 def evaluate(root: Path) -> list[RuleResult]:
     skill = read_required(root / "SKILL.md")
     readme_en = read_required(root / "README.md")
@@ -101,6 +108,52 @@ def evaluate(root: Path) -> list[RuleResult]:
         ],
     )
     results.append(RuleResult("report_class-mixed-contract", ok, detail))
+
+    ok, detail = contains_all(
+        skill,
+        [
+            "extract exactly one valid IR block from context",
+            "Never render the surrounding conversation.",
+            "Load reference files minimally",
+            "load only the references that materially help the current render path",
+        ],
+    )
+    results.append(RuleResult("skill-late-context-boundary-contract", ok, detail))
+
+    ok, detail = contains_none(
+        skill,
+        [
+            "read ALL of these before generating any HTML",
+        ],
+    )
+    results.append(RuleResult("skill-no-full-reference-load-contract", ok, detail))
+
+    ok, detail = contains_all(
+        skill,
+        [
+            "Thin Routing Over Prompt Growth",
+            "Contracts and Gates Beat Prompt Soup",
+        ],
+    )
+    results.append(RuleResult("skill-context-budget-contract", ok, detail))
+
+    ok, detail = contains_all(
+        readme_en,
+        [
+            "Capability Growth Must Reduce Context Load",
+            "Move quality checks off the hot path.",
+        ],
+    )
+    results.append(RuleResult("readme-en-context-budget-contract", ok, detail))
+
+    ok, detail = contains_all(
+        readme_zh,
+        [
+            "能力增长先减少上下文负担",
+            "质量机制后移",
+        ],
+    )
+    results.append(RuleResult("readme-zh-context-budget-contract", ok, detail))
 
     return results
 

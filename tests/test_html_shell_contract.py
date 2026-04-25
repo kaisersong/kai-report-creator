@@ -15,6 +15,8 @@ Two test modes:
 import pytest
 from pathlib import Path
 
+from scripts.shell_metadata import footer_watermark_text
+
 REPO_ROOT = Path(__file__).parent.parent
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
@@ -241,6 +243,63 @@ class TestJsonSummaryBlock:
         assert '"title"' in html, "JSON summary missing 'title' field"
         assert '"sections"' in html, "JSON summary missing 'sections' field"
         assert '"kpis"' in html, "JSON summary missing 'kpis' field"
+
+
+class TestFooterWatermarkContract:
+    """Footer and hidden watermark must use deterministic shell metadata only."""
+
+    @staticmethod
+    def template_source() -> str:
+        return TEMPLATE_PATH.read_text(encoding="utf-8")
+
+    def test_template_footer_placeholder_format(self):
+        src = self.template_source()
+        expected = footer_watermark_text("[version]", "[theme]")
+        assert f'<div class="report-footer">{expected}</div>' in src, (
+            "Visible footer must be assembled as 'kai-report-creator v[version] [theme]'.\n"
+            "Do not swap the order or improvise additional prose."
+        )
+
+    def test_template_hidden_watermark_matches_footer(self):
+        src = self.template_source()
+        expected = footer_watermark_text("[version]", "[theme]")
+        assert f'data-watermark="{expected}"' in src, (
+            "Hidden watermark must match the visible footer text exactly."
+        )
+        assert f"\n            {expected}\n" in src, (
+            "Hidden watermark body text must match the visible footer text exactly."
+        )
+
+    def test_template_footer_forbids_debug_metadata(self):
+        src = self.template_source()
+        assert "IR hash" not in src
+        assert "Source condensed" not in src
+        assert "By kai-report-creator" not in src
+
+    @pytest.mark.parametrize(
+        "fixture_name,version,theme",
+        [
+            ("minimal_report.html", "1.14.0", "minimal"),
+            ("color_system_report.html", "1.21.0", "corporate-blue"),
+        ],
+    )
+    def test_fixtures_match_footer_contract(self, fixture_name, version, theme):
+        html = load_html(fixture_name)
+        expected = footer_watermark_text(version, theme)
+        assert f'<div class="report-footer">{expected}</div>' in html
+        assert f'data-watermark="{expected}"' in html
+        assert "IR hash" not in html
+        assert "By kai-report-creator" not in html
+
+    @pytest.mark.parametrize("template_path", [
+        REPO_ROOT / "templates" / "en" / "regular-lumen.html",
+        REPO_ROOT / "templates" / "zh" / "regular-lumen.html",
+    ])
+    def test_regular_lumen_templates_match_footer_contract(self, template_path: Path):
+        html = template_path.read_text(encoding="utf-8")
+        expected = footer_watermark_text("1.21.0", "regular-lumen")
+        assert f'<div class="report-footer">{expected}</div>' in html
+        assert f'data-watermark="{expected}"' in html
 
 
 # ── Anti-regression: Forbidden Patterns ───────────────────────────────────────

@@ -431,12 +431,12 @@ When generating the final HTML report, produce a complete self-contained HTML fi
 
           [All rendered section content here]
 
-          <!-- Visible footer -->
-          <div class="report-footer">kai-report-creator [theme] v[version]</div>
+          <!-- Visible footer (deterministic shell metadata only; do not add debug hashes, source notes, or extra prose) -->
+          <div class="report-footer">kai-report-creator v[version] [theme]</div>
 
-          <!-- Invisible watermark -->
-          <div style="display:none;visibility:hidden;opacity:0;font-size:0;line-height:0;height:0;overflow:hidden;" aria-hidden="true" data-watermark="kai-report-creator [theme] v[version]">
-            kai-report-creator [theme] v[version]
+          <!-- Invisible watermark (must match the visible footer exactly) -->
+          <div style="display:none;visibility:hidden;opacity:0;font-size:0;line-height:0;height:0;overflow:hidden;" aria-hidden="true" data-watermark="kai-report-creator v[version] [theme]">
+            kai-report-creator v[version] [theme]
           </div>
 
         </div>

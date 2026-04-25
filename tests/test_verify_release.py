@@ -27,17 +27,26 @@ def test_verify_release_script_exists_and_reports_default_plan():
     assert [step["name"] for step in payload["steps"]] == [
         "pytest",
         "report-evals",
+        "late-context-evals",
         "doc-sync",
         "export-smoke",
     ]
     assert any("python -m pytest -q" in step["command"] for step in payload["steps"])
     assert any("scripts/run-report-evals.py" in step["command"] for step in payload["steps"])
+    assert any("scripts/run-late-context-evals.py" in step["command"] for step in payload["steps"])
     assert any("check-doc-sync.py" in step["command"] for step in payload["steps"])
     assert any("scripts/export-image.py" in step["command"] for step in payload["steps"])
 
 
 def test_verify_release_respects_skip_flags():
-    result = run_verify_release("--dry-run", "--format", "json", "--skip-export-smoke", "--skip-doc-sync")
+    result = run_verify_release(
+        "--dry-run",
+        "--format",
+        "json",
+        "--skip-export-smoke",
+        "--skip-doc-sync",
+        "--skip-late-context-evals",
+    )
     assert result.returncode == 0, result.stdout + result.stderr
 
     payload = json.loads(result.stdout)

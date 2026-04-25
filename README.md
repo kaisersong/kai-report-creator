@@ -56,7 +56,19 @@ report-creator solves this with **rules in the skill, assets in files**:
 
 This is progressive disclosure applied to AI context: **reveal information at the moment it's needed, not before.**
 
-### 2. Silicon-Carbon Collaboration Design
+### 2. Capability Growth Must Reduce Context Load
+
+When adding a new capability, the first question is not "what else can we stuff into context?" It is "can we reduce prompt/context burden on the generation path?"
+
+report-creator should prefer three moves:
+
+- **Thin routing in `SKILL.md`.** Keep the skill file as a router plus contract boundary. Load only the files needed for the selected path. Do not drag long planning conversations directly into the render phase.
+- **Structured compression over raw prose.** Prefer `.report.md`, `BRIEF.json`-style briefs, explicit contracts, and routing metadata over more prompt paragraphs. If information matters repeatedly, give it a field, a schema, or a deterministic transform.
+- **Move quality checks off the hot path.** If a new quality mechanism increases generation-time cognitive load, it belongs in guard validation, post-render review, or evals instead of the prompt chain.
+
+This is not minimalism for its own sake. It is reliability work. Prompt bloat makes routing fuzzy, hides the real contract, and causes the model to drop constraints exactly when rendering needs precision.
+
+### 3. Silicon-Carbon Collaboration Design
 
 report-creator is designed for human-AI collaboration at both input and output ends.
 
@@ -94,7 +106,7 @@ An AI agent reads Layer 1 for a 3-second overview, drills to Layer 2 for section
 
 **Progressive disclosure for both species:** IR reveals structure to humans; HTML reveals data to machines. The same principle applied twice — once for carbon-based readers, once for silicon-based ones.
 
-### 3. Visual Rhythm as Cognitive Pacing
+### 4. Visual Rhythm as Cognitive Pacing
 
 Reports that work follow a rhythm: **prose sets context, components deliver data, prose interprets it**.
 
@@ -102,7 +114,7 @@ The skill enforces this: never 3+ consecutive prose-only sections. Every 4–5 s
 
 This is why IR's component syntax (`:::tag ... :::`) is visually obvious: authors scan IR files and see data-heavy sections immediately.
 
-### 4. Reports Are Asynchronous Decision Support
+### 5. Reports Are Asynchronous Decision Support
 
 Slides have a presenter. Reports don't. A report must survive first contact with a busy reader who skims the opening, scans headings, glances at data, and decides in under a minute whether to continue.
 
@@ -115,7 +127,7 @@ This constraint drives product design:
 
 **Rule of thumb:** A generated report should reduce reader effort. If a stakeholder can understand the point, evidence, and next action from a fast skim, the report works.
 
-### 5. Design Quality Baseline: Against AI Slop
+### 6. Design Quality Baseline: Against AI Slop
 
 The enemy: instantly recognizable AI output — uniform borders, primary color flooding everything, 3-column KPI grids regardless of count, template-sounding headings.
 
@@ -138,7 +150,7 @@ The enemy: instantly recognizable AI output — uniform borders, primary color f
 
 **Pre-output check:** *"If you told someone 'an AI wrote this', would they believe it? If yes — find the most generic-looking part and redesign it."*
 
-### 6. Contract Enforcement Before Render
+### 7. Contract Enforcement Before Render
 
 v1.20.0's guard validation pipeline introduces a new principle: **intercept invalid IR before rendering, not repair after.**
 
@@ -161,7 +173,7 @@ Three sub-principles:
 - Prevents invalid IR from entering the render pipeline and producing unpredictable output
 - Zero-drift ensures guard's judgment and renderer's behavior stay aligned
 
-### 7. Eval as Quality Boundary, Not Quality Score
+### 8. Eval as Quality Boundary, Not Quality Score
 
 v1.15.0's eval workflow embodies this principle: **evals define boundaries, not scores.**
 
@@ -182,7 +194,7 @@ compression → ir_contract → async_readability → render_integrity
 
 **Rubric design:** Output structured JSON (verdict + scores + findings), not fuzzy scores. Downstream agents can parse and auto-repair.
 
-### 8. Contract Checks as Programmable Guardrails
+### 9. Contract Checks as Programmable Guardrails
 
 `contract_checks.py` makes IR spec executable:
 
@@ -538,6 +550,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 ---
 
 ## Version History
+
+**v1.21.0** — Late-context isolation and release hardening: require `--generate` to extract exactly one IR block from context, add context isolation helpers plus late-context eval runner, expand release verification and fast-test coverage, normalize footer/watermark shell metadata, and tighten bilingual doc-sync guardrails.
 
 **v1.20.1** — Design philosophy expansion: added §6 (Contract Enforcement Before Render), §7 (Eval as Quality Boundary), §8 (Contract Checks as Programmable Guardrails) documenting the guard pipeline and eval workflow principles.
 

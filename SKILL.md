@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from FILE, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.20.1
+version: 1.21.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -17,6 +17,8 @@ Generate beautiful, single-file HTML reports with mixed text, charts, KPIs, time
 3. **Progressive Disclosure for AI** — Output HTML embeds a 3-layer machine-readable structure (summary JSON → section annotations → component raw data) so downstream AI agents can read reports efficiently.
 4. **Mobile Responsive** — Reports render correctly on both desktop and mobile.
 5. **Plan Before Generate** — For complex reports, `--plan` creates a `.report.md` IR file first; `--generate` renders it to HTML.
+6. **Thin Routing Over Prompt Growth** — When adding capability, first reduce prompt/context burden. Keep `SKILL.md` as a router plus contract boundary, load only path-specific files, and do not carry long planning conversations into render.
+7. **Contracts and Gates Beat Prompt Soup** — Prefer `.report.md`, `BRIEF.json`-style briefs, explicit contracts, and routing metadata over more prose rules. If a quality mechanism increases generation-time cognitive load, move it to guard validation, post-render review, or evals.
 
 ## Command Routing
 
@@ -25,7 +27,7 @@ When invoked as `/report [flags] [content]`, parse flags and route:
 | Flag | Action |
 |------|--------|
 | `--plan "topic"` | Generate a `.report.md` IR file only. Do NOT generate HTML. Save as `report-<slug>.report.md`. |
-| `--generate [file]` | Read the specified `.report.md` file (or IR from context if no file given), render to HTML. |
+| `--generate [file]` | Read the specified `.report.md` file. If no file is given, extract exactly one valid IR block from context and render that IR only. Never render the surrounding conversation. |
 | `--review [file]` | Read the specified HTML file and run one-pass automatic refinement using the report review checklist. |
 | `--themes` | Output `report-themes-preview.html` showing all 7 built-in themes. Do not generate a report. |
 | `--bundle` | Generate HTML with all CDN libraries inlined. Overrides `charts: cdn` in frontmatter. |
@@ -451,16 +453,14 @@ Generate a complete self-contained HTML file with embedded CSS/JS.
 
 When the user runs `/report --generate [file]`:
 
-1. **Read the IR file** — read the specified `.report.md` file (or IR from context).
-2. **Load reference files** — read ALL of these before generating any HTML:
-   - `references/spec-loading-matrix.md` — silent classification + minimal spec routing
-   - `references/rendering-rules.md` — component rendering rules
-   - `references/design-quality.md` — design quality baseline + anti-slop rules
-   - `references/anti-patterns.md` — report-specific failure modes to reject before render
-   - `references/html-shell-template.md` — HTML shell structure
-   - `references/theme-css.md` — CSS assembly rules
-   - `references/review-checklist.md` — review checklist
-   - `references/diagram-decision-rules.md` — load whenever a diagram or diagram-like structure is being considered
+1. **Read the IR input only** — read the specified `.report.md` file. If no file given, extract exactly one valid IR block from context. If zero or multiple valid IR blocks are present, stop and ask for an explicit IR file or a single IR block. `--generate` may read IR from context, but it must never render surrounding conversation, planning notes, or unrelated chat history.
+2. **Load reference files minimally** — start with `references/spec-loading-matrix.md` as a silent classifier, then load only the references that materially help the current render path:
+   - Always: `references/html-shell-template.md`, `references/theme-css.md`, `references/review-checklist.md`
+   - Load `references/rendering-rules.md` when the IR contains structured components
+   - Load `references/anti-patterns.md` when component choice or visual-anchor choice could drift into prompt soup patterns
+   - Load `references/diagram-decision-rules.md` only when a diagram or diagram-like structure is being considered
+   - Load `references/regular-report-content-rules.md` only for `regular-lumen` or periodic-report content
+   - Load only the relevant section of `references/design-quality.md` when a deterministic owner does not already cover the rule
 3. Parse the frontmatter to get metadata and settings.
    **智能日期显示规则（仅适用于周期报告主题：regular-lumen、corporate-blue 等）**：
    - 如果 `date` 字段已存在 → 直接使用
@@ -473,7 +473,7 @@ When the user runs `/report --generate [file]`:
 4. Select the appropriate theme CSS.
 4.5. **Run guard validation** — call Python guard before rendering (v4 guardrails):
      - If file-backed: read IR file content → ir_text
-     - If context-backed: use IR string from context → ir_text
+     - If context-backed: extract exactly one valid IR block from context → ir_text; surrounding conversation must be discarded
      - Call guard: `python <skill-dir>/scripts/guard_validate.py` (pass ir_text via stdin or temp file)
      - Guard resolves report_class using the same path as --generate (Step 1.5 density detection → default "mixed")
      - Guard calls contract_checks validators with resolved class (zero drift)
@@ -494,7 +494,7 @@ When the user runs `/report --generate [file]`:
    - HASH = sha256 of the IR text content (first 16 hex chars), prefixed with `sha256:`
    - IR text 来源：
      - File-backed: IR file content (`read_text()` from the `.report.md` file)
-     - Context-backed: IR string extracted directly from context (no file read)
+     - Context-backed: the extracted IR block only (no surrounding conversation, no file read)
    - Both paths hash the same `ir_text` content, not the file path
 8. **Pre-write validation** — scan the assembled HTML for these violations and fix each one found:
    - **L0: Content checks**

@@ -80,6 +80,24 @@ def build_steps(root: Path, args: argparse.Namespace) -> list[Step]:
             )
         )
 
+    if not args.skip_late_context_evals:
+        steps.append(
+            Step(
+                name="late-context-evals",
+                command=[
+                    python,
+                    str(resolve(root, "scripts/run-late-context-evals.py")),
+                    "--root",
+                    str(root),
+                    "--format",
+                    "json",
+                    "--json-out",
+                    str(resolve(root, args.late_context_json_out)),
+                ],
+                cwd=str(root),
+            )
+        )
+
     if not args.skip_doc_sync:
         steps.append(
             Step(
@@ -185,6 +203,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dry-run", action="store_true", help="Print the verification plan without running it.")
     parser.add_argument("--skip-pytest", action="store_true", help="Skip the full pytest run.")
     parser.add_argument("--skip-evals", action="store_true", help="Skip scripts/run-report-evals.py.")
+    parser.add_argument("--skip-late-context-evals", action="store_true", help="Skip scripts/run-late-context-evals.py.")
     parser.add_argument("--skip-doc-sync", action="store_true", help="Skip check-doc-sync.py.")
     parser.add_argument("--skip-export-smoke", action="store_true", help="Skip the screenshot export smoke check.")
     parser.add_argument("--basetemp", default=".tmp/pytest", help="Pytest base temp path relative to repo root.")
@@ -192,6 +211,11 @@ def parse_args() -> argparse.Namespace:
         "--packet-dir",
         default=".tmp/verify-release/eval-packets",
         help="Eval packet output dir relative to repo root.",
+    )
+    parser.add_argument(
+        "--late-context-json-out",
+        default=".tmp/verify-release/late-context-evals.json",
+        help="Output path for late-context eval JSON, relative to repo root.",
     )
     parser.add_argument(
         "--export-fixture",
