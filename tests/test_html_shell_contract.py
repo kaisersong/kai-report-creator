@@ -130,6 +130,46 @@ class TestTemplateExportContract:
             )
 
 
+class TestPandocTitleBlockContract:
+    """Pandoc title metadata must not duplicate the shell title/date metadata."""
+
+    @staticmethod
+    def template_source() -> str:
+        return TEMPLATE_PATH.read_text(encoding="utf-8")
+
+    def test_template_forbids_pandoc_title_block_header(self):
+        src = self.template_source()
+        assert "title-block-header" in src
+        assert '<p class="date">' in src
+        assert "duplicate date" in src.lower()
+
+    def test_skill_prewrite_points_to_duplicate_date_guard(self):
+        skill = (REPO_ROOT / "SKILL.md").read_text(encoding="utf-8")
+        assert "duplicate-date guard" in skill
+        assert "references/html-shell-template.md" in skill
+
+
+class TestWatermarkContract:
+    """Main skill delegates detailed watermark handling to the shell reference."""
+
+    @staticmethod
+    def template_source() -> str:
+        return TEMPLATE_PATH.read_text(encoding="utf-8")
+
+    def test_skill_prewrite_delegates_watermark_details_to_reference(self):
+        skill = (REPO_ROOT / "SKILL.md").read_text(encoding="utf-8")
+        assert "Shell metadata" in skill
+        assert "references/html-shell-template.md" in skill
+        assert "version/theme metadata" in skill
+        assert "must match exactly" not in skill
+
+    def test_template_has_html_shell_metadata_attrs(self):
+        src = self.template_source()
+        assert 'data-template="kai-report-creator"' in src
+        assert 'data-version="[version]"' in src
+        assert 'data-theme="[theme]"' in src
+
+
 # ── L2: IR Hash Meta Tag ───────────────────────────────────────────────────────
 
 class TestIRHashMetaContract:
@@ -246,7 +286,7 @@ class TestJsonSummaryBlock:
 
 
 class TestFooterWatermarkContract:
-    """Footer and hidden watermark must use deterministic shell metadata only."""
+    """Standard shell footer/watermark use deterministic shell metadata."""
 
     @staticmethod
     def template_source() -> str:
@@ -264,10 +304,10 @@ class TestFooterWatermarkContract:
         src = self.template_source()
         expected = footer_watermark_text("[version]", "[theme]")
         assert f'data-watermark="{expected}"' in src, (
-            "Hidden watermark must match the visible footer text exactly."
+            "Standard shell hidden watermark should carry the same deterministic metadata string."
         )
         assert f"\n            {expected}\n" in src, (
-            "Hidden watermark body text must match the visible footer text exactly."
+            "Standard shell hidden watermark body should carry the deterministic metadata string."
         )
 
     def test_template_footer_forbids_debug_metadata(self):

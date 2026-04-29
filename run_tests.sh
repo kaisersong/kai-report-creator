@@ -20,6 +20,7 @@ if [ "${1-}" = "--fast" ]; then
   echo "Mode: unit tests only (--fast)"
   python3 -m pytest \
     tests/test_export_config.py \
+    tests/test_skill_size.py \
     tests/test_color_system_docs.py \
     tests/test_html_shell_contract.py \
     tests/test_review_docs.py \

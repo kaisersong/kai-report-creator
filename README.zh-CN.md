@@ -483,6 +483,8 @@ OpenClaw 会自动：
 
 ## 版本日志
 
+**v1.21.1** — Skill prompt 预算发布：将 `SKILL.md` 压缩为 320 行以内的薄路由契约，把 shell metadata 与重复日期细节下沉到 references，新增行数预算回归测试，并纳入 fast 验证链路。
+
 **v1.21.0** — Late-context 隔离与发布链路加固：要求 `--generate` 从上下文中只提取唯一 IR 块，新增 context isolation 辅助脚本与 late-context eval 运行器，扩展 release verification 与 fast-test 覆盖，统一 footer/watermark shell metadata，并收紧中英文 doc-sync 护栏。
 
 **v1.20.1** — 设计哲学扩展：新增 §7（渲染前先做契约拦截）、§8（Eval 是质量边界，不是质量分数）、§9（把契约检查做成可编程护栏），系统化说明 guard 流水线与 eval 工作流原则。
