@@ -16,6 +16,7 @@ import pytest
 from pathlib import Path
 
 from scripts.shell_metadata import footer_watermark_text
+from tests.reference_loader import shell_reference_text
 
 REPO_ROOT = Path(__file__).parent.parent
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -106,7 +107,7 @@ class TestTemplateExportContract:
 
     @staticmethod
     def template_source() -> str:
-        return TEMPLATE_PATH.read_text(encoding="utf-8")
+        return shell_reference_text()
 
     @pytest.mark.parametrize("element_id,purpose", REQUIRED_EXPORT_ITEMS)
     def test_template_has_all_export_entries(self, element_id, purpose):
@@ -135,7 +136,7 @@ class TestPandocTitleBlockContract:
 
     @staticmethod
     def template_source() -> str:
-        return TEMPLATE_PATH.read_text(encoding="utf-8")
+        return shell_reference_text()
 
     def test_template_forbids_pandoc_title_block_header(self):
         src = self.template_source()
@@ -154,7 +155,7 @@ class TestWatermarkContract:
 
     @staticmethod
     def template_source() -> str:
-        return TEMPLATE_PATH.read_text(encoding="utf-8")
+        return shell_reference_text()
 
     def test_skill_prewrite_delegates_watermark_details_to_reference(self):
         skill = (REPO_ROOT / "SKILL.md").read_text(encoding="utf-8")
@@ -177,7 +178,7 @@ class TestIRHashMetaContract:
 
     @staticmethod
     def template_source() -> str:
-        return TEMPLATE_PATH.read_text(encoding="utf-8")
+        return shell_reference_text()
 
     def test_template_has_ir_hash_placeholder(self):
         """Template must include ir-hash meta tag placeholder."""
@@ -290,7 +291,7 @@ class TestFooterWatermarkContract:
 
     @staticmethod
     def template_source() -> str:
-        return TEMPLATE_PATH.read_text(encoding="utf-8")
+        return shell_reference_text()
 
     def test_template_footer_placeholder_format(self):
         src = self.template_source()

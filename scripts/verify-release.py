@@ -55,6 +55,15 @@ def build_steps(root: Path, args: argparse.Namespace) -> list[Step]:
     python = sys.executable
     steps: list[Step] = []
 
+    if not args.skip_cleanup:
+        steps.append(
+            Step(
+                name="cleanup-generated",
+                command=[python, str(resolve(root, "scripts/clean-generated.py")), "--root", str(root)],
+                cwd=str(root),
+            )
+        )
+
     if not args.skip_pytest:
         steps.append(
             Step(
@@ -132,6 +141,15 @@ def build_steps(root: Path, args: argparse.Namespace) -> list[Step]:
             )
         )
 
+    if not args.skip_cleanup:
+        steps.append(
+            Step(
+                name="cleanup-generated-final",
+                command=[python, str(resolve(root, "scripts/clean-generated.py")), "--root", str(root)],
+                cwd=str(root),
+            )
+        )
+
     return steps
 
 
@@ -150,7 +168,7 @@ def dry_run_payload(steps: list[Step]) -> dict[str, object]:
 
 def run_steps(steps: list[Step]) -> list[StepResult]:
     results: list[StepResult] = []
-    for step in steps:
+    for index, step in enumerate(steps):
         completed = subprocess.run(
             step.command,
             cwd=step.cwd,
@@ -170,6 +188,27 @@ def run_steps(steps: list[Step]) -> list[StepResult]:
             )
         )
         if completed.returncode != 0:
+            for cleanup_step in steps[index + 1 :]:
+                if not cleanup_step.name.startswith("cleanup-generated"):
+                    continue
+                cleanup_completed = subprocess.run(
+                    cleanup_step.command,
+                    cwd=cleanup_step.cwd,
+                    capture_output=True,
+                    text=True,
+                    timeout=900,
+                )
+                results.append(
+                    StepResult(
+                        name=cleanup_step.name,
+                        command=command_string(cleanup_step.command, Path(cleanup_step.cwd)),
+                        cwd=cleanup_step.cwd,
+                        ok=cleanup_completed.returncode == 0,
+                        returncode=cleanup_completed.returncode,
+                        stdout=cleanup_completed.stdout,
+                        stderr=cleanup_completed.stderr,
+                    )
+                )
             break
     return results
 
@@ -206,6 +245,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-late-context-evals", action="store_true", help="Skip scripts/run-late-context-evals.py.")
     parser.add_argument("--skip-doc-sync", action="store_true", help="Skip check-doc-sync.py.")
     parser.add_argument("--skip-export-smoke", action="store_true", help="Skip the screenshot export smoke check.")
+    parser.add_argument("--skip-cleanup", action="store_true", help="Skip generated cache cleanup before/after verification.")
     parser.add_argument("--basetemp", default=".tmp/pytest", help="Pytest base temp path relative to repo root.")
     parser.add_argument(
         "--packet-dir",

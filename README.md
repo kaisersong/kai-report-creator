@@ -551,6 +551,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 
 ## Version History
 
+**v1.22.0** — Reference split and validator profile release: split oversized shell and rendering contracts into route-specific child references, add a reference index and validator-facing usage boundary artifacts, add a generated-cache cleanup gate to release verification, and document golden eval cases for external validators.
+
 **v1.21.2** — Packaging cleanup: remove the tracked `docs/` directory from GitHub and ClawHub packages, ignore the local docs symlink, and keep project documentation in `/Users/song/projects/mydocs/report-creator`.
 
 **v1.21.1** — Skill prompt budget release: compress `SKILL.md` into a thin routing contract under 320 lines, move shell metadata and duplicate-date details into references, add a size-budget regression test, and include that test in the fast verification path.

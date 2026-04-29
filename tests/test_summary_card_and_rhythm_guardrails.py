@@ -1,6 +1,8 @@
 from pathlib import Path
 import re
 
+from tests.reference_loader import rendering_reference_text, shell_reference_text
+
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -10,7 +12,7 @@ def read(rel_path: str) -> str:
 
 
 def test_summary_card_poster_mode_requires_explicit_fields():
-    shell = read("references/html-shell-template.md")
+    shell = shell_reference_text()
     skill = read("SKILL.md")
     checklist = read("references/review-checklist.md")
 
@@ -27,7 +29,7 @@ def test_summary_card_poster_mode_requires_explicit_fields():
 
 
 def test_summary_card_stays_poster_like_not_metadata_panel():
-    shell = read("references/html-shell-template.md")
+    shell = shell_reference_text()
     design = read("references/design-quality.md")
     checklist = read("references/review-checklist.md")
 
@@ -53,7 +55,7 @@ def test_summary_card_stays_poster_like_not_metadata_panel():
 
 def test_narrative_cadence_blocks_are_optional_upgrades_with_strict_gates():
     skill = read("SKILL.md")
-    rendering = read("references/rendering-rules.md")
+    rendering = rendering_reference_text()
     design = read("references/design-quality.md")
     checklist = read("references/review-checklist.md")
 

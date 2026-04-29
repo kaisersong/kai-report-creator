@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from FILE, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.21.2
+version: 1.22.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -47,7 +47,7 @@ Load references by route; do not read every reference by default.
 | Route | Always load | Conditional load |
 |-------|-------------|------------------|
 | `--plan` | `references/spec-loading-matrix.md`, `references/design-quality.md` | `references/regular-report-content-rules.md` for periodic reports |
-| `--generate` | `references/html-shell-template.md`, `references/theme-css.md`, `references/review-checklist.md` | `references/rendering-rules.md` for components; `references/anti-patterns.md` for visual anchors; `references/diagram-decision-rules.md` for diagrams; `references/regular-report-content-rules.md` for periodic reports |
+| `--generate` | `references/html-shell-template.md` + every `references/html-shell/*.md`, `references/theme-css.md`, `references/review-checklist.md` | `references/rendering-rules.md` then only the `references/rendering/*.md` files required by the IR; `references/anti-patterns.md` for visual anchors; `references/diagram-decision-rules.md` for diagrams; `references/regular-report-content-rules.md` for periodic reports |
 | `--review` | `references/review-checklist.md` | `references/review-report-template.md` if a structured change summary is requested |
 | custom theme/template | `references/theme-css.md`, `references/toc-and-template.md` | custom theme `reference.md` or `theme.css` |
 
@@ -101,7 +101,7 @@ Poster summary mode is opt-in. Do not infer `poster_title` or `poster_subtitle` 
 
 IR validity terms: `invalid_syntax`, `invalid_semantics`, `contract_conflict`, `auto_downgrade_target`.
 
-Canonical component details live in `references/rendering-rules.md`. Compatibility anchors that must remain discoverable here:
+Canonical component routing lives in `references/rendering-rules.md`; component details live in `references/rendering/*.md`. Compatibility anchors that must remain discoverable here:
 
 - `:::kpi` canonical body uses `items:`.
 - Timeline Allowed `Date` tokens: `YYYY-MM-DD`, `YYYY-MM`, `YYYY`, `Q[1-4] YYYY`, `Day N`, `Week N`, `Month N`.
@@ -145,14 +145,14 @@ Narrative rhythm reminders: `lead-block`, `section-quote`, and `action-grid` are
 ## `--generate` Flow
 
 1. Read IR input only. With no file given, extract exactly one valid IR block from context. Treat this as IR from context, not chat history. If zero or multiple are present, stop and ask for an explicit file or single IR block. Never render the surrounding conversation.
-2. Load reference files minimally; load only the references that materially help the current render path.
+2. Load reference files minimally but reliably; load only the references that materially help the current render path. Standard HTML shell generation always loads the shell entry plus all `references/html-shell/*.md`; component rules load by IR inventory via `references/rendering-rules.md`.
 3. Parse frontmatter and resolve `lang`, `theme`, `report_class: mixed` default, `archetype`, date display, chart mode, TOC, animation, template, and theme overrides.
 4. Run guard validation before rendering:
    - Use `scripts/guard_validate.py` with IR text from file or extracted context.
    - If fatal metadata is missing, stop and report the error.
    - If a block is invalid, apply its `auto_downgrade_target` (`kpi -> callout`, `chart -> table`, `timeline -> list`, `diagram -> callout`) and mention the downgrade.
-5. Render components using `references/rendering-rules.md`, `references/design-quality.md`, and path-specific references.
-6. Build the shell from `references/html-shell-template.md`; follow Shell metadata, version/theme metadata, and the duplicate-date guard.
+5. Render components using `references/rendering-rules.md`, `references/design-quality.md`, and the path-specific `references/rendering/*.md` files selected from the IR.
+6. Build the standard shell from `references/html-shell-template.md` plus all `references/html-shell/*.md`; follow Shell metadata, version/theme metadata, export completeness, and the duplicate-date guard.
 7. Compute and embed `<meta name="ir-hash" content="sha256:[ir-hash]">` from the exact IR text, not the file path.
 8. Assemble CSS through `references/theme-css.md`: theme before-marker, shared CSS, theme post-shared override, TOC/shell CSS, frontmatter overrides.
 9. Run pre-write validation and fix all violations:
@@ -165,7 +165,7 @@ Narrative rhythm reminders: `lead-block`, `section-quote`, and `action-grid` are
    - timeline dates are real time markers
    - no U+FE0F
    - no `text-align: justify`, black-background flood, body letter-spacing > `0.05em`, or mobile-hidden critical controls
-10. Run L2 shell checks. Required: `data-template="kai-report-creator"`, `data-version`, `data-theme`, `id="toc-toggle-btn"`, `id="toc-sidebar"`, `id="card-mode-btn"`, `id="sc-overlay"`, `id="export-btn"`, `id="export-menu"`, `id="export-print"`, `id="export-png-desktop"`, `id="export-png-mobile"`, `id="export-im-share"`, `id="report-summary"`, plus the JS bindings for print/desktop/mobile/IM export. If any export item or binding is missing, rebuild the whole export block from `references/html-shell-template.md`.
+10. Run L2 shell checks. Required: `data-template="kai-report-creator"`, `data-version`, `data-theme`, `id="toc-toggle-btn"`, `id="toc-sidebar"`, `id="card-mode-btn"`, `id="sc-overlay"`, `id="export-btn"`, `id="export-menu"`, `id="export-print"`, `id="export-png-desktop"`, `id="export-png-mobile"`, `id="export-im-share"`, `id="report-summary"`, plus the JS bindings for print/desktop/mobile/IM export. If any export item or binding is missing, rebuild the whole export block from `references/html-shell/export.md`.
 11. Run the silent final review pass from `references/review-checklist.md`, then write the HTML and report the path.
 
 When the report is explicitly comparing named vendors, models, or tools, set `data-report-mode="comparison"` on the outer report container and use `.badge--entity-a/.badge--entity-b/.badge--entity-c` only for entity identity.
@@ -197,7 +197,7 @@ If Playwright is unavailable, print install instructions and skip image export w
 
 ## Shell And Template Boundary
 
-Generate complete self-contained HTML. The full shell, inline JS, export behavior, summary card, edit mode, TOC, print rules, and footer/watermark degradation rules live in `references/html-shell-template.md`.
+Generate complete self-contained HTML. The shell entry contract lives in `references/html-shell-template.md`; full shell structure, inline JS, export behavior, summary card, edit mode, TOC, print rules, and footer/watermark degradation rules live in `references/html-shell/*.md`.
 
 All scripts are inline in the shell template. Never load nonexistent files such as `templates/scripts/*.js`.
 

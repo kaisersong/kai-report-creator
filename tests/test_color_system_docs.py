@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from tests.reference_loader import rendering_reference_text, shell_reference_text
+
 
 REPO_ROOT = Path(__file__).parent.parent
 DEMO_PAGES = sorted((REPO_ROOT / "templates").glob("*/**/*.html"))
@@ -25,7 +27,7 @@ def test_design_quality_business_hint_matches_new_default_direction():
 
 
 def test_rendering_rules_remove_rainbow_kpi_cycle_and_define_comparison_mode():
-    src = read("references/rendering-rules.md")
+    src = rendering_reference_text()
     assert "assign `data-accent` cycling `blue → green → purple → orange`" not in src
     assert "Default mode: do not add `data-accent` to KPI cards." in src
     assert 'Set `data-report-mode="comparison"` on the comparison wrapper only when the report is explicitly comparing named entities.' in src
@@ -33,7 +35,7 @@ def test_rendering_rules_remove_rainbow_kpi_cycle_and_define_comparison_mode():
 
 
 def test_html_shell_template_uses_neutral_badges_and_report_mode_attribute():
-    src = read("references/html-shell-template.md")
+    src = shell_reference_text()
     assert 'data-report-mode="[default|comparison]"' in src
     assert ".badge--blue   { background: var(--report-chip-bg" in src
     assert ".badge--entity-a" in src

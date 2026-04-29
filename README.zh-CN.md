@@ -483,6 +483,8 @@ OpenClaw 会自动：
 
 ## 版本日志
 
+**v1.22.0** — Reference split 与 validator profile 发布：将过大的 shell / rendering 契约拆分为按路由加载的子 reference，新增 reference index 与面向 validator 的使用边界材料，把 generated cache cleanup 纳入 release verification，并补充外部 validator 可读的 golden eval cases。
+
 **v1.21.2** — 打包清理：从 GitHub 与 ClawHub 包中移除 tracked `docs/` 目录，忽略本地 docs 软链接，并将项目文档保留在 `/Users/song/projects/mydocs/report-creator`。
 
 **v1.21.1** — Skill prompt 预算发布：将 `SKILL.md` 压缩为 320 行以内的薄路由契约，把 shell metadata 与重复日期细节下沉到 references，新增行数预算回归测试，并纳入 fast 验证链路。

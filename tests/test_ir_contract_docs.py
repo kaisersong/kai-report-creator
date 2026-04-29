@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from tests.reference_loader import rendering_reference_text, shell_reference_text
+
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -21,8 +23,8 @@ def test_skill_declares_ir_validity_taxonomy():
 
 def test_chart_contract_is_echarts_only_everywhere():
     skill = read("SKILL.md")
-    rules = read("references/rendering-rules.md")
-    shell = read("references/html-shell-template.md")
+    rules = rendering_reference_text()
+    shell = shell_reference_text()
 
     assert "Use **ECharts** for ALL charts" in skill
     assert "Use **ECharts** for ALL charts" in rules
@@ -34,7 +36,7 @@ def test_chart_contract_is_echarts_only_everywhere():
 
 def test_docs_mark_badges_as_optional_and_highlight_sentence_as_prose():
     skill = read("SKILL.md")
-    rules = read("references/rendering-rules.md")
+    rules = rendering_reference_text()
     readme_en = read("README.md")
     readme_zh = read("README.zh-CN.md")
 
@@ -47,7 +49,7 @@ def test_docs_mark_badges_as_optional_and_highlight_sentence_as_prose():
 
 def test_docs_publish_canonical_kpi_form_and_timeline_whitelist():
     skill = read("SKILL.md")
-    rules = read("references/rendering-rules.md")
+    rules = rendering_reference_text()
     readme_en = read("README.md")
     readme_zh = read("README.zh-CN.md")
 

@@ -23,6 +23,12 @@ ROLE_LINE_RE = re.compile(r"^(?:User|Assistant|System|Human):")
 
 BASE_REFS = [
     "references/html-shell-template.md",
+    "references/html-shell/core-structure.md",
+    "references/html-shell/shared-component-css.md",
+    "references/html-shell/toc-edit-summary.md",
+    "references/html-shell/summary-card.md",
+    "references/html-shell/export.md",
+    "references/html-shell/print-responsive.md",
     "references/theme-css.md",
     "references/review-checklist.md",
 ]
@@ -250,7 +256,22 @@ def resolve_required_refs(theme: str, counts: dict[str, int]) -> list[str]:
     refs = list(BASE_REFS)
     if counts:
         refs.append("references/rendering-rules.md")
+        refs.append("references/rendering/plain-markdown.md")
         refs.append("references/anti-patterns.md")
+    if counts.get("kpi", 0):
+        refs.append("references/rendering/kpi.md")
+    if counts.get("chart", 0):
+        refs.append("references/rendering/chart.md")
+    if counts.get("table", 0) or counts.get("list", 0):
+        refs.append("references/rendering/table-list.md")
+    if counts.get("timeline", 0) or counts.get("diagram", 0):
+        refs.append("references/rendering/timeline-diagram.md")
+    if (
+        counts.get("image", 0)
+        or counts.get("code", 0)
+        or counts.get("callout", 0)
+    ):
+        refs.append("references/rendering/media-code-callout.md")
     if counts.get("diagram", 0):
         refs.append("references/diagram-decision-rules.md")
     if theme == "regular-lumen":
@@ -303,4 +324,3 @@ def compare_snapshots(
         if expected.get(key) != actual.get(key):
             drift_fields.append(key)
     return drift_fields
-

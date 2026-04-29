@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from tests.reference_loader import shell_reference_text
+
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -9,7 +11,7 @@ def read(rel_path: str) -> str:
 
 
 def test_html_shell_template_uses_poster_summary_title_hierarchy():
-    src = read("references/html-shell-template.md")
+    src = shell_reference_text()
 
     required_markers = [
         '"poster_title"',
@@ -43,7 +45,7 @@ def test_minimal_fixture_reflects_poster_summary_contract():
 def test_docs_require_narrative_rhythm_blocks_not_just_shorter_paragraphs():
     skill = read("SKILL.md")
     checklist = read("references/review-checklist.md")
-    shell = read("references/html-shell-template.md")
+    shell = shell_reference_text()
     design = read("references/design-quality.md")
 
     for marker in [

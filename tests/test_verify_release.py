@@ -25,12 +25,15 @@ def test_verify_release_script_exists_and_reports_default_plan():
 
     payload = json.loads(result.stdout)
     assert [step["name"] for step in payload["steps"]] == [
+        "cleanup-generated",
         "pytest",
         "report-evals",
         "late-context-evals",
         "doc-sync",
         "export-smoke",
+        "cleanup-generated-final",
     ]
+    assert any("scripts/clean-generated.py" in step["command"] for step in payload["steps"])
     assert any("python -m pytest -q" in step["command"] for step in payload["steps"])
     assert any("scripts/run-report-evals.py" in step["command"] for step in payload["steps"])
     assert any("scripts/run-late-context-evals.py" in step["command"] for step in payload["steps"])
@@ -50,4 +53,9 @@ def test_verify_release_respects_skip_flags():
     assert result.returncode == 0, result.stdout + result.stderr
 
     payload = json.loads(result.stdout)
-    assert [step["name"] for step in payload["steps"]] == ["pytest", "report-evals"]
+    assert [step["name"] for step in payload["steps"]] == [
+        "cleanup-generated",
+        "pytest",
+        "report-evals",
+        "cleanup-generated-final",
+    ]
