@@ -483,6 +483,8 @@ OpenClaw 会自动：
 
 ## 版本日志
 
+**v1.21.2** — 打包清理：从 GitHub 与 ClawHub 包中移除 tracked `docs/` 目录，忽略本地 docs 软链接，并将项目文档保留在 `/Users/song/projects/mydocs/report-creator`。
+
 **v1.21.1** — Skill prompt 预算发布：将 `SKILL.md` 压缩为 320 行以内的薄路由契约，把 shell metadata 与重复日期细节下沉到 references，新增行数预算回归测试，并纳入 fast 验证链路。
 
 **v1.21.0** — Late-context 隔离与发布链路加固：要求 `--generate` 从上下文中只提取唯一 IR 块，新增 context isolation 辅助脚本与 late-context eval 运行器，扩展 release verification 与 fast-test 覆盖，统一 footer/watermark shell metadata，并收紧中英文 doc-sync 护栏。

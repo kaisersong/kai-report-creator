@@ -551,6 +551,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 
 ## Version History
 
+**v1.21.2** — Packaging cleanup: remove the tracked `docs/` directory from GitHub and ClawHub packages, ignore the local docs symlink, and keep project documentation in `/Users/song/projects/mydocs/report-creator`.
+
 **v1.21.1** — Skill prompt budget release: compress `SKILL.md` into a thin routing contract under 320 lines, move shell metadata and duplicate-date details into references, add a size-budget regression test, and include that test in the fast verification path.
 
 **v1.21.0** — Late-context isolation and release hardening: require `--generate` to extract exactly one IR block from context, add context isolation helpers plus late-context eval runner, expand release verification and fast-test coverage, normalize footer/watermark shell metadata, and tighten bilingual doc-sync guardrails.

@@ -1,4 +1,5 @@
 .superpowers/
+docs
 docs/superpowers/plans/
 outputs/
 __pycache__/
