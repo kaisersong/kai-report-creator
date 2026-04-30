@@ -24,6 +24,20 @@ For built-in themes, assemble CSS in `<style>` in this order:
 
 **Critical:** Do NOT load the entire theme file in one block. The POST-SHARED section must load AFTER shared.css to properly override shared defaults.
 
+## Theme Fidelity Gate
+
+The `data-theme` attribute is a contract, not a label. Do not hand-roll a simplified CSS block and then stamp it with a built-in theme name.
+
+Before finalizing HTML, run `scripts/html_quality_gate.py` or check the same markers manually:
+
+- The HTML must include the built-in theme marker comment, e.g. `/* Theme: regular-lumen`.
+- The theme's typography variables must survive, e.g. regular-lumen keeps `--font-sans: 'Playfair Display', 'Noto Serif SC', Georgia, serif`.
+- Body typography must route through the theme's declared font variable (`var(--font-sans)` for most themes; `fangsong` uses `var(--font-sans-ui)` for body text and `var(--font-sans)` for headings).
+- Layout width and page padding belong to `.report-wrapper`, not to `body`.
+- regular-lumen specifically must preserve `--bg: #F7F5F1`, `.main-with-toc`, and `.report-wrapper { max-width: 920px; ... }`.
+
+If any marker is missing, rebuild CSS from the theme file and shared CSS instead of patching individual rules.
+
 ## CSS Assembly Order (Custom Themes)
 
 For custom themes, assemble CSS in `<style>` in this order:
@@ -37,8 +51,8 @@ Using `minimal` as the base ensures all shared components render correctly even 
 
 ## Built-in Theme Names
 
-`corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`, `regular-lumen`
+`corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`, `regular-lumen`, `fangsong`
 
-**Themes with POST-SHARED OVERRIDE sections:** `dark-board`, `data-story`, `newspaper`, `regular-lumen`
+**Themes with POST-SHARED OVERRIDE sections:** `dark-board`, `data-story`, `newspaper`, `regular-lumen`, `fangsong`
 
 **Special code block note:** `dark-tech` and `dark-board` use `github-dark.min.css` instead of `github.min.css` for highlight.js.

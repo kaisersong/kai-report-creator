@@ -10,7 +10,7 @@ These tests verify:
   - Guard resolves report_class using existing --generate path (no new default)
   - Guard accepts ir_text: str (not file path)
   - Guard calls contract_checks validators (no cloning)
-  - Zero contract change
+  - KPI placeholder policy stays centralized in contract_checks
 """
 
 import json
@@ -92,7 +92,7 @@ class TestReportClassResolution:
     """Guard must resolve report_class using existing path (验收清单 #3, #4)."""
 
     def test_mixed_vs_data_classification(self):
-        """placeholder-only KPI must fail in mixed/narrative, pass in data (验收清单 #7)."""
+        """placeholder-only KPI must fail for every report_class (验收清单 #7)."""
         # Narrative + placeholder KPI → invalid_semantics (should downgrade)
         report_narrative = validate_ir_text(PLACEHOLDER_KPI_IR)
         assert report_narrative["status"] == "invalid_blocks", (
@@ -100,10 +100,10 @@ class TestReportClassResolution:
         )
         assert report_narrative["resolved_report_class"] == "narrative"
 
-        # Data + placeholder KPI → valid (data reports allow placeholders)
+        # Data + placeholder KPI → invalid_semantics (KPI cards require real metrics)
         report_data = validate_ir_text(PLACEHOLDER_KPI_IR_DATA)
-        assert report_data["status"] == "valid", (
-            "placeholder-only KPI in data should be valid"
+        assert report_data["status"] == "invalid_blocks", (
+            "placeholder-only KPI in data should be invalid"
         )
         assert report_data["resolved_report_class"] == "data"
 

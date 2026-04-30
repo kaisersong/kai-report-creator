@@ -4,7 +4,9 @@
 
 ## Extraction Rules
 
-**1. Core KPIs** (强制 3-4 个): 项目完成数 (`X/Y`), 进度百分比 (`XX%`), 风险/阻塞数 (`N`), 临时需求处理 (`N`). Missing → `[数据待填写]` (最多 1-2 个).
+**1. Core KPIs** (有真实指标才渲染): 只有源内容提供短、明确、可核验的数量指标时，才使用 KPI 区块。可选指标包括项目完成数 (`X/Y`)、进度百分比 (`XX%`)、风险/阻塞数 (`N`)、临时需求处理 (`N`)。
+
+不要为了周期报告版式强行补 KPI。日期、周数、版本号、章节序号不算 KPI。若没有真实业务/工作数字，省略 KPI 区块，并用 callout、timeline、table 或普通段落承载本周期概览；`report-summary.kpis` 使用空数组。
 
 **2. Project Progress** (三段式):
 - 状态 badge: `进行中` / `阻塞` / `已完成`
@@ -24,7 +26,7 @@ Mixed 规则生效：仅当源内容有真实数字时使用 `:::kpi`/`:::chart`
 
 ## Section Order
 
-1. 本周期核心指标 (KPI)
+1. 本周期概览 (callout/prose；有真实指标时才是 KPI)
 2. 项目进展 (badge + timeline + callout)
 3. 日常工作 (table)
 4. **Period Divider**

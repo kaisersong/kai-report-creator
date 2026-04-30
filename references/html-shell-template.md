@@ -97,3 +97,16 @@ If only this entry file is available, do not improvise. Preserve the red lines:
 3. `report-summary` JSON must exist.
 4. At least one footer or watermark carrier must include version/theme metadata.
 5. Load the child references before generating the full standard shell.
+
+## Final HTML Gate
+
+After assembling the HTML, validate the actual output with `scripts/html_quality_gate.py <output.html>`.
+
+This catches failures that IR validation cannot see:
+
+- missing standard shell controls such as summary card, TOC, edit mode, and export entries
+- a `data-theme` value that does not match the embedded theme CSS
+- font/layout drift caused by hand-written body styles
+- KPI cards or `report-summary.kpis` containing placeholders or status-only values
+
+If the gate fails, rebuild from the standard shell and selected theme CSS before reporting the file as complete.

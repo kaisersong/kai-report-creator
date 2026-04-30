@@ -22,13 +22,13 @@ The system has **13 checkpoints**:
 
 These are structural checks from `references/design-quality.md` §7 (Pre-Output Self-Check). Fix automatically before writing HTML.
 
-### 0.1 KPI Value Length
+### 0.1 KPI Value Validity
 
 **Trigger:** Every `.kpi-value` element and `report-summary` JSON `kpis[].value` field.
 
-**Detection:** If any KPI value contains a sentence or paragraph longer than 8 Chinese characters or 3 English words, it fails.
+**Detection:** If any KPI value is a placeholder (`[数据待填写]` / `[INSERT VALUE]`), lacks a real number, or contains a sentence/paragraph longer than 8 Chinese characters or 3 English words, it fails.
 
-**Auto-fix:** Extract the key number/phrase for the KPI value. Move the explanation to adjacent prose, a callout, or a table cell.
+**Auto-fix:** Extract the key number for the KPI value. Move status words to badges and move explanations to adjacent prose, a callout, or a table cell. If there is no real number, remove the KPI card and use a callout, timeline, or table row instead.
 
 ### 0.2 Badge Coverage
 

@@ -136,6 +136,17 @@ THEME_KEYWORDS: list[tuple[str, tuple[str, ...]]] = [
         ),
     ),
     (
+        "fangsong",
+        (
+            "公文",
+            "正式报告",
+            "通知",
+            "制度",
+            "formal document",
+            "official notice",
+        ),
+    ),
+    (
         "dark-board",
         (
             "看板",

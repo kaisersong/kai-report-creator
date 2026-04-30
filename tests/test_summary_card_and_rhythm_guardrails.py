@@ -81,6 +81,17 @@ def test_narrative_cadence_blocks_are_optional_upgrades_with_strict_gates():
     assert "When unsure, prefer paragraph splits or one ordinary scan anchor over decorative cadence blocks." in checklist
 
 
+def test_regular_lumen_periodic_reports_do_not_force_placeholder_kpis():
+    regular_rules = read("references/regular-report-content-rules.md")
+
+    assert "强制 3-4 个" not in regular_rules
+    assert "Missing → `[数据待填写]`" not in regular_rules
+    assert "有真实指标才渲染" in regular_rules
+    assert "日期、周数、版本号、章节序号不算 KPI" in regular_rules
+    assert "`report-summary.kpis` 使用空数组" in regular_rules
+    assert "本周期概览 (callout/prose；有真实指标时才是 KPI)" in regular_rules
+
+
 def test_review_checklist_overview_count_matches_categories():
     checklist = read("references/review-checklist.md")
     category_counts = [int(match) for match in re.findall(r"\*\*Category \d: .*?\((\d+)\)\*\*", checklist)]

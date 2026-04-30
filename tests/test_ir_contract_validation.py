@@ -40,6 +40,30 @@ items:
     }
 
 
+def test_kpi_placeholder_value_is_invalid_for_any_report_class():
+    body = """
+items:
+  - label: Metric A
+    value: [INSERT VALUE]
+""".strip()
+    assert validate_kpi(body, report_class="data") == {
+        "status": "invalid_semantics",
+        "auto_downgrade_target": "callout",
+    }
+
+
+def test_kpi_value_must_be_quantitative():
+    body = """
+items:
+  - label: Status
+    value: 通过
+""".strip()
+    assert validate_kpi(body, report_class="data") == {
+        "status": "invalid_semantics",
+        "auto_downgrade_target": "callout",
+    }
+
+
 def test_timeline_requires_whitelisted_dates():
     good = "- 2024-10-15: Launch\n- Q4 2024: Expansion"
     bad = "- 核心原则: 真诚服务\n- 核心能力: 专业高效"

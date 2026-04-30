@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from FILE, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.22.0
+version: 1.23.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -30,7 +30,7 @@ When invoked as `/report [flags] [content]`, parse flags first:
 | `--review [file]` | Refine an existing HTML report with `references/review-checklist.md`. |
 | `--themes` | Write the themes preview HTML. |
 | `--from <file>` | If the file starts with frontmatter, treat as IR; otherwise create IR, then render. |
-| `--theme <name>` | Override the theme. Built-ins: `corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`, `regular-lumen`. |
+| `--theme <name>` | Override the theme. Built-ins: `corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`, `regular-lumen`, `fangsong`. |
 | `--template <file>` | Use a custom HTML template. See `references/toc-and-template.md`. |
 | `--output <file>` | Save to this path instead of the default. |
 | `--bundle` | Inline CDN assets where supported. |
@@ -122,6 +122,7 @@ If no theme is provided, pick by intent, first match wins:
 | tech/architecture/API/system/performance/工程/架构 | `dark-tech` |
 | news/industry/trend/新闻/行业/趋势 | `newspaper` |
 | annual/story/growth/retrospective/年度/增长/复盘 | `data-story` |
+| formal document/official notice/公文/正式报告/通知/制度 | `fangsong` |
 | board/dashboard/status/看板 | `dark-board` |
 | generic project progress/项目进展/项目状态 | `corporate-blue` |
 
@@ -133,8 +134,8 @@ Classify content by numeric density: `narrative` < 5%, `mixed` 5-20%, `data` > 2
 2. Classify `report_class`; optionally add `archetype` only when the report clearly matches `brief`, `research`, `comparison`, or `update`.
 3. For `regular-lumen` or periodic keywords, load `references/regular-report-content-rules.md`.
 4. Generate `.report.md` with complete frontmatter, 3-5 useful sections, source-faithful structure, and placeholders only where data is missing.
-5. Use real visual anchors only. In `narrative` and `mixed`, never use placeholder-only KPI/chart blocks; prefer callout, timeline, diagram, table, or prose scan anchors.
-6. Keep KPI values short: <=8 Chinese chars or <=3 English words. Explanations belong in prose, callouts, or tables.
+5. Use real visual anchors only. Never use placeholder-only KPI/chart blocks; prefer callout, timeline, diagram, table, or prose scan anchors.
+6. KPI values must be short, real quantitative values. If the source has no actual metric, do not render a KPI card; explanations and status words belong in prose, badges, callouts, or tables.
 7. Use `theme_overrides` only for a small content-tone color hint; do not create a new design system in the IR.
 8. Save as `report-<slug>.report.md`.
 9. Tell the user the IR path, placeholder fields, suggested theme, and render command.
@@ -159,14 +160,15 @@ Narrative rhythm reminders: `lead-block`, `section-quote`, and `action-grid` are
    - no raw `:::` in HTML
    - valid `ir-hash`
    - no generic/template h2 headings
-   - short `.kpi-value` and short `report-summary` KPI values
+   - short, real quantitative `.kpi-value` and `report-summary` KPI values; no placeholder or status-only KPI values
    - `.number` body numerals use tabular lining numerals
    - badges clarify status/category/entity, never quota-fill
    - timeline dates are real time markers
    - no U+FE0F
    - no `text-align: justify`, black-background flood, body letter-spacing > `0.05em`, or mobile-hidden critical controls
-10. Run L2 shell checks. Required: `data-template="kai-report-creator"`, `data-version`, `data-theme`, `id="toc-toggle-btn"`, `id="toc-sidebar"`, `id="card-mode-btn"`, `id="sc-overlay"`, `id="export-btn"`, `id="export-menu"`, `id="export-print"`, `id="export-png-desktop"`, `id="export-png-mobile"`, `id="export-im-share"`, `id="report-summary"`, plus the JS bindings for print/desktop/mobile/IM export. If any export item or binding is missing, rebuild the whole export block from `references/html-shell/export.md`.
-11. Run the silent final review pass from `references/review-checklist.md`, then write the HTML and report the path.
+10. Run the final HTML quality gate with `scripts/html_quality_gate.py` on the rendered HTML. It must pass standard shell IDs, theme fidelity, and KPI value checks. If it fails, fix the HTML and rerun it before reporting success.
+11. Run L2 shell checks. Required: `data-template="kai-report-creator"`, `data-version`, `data-theme`, `id="toc-toggle-btn"`, `id="toc-sidebar"`, `id="card-mode-btn"`, `id="sc-overlay"`, `id="export-btn"`, `id="export-menu"`, `id="export-print"`, `id="export-png-desktop"`, `id="export-png-mobile"`, `id="export-im-share"`, `id="report-summary"`, plus the JS bindings for print/desktop/mobile/IM export. If any export item or binding is missing, rebuild the whole export block from `references/html-shell/export.md`.
+12. Run the silent final review pass from `references/review-checklist.md`, then write the HTML and report the path.
 
 When the report is explicitly comparing named vendors, models, or tools, set `data-report-mode="comparison"` on the outer report container and use `.badge--entity-a/.badge--entity-b/.badge--entity-c` only for entity identity.
 

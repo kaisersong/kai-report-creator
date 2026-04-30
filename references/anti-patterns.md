@@ -26,10 +26,10 @@ One direct instruction that the generator or reviewer can apply without debate.
 
 ## `fake-kpi`
 
-- Symptom: KPI cards are filled with placeholders, long explanatory sentences, or qualitative claims that are not actually metrics.
+- Symptom: KPI cards are filled with placeholders, status words, long explanatory sentences, or qualitative claims that are not actually metrics.
 - Why It Hurts: It creates a fake visual anchor and tells the reader that the report has hard numbers when it does not.
 - Preferred Replacement: `callout`, prose, or `table`.
-- Rewrite Rule: If the source does not provide a short real metric, do not emit `:::kpi`; downgrade to `callout`.
+- Rewrite Rule: If the source does not provide a short real numeric metric, do not emit `:::kpi`; downgrade to `callout`, `timeline`, or `table`.
 
 ## `decorative-chart`
 

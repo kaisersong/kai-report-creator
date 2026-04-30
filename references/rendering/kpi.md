@@ -24,12 +24,12 @@ Compatibility input:
 
 Trend: `↑` = positive (green), `↓` = negative (red), `→` = neutral (gray).
 
-**Allowed input:** `value` must be a short numeric value or brief phrase. `delta` may be a symbol alone (`→`) or a short status like `↑12% MoM`.
+**Allowed input:** `value` must be a short, real quantitative value from the source. `delta` may be a symbol alone (`→`) or a short status like `↑12% MoM`.
 
 **Compatibility note:** Labels containing literal colons should use the canonical YAML form, not the short-line form.
 
 - `invalid_syntax`: body is neither canonical `items:` YAML nor the compatibility short-line format.
-- `invalid_semantics`: `value` is a sentence/paragraph, or the whole block exists only as placeholder decoration.
+- `invalid_semantics`: `value` is a sentence/paragraph, a placeholder, a status-only word with no number, or the whole block exists only as decoration.
 - `contract_conflict`: none.
 - `auto_downgrade_target`: `callout`.
 
@@ -55,12 +55,14 @@ Extract the numeric part of Value into `data-target-value`, set `data-prefix` an
     <!-- ❌ Never combine data-target-value with kpi-suffix span — countUp will overwrite the span -->
     <div class="kpi-value" data-target-value="1000">1,000<span class="kpi-suffix">commits/hour</span></div>
 
-**KPI value length rule (MANDATORY):** The `.kpi-value` must contain ONLY a short numeric value or very brief phrase. Maximum length:
+**KPI value rule (MANDATORY):** The `.kpi-value` must contain ONLY a short quantitative value. It must include a real number from the source; placeholders and status-only words are not valid KPI values. Maximum length:
 - Numeric/currency/percentage: `128K`, `¥2,450万`, `8.6%`, `72`, `↑18%` — ✅
-- Short phrase (≤8 Chinese chars / ≤3 English words): `全场景`, `行业领先`, `Top 3` — ✅
+- Short phrase with a number: `Top 3`, `3 launches`, `v4.2` — ✅ when the label makes the metric meaning clear
+- Status-only phrase: `通过`, `Pass`, `全场景`, `行业领先` — ❌
+- Placeholder: `[数据待填写]`, `[INSERT VALUE]` — ❌
 - Descriptive sentences or paragraphs: `支持CSV/Excel等表格文件的统计汇总、趋势分析、数据可视化` — ❌
 
-If the content is a full sentence or descriptive paragraph, it belongs in prose, a `:::callout`, or a table cell — **NEVER** in a KPI card. The `:::kpi` block is for at-a-glance metrics, not explanations. When planning a report, if the source content has no short numbers to extract, use `:::callout` or `:::timeline` instead of forcing a `:::kpi` block.
+If the content is a full sentence, descriptive paragraph, placeholder, or status-only label, it belongs in prose, a badge, a `:::callout`, or a table cell — **NEVER** in a KPI card. The `:::kpi` block is for at-a-glance metrics, not explanations. When planning a report, if the source content has no short numbers to extract, use `:::callout`, `:::timeline`, or `:::table` instead of forcing a `:::kpi` block.
 
 **Summary card KPI value rule:** The `report-summary` JSON `kpis[].value` field feeds the summary card's `.sc-kpi-row-v` (1.15rem, compact). If a KPI value exceeds the length rule above, use the kpi-label or a separate callout for the explanation, and keep the KPI value short for the card.
 

@@ -63,8 +63,8 @@ These patterns make a report look instantly AI-generated. Do not produce them:
 | Same font size for every paragraph | Vary prose density: lead paragraphs slightly larger (16px), supporting detail smaller (14px) |
 | Symmetrical two-column layouts everywhere | Use `2fr 1fr` or `3fr 1fr` — asymmetry implies hierarchy |
 | Inter as body font | Use system-ui / -apple-system stack (already in themes) |
-| `:::kpi` block where every value is `[INSERT VALUE]` / `[数据待填写]` in a narrative report | Use `:::callout` or `:::timeline` as the visual anchor instead |
-| `:::kpi` value contains a full sentence or descriptive paragraph (e.g. "支持CSV/Excel等表格文件的统计汇总、趋势分析、数据可视化") | KPI value = short number/phrase only (≤8 Chinese chars / ≤3 English words). Explanations go in prose, callout, or table cell |
+| `:::kpi` block with placeholder values (`[INSERT VALUE]` / `[数据待填写]`) in any report | Use `:::callout`, `:::timeline`, or `:::table` as the visual anchor instead |
+| `:::kpi` value is status-only or contains a full sentence/descriptive paragraph (e.g. "通过" or "支持CSV/Excel等表格文件的统计汇总、趋势分析、数据可视化") | KPI value = short real number only. Status goes in badges; explanations go in prose, callout, or table cell |
 | `:::chart` with all-placeholder data in a text-heavy (narrative/mixed) section | Use `:::diagram` (flowchart/mindmap) or a `highlight-sentence` paragraph |
 | Nested cards (card inside a card) | Flatten hierarchy — use indentation, sub-lists, or adjacent blocks instead |
 | Default text alignment centered everywhere | Left-align body text; center only the title and hero metrics |
@@ -166,8 +166,8 @@ Before writing the final HTML, answer each question. Fix any "no":
 - [ ] Are there 3+ consecutive all-prose sections with no component? If yes → insert visual anchor
 - [ ] Do all section headings feel like AI-generated template phrases? If yes → make them content-specific
 - [ ] Is every card's `border-radius` identical? If yes → vary radii between data elements and prose cards
-- [ ] Does any `:::kpi` or `:::chart` block contain only placeholder values (`[INSERT VALUE]` / `[数据待填写]`) in a `narrative` or `mixed` report? If yes → replace with `:::callout`, `:::timeline`, or `:::diagram`
-- [ ] Does any `.kpi-value` contain a sentence or paragraph longer than 8 Chinese chars / 3 English words? If yes → move explanation to prose/callout, keep KPI value short
+- [ ] Does any `:::kpi` or `:::chart` block contain placeholder values (`[INSERT VALUE]` / `[数据待填写]`)? If yes → replace with `:::callout`, `:::timeline`, `:::table`, or `:::diagram`
+- [ ] Does any `.kpi-value` lack a real number, or contain a sentence/paragraph longer than 8 Chinese chars / 3 English words? If yes → move status/explanation to badges, prose, callout, or table; keep KPI value quantitative
 - [ ] Does the report use `.badge` elements in at least 2 locations (section headers, KPI cards, table cells, timeline items)? If no → add badges at appropriate locations
 - [ ] **If you told someone "an AI wrote this", would they immediately believe it?** If yes → find the most generic-looking part and redesign it
 - [ ] Is any prose line wider than ~75 characters (Chinese: ~50 chars)? If yes → constrain with `max-width` or `max-inline-size` in CSS

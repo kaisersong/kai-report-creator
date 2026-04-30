@@ -51,7 +51,9 @@ def has_real_number(text: str) -> bool:
 def is_short_kpi_value(value: str) -> bool:
     stripped = value.strip()
     if PLACEHOLDER_RE.search(stripped):
-        return True
+        return False
+    if not has_real_number(stripped):
+        return False
     if len(re.findall(r"[A-Za-z]+", stripped)) > 3:
         return False
     cjk_count = len(re.findall(r"[\u4e00-\u9fff]", stripped))
@@ -112,12 +114,6 @@ def validate_kpi(body: str, report_class: str = "data") -> dict[str, str]:
         return result("invalid_syntax", "callout")
 
     if any(not is_short_kpi_value(item["value"]) for item in items):
-        return result("invalid_semantics", "callout")
-
-    if report_class == "narrative" and all(PLACEHOLDER_RE.search(item["value"]) for item in items):
-        return result("invalid_semantics", "callout")
-
-    if report_class == "mixed" and not any(has_real_number(item["value"]) for item in items):
         return result("invalid_semantics", "callout")
 
     return result("valid")

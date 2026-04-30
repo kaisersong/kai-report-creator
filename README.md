@@ -32,7 +32,7 @@ Click any screenshot to open the live demo:
 </tr>
 </table>
 
-Preview all themes: `/report --themes` → opens `report-themes-preview.html`
+Preview the theme gallery: `/report --themes` → opens `report-themes-preview.html`
 
 ---
 
@@ -48,11 +48,11 @@ report-creator solves this with **rules in the skill, assets in files**:
 
 ```
 --plan        → only IR rules + component syntax; no CSS, no HTML shell
---generate    → one theme CSS + one shared CSS; other 5 themes stay on disk
+--generate    → one theme CSS + one shared CSS; other theme files stay on disk
 --themes      → pre-built preview HTML; skill doesn't parse internals
 ```
 
-**Result:** `--plan` never touches CSS. Single-theme generation never loads other themes.
+**Result:** `--plan` never touches CSS. Single-theme generation only loads the selected theme.
 
 This is progressive disclosure applied to AI context: **reveal information at the moment it's needed, not before.**
 
@@ -173,6 +173,8 @@ Three sub-principles:
 - Prevents invalid IR from entering the render pipeline and producing unpredictable output
 - Zero-drift ensures guard's judgment and renderer's behavior stay aligned
 
+v1.23.0 extends this boundary to final HTML with `scripts/html_quality_gate.py`: rendered files must keep the standard shell controls, the declared theme's CSS fingerprint, typography/layout markers, and only real quantitative KPI values. This catches failures where IR is legal but the HTML hand-rolls a theme, drops summary/export controls, or smuggles placeholder/status text into KPI cards.
+
 ### 8. Eval as Quality Boundary, Not Quality Score
 
 v1.15.0's eval workflow embodies this principle: **evals define boundaries, not scores.**
@@ -188,7 +190,7 @@ compression → ir_contract → async_readability → render_integrity
 | compression | report_class, audience, decision_goal declared | SKILL.md |
 | ir_contract | timeline is real time, kpi is short value, chart schema legal | rendering-rules.md + contract_checks.py |
 | async_readability | BLUF, heading stack, takeaway after data | review-checklist.md |
-| render_integrity | shell IDs, report-summary JSON, no `:::` leak | html-shell-template.md |
+| render_integrity | shell IDs, report-summary JSON, no `:::` leak, theme fidelity | html-shell-template.md + html_quality_gate.py |
 
 **Failure Map rule:** Every real production failure → one new eval case. Not post-hoc discussion about "feels wrong", but direct pointer to the layer that needs fixing.
 
@@ -202,7 +204,7 @@ compression → ir_contract → async_readability → render_integrity
 # Timeline must be real dates
 DATE_PATTERNS = [YYYY-MM-DD, YYYY-MM, Q1-4 YYYY, Day N, Week N]
 
-# KPI value must be shorter than 8 CJK chars or 3 English words
+# KPI value must be a short real quantitative value; placeholders/status-only words fail
 def is_short_kpi_value(value): ...
 
 # Placeholder pattern recognition
@@ -213,6 +215,12 @@ PLACEHOLDER_RE = r"\[(INSERT VALUE|数据待填写)\]"
 - Spec declared in SKILL.md, validated in contract_checks.py
 - Guard calls contract_checks, zero drift
 - Every component has `auto_downgrade_target`: safe fallback path when invalid
+
+Final HTML has a separate gate:
+
+```bash
+python scripts/html_quality_gate.py report.html
+```
 
 ---
 
@@ -252,7 +260,7 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 | `/report --plan "topic"` | Create a `.report.md` outline first |
 | `/report --generate file.report.md` | Render an outline to HTML |
 | `/report --review file.html` | Refine an existing report |
-| `/report --themes` | Preview all 6 themes side by side |
+| `/report --themes` | Preview the bundled theme gallery |
 | `/report --bundle --from file.md` | Offline HTML with inlined CDN assets |
 | `/report --theme <name> --from file.md` | Use a built-in or custom theme |
 | `/report [content]` | One-step: generate from description |
@@ -347,6 +355,12 @@ Maintainers can run the full release verification chain from one entry point:
 python scripts/verify-release.py --root .
 ```
 
+For a single generated report, run the final HTML gate directly:
+
+```bash
+python scripts/html_quality_gate.py report.html
+```
+
 ---
 
 ## Features
@@ -354,7 +368,7 @@ python scripts/verify-release.py --root .
 ### Core
 
 - **Zero dependencies** — single `.html` file, works offline with `--bundle`
-- **7 built-in themes** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper, weekly-frost
+- **8 built-in themes** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper, regular-lumen, fangsong
 - **9 component types** — KPIs, charts (ECharts), tables, timelines, diagrams, code blocks, callouts, images, lists
 - **Report Review System** — 13-checkpoint automatic refinement
 - **AI-readable output** — 3-layer machine-readable structure for downstream agents
@@ -550,6 +564,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 ---
 
 ## Version History
+
+**v1.23.0** — Final HTML quality gate release: add `scripts/html_quality_gate.py` to validate rendered shell IDs, theme CSS fidelity, regular-lumen/fangsong typography and layout markers, and KPI values; require every KPI card to use a real quantitative value; remove forced placeholder KPIs from periodic reports; fix dark-board status KPI examples; and add regression coverage for the failure modes.
 
 **v1.22.0** — Reference split and validator profile release: split oversized shell and rendering contracts into route-specific child references, add a reference index and validator-facing usage boundary artifacts, add a generated-cache cleanup gate to release verification, and document golden eval cases for external validators.
 
