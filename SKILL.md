@@ -1,14 +1,14 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from FILE, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.23.0
+version: 1.23.1
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
 
 # kai-report-creator
 
-Generate single-file HTML reports from source notes or `.report.md` IR. Keep this file as a thin router: load only the references needed for the current path, and move detailed contracts into `references/`, scripts, tests, or templates.
+Generate single-file HTML reports from source notes or `.report.md` IR. Keep this file as a thin router: load only the references needed for the current path.
 
 ## Core Principles
 
@@ -16,7 +16,7 @@ Generate single-file HTML reports from source notes or `.report.md` IR. Keep thi
 2. **User Provides Data, AI Provides Structure** — never fabricate facts or numbers; use `[数据待填写]` / `[INSERT VALUE]` when data is missing.
 3. **Plan Before Generate** — complex reports should become `.report.md` IR first, then HTML.
 4. **Progressive Disclosure for AI** — output keeps `report-summary`, section annotations, and component data machine-readable.
-5. **Thin Routing Over Prompt Growth** — `SKILL.md` routes work and names hard gates; detailed rules live in references.
+5. **Thin Routing Over Prompt Growth** — `SKILL.md` routes work; detailed rules live in references.
 6. **Contracts and Gates Beat Prompt Soup** — prefer IR, guard validation, shell tests, and post-render review over adding more prose to this hot path.
 
 ## Command Routing
@@ -46,8 +46,8 @@ Load references by route; do not read every reference by default.
 
 | Route | Always load | Conditional load |
 |-------|-------------|------------------|
-| `--plan` | `references/spec-loading-matrix.md`, `references/design-quality.md` | `references/regular-report-content-rules.md` for periodic reports |
-| `--generate` | `references/html-shell-template.md` + every `references/html-shell/*.md`, `references/theme-css.md`, `references/review-checklist.md` | `references/rendering-rules.md` then only the `references/rendering/*.md` files required by the IR; `references/anti-patterns.md` for visual anchors; `references/diagram-decision-rules.md` for diagrams; `references/regular-report-content-rules.md` for periodic reports |
+| `--plan` | `references/spec-loading-matrix.md`, `references/plan-flow.md`, `references/theme-routing.md` | `references/regular-report-content-rules.md` for periodic reports |
+| `--generate` | `references/generate-flow.md`, `references/html-shell-template.md` + every `references/html-shell/*.md`, `references/theme-css.md`, `references/review-checklist.md` | `references/rendering-rules.md` then only the `references/rendering/*.md` files required by the IR; `references/anti-patterns.md` for visual anchors; `references/diagram-decision-rules.md` for diagrams; `references/regular-report-content-rules.md` for periodic reports |
 | `--review` | `references/review-checklist.md` | `references/review-report-template.md` if a structured change summary is requested |
 | custom theme/template | `references/theme-css.md`, `references/toc-and-template.md` | custom theme `reference.md` or `theme.css` |
 
@@ -55,107 +55,33 @@ Load `references/spec-loading-matrix.md` before `--plan` and `--generate` as a s
 
 Always load `references/anti-patterns.md` before `--generate`. Load `references/diagram-decision-rules.md` whenever a diagram or diagram-like structure is being considered.
 
-## IR Quick Contract
+## IR Contract
 
-`.report.md` has three parts:
+Load `references/ir-contract.md` for the full frontmatter spec, validity terms, and compatibility anchors.
 
-1. YAML frontmatter between `---` delimiters.
-2. Markdown prose with `##` / `###` headings.
-3. Component fences: `:::tag [param=value]` ... `:::`.
+Quick reference:
+- Three parts: YAML frontmatter, Markdown prose (`##`/`###`), component fences `:::tag [param=value]`.
+- `:::kpi` uses `items:`; use **ECharts** for ALL charts; badges are optional enhancements.
+- Canonical component routing: `references/rendering-rules.md`; component details: `references/rendering/*.md`.
 
-Minimal frontmatter:
+## Language And Theme
 
-```yaml
----
-title: Report Title
-theme: corporate-blue                  # Optional. Default: corporate-blue
-date: YYYY-MM-DD
-lang: zh
-report_class: mixed
-archetype: research                    # Optional lightweight archetype hint for silent classification.
-audience: "Busy decision-maker"
-decision_goal: "Decide next move"
-must_include:
-  - Source truth that must survive compression
-must_avoid:
-  - Decorative placeholder chart
-charts: cdn
-toc: true
-animations: true
-abstract: "One-sentence summary"
-poster_title: "Optional stronger poster headline"
-poster_subtitle: "Optional poster subtitle"
-poster_note: "Optional short closing sentence"
-template: ./my-template.html
-theme_overrides:
-  primary_color: "#E63946"
-custom_blocks:
-  my-tag: |
-    <div class="my-class">{{content}}</div>
----
-```
+Load `references/theme-routing.md` for the full theme-selection table and report-class rules.
 
-For trivial reports, omit optional fields. For high-stakes or complex reports, keep `report_class`, `audience`, `decision_goal`, `must_include`, and `must_avoid` so review/evals can detect drift.
-
-Poster summary mode is opt-in. Do not infer `poster_title` or `poster_subtitle` from punctuation in `title`.
-
-IR validity terms: `invalid_syntax`, `invalid_semantics`, `contract_conflict`, `auto_downgrade_target`.
-
-Canonical component routing lives in `references/rendering-rules.md`; component details live in `references/rendering/*.md`. Compatibility anchors that must remain discoverable here:
-
-- `:::kpi` canonical body uses `items:`.
-- Timeline Allowed `Date` tokens: `YYYY-MM-DD`, `YYYY-MM`, `YYYY`, `Q[1-4] YYYY`, `Day N`, `Week N`, `Month N`.
-- Use **ECharts** for ALL charts.
-- Badges are optional visual enhancements, not a first-class IR tag.
-
-## Language, Theme, And Class
-
-Auto-detect `lang` unless frontmatter sets it: use `zh` when CJK is material or appears in the title/topic; otherwise use `en`. Apply language to placeholders, TOC labels, date display, and shell labels.
-
-If no theme is provided, pick by intent, first match wins:
-
-| Signal | Theme |
-|--------|-------|
-| weekly/daily/monthly/work progress/周报/日报/月报/本周/下周 | `regular-lumen` |
-| sales/revenue/KPI/quarterly/business/销售/营收/业绩/季报 | `corporate-blue` |
-| research/survey/whitepaper/internal/研究/调研/白皮书 | `minimal` |
-| tech/architecture/API/system/performance/工程/架构 | `dark-tech` |
-| news/industry/trend/新闻/行业/趋势 | `newspaper` |
-| annual/story/growth/retrospective/年度/增长/复盘 | `data-story` |
-| formal document/official notice/公文/正式报告/通知/制度 | `fangsong` |
-| board/dashboard/status/看板 | `dark-board` |
-| generic project progress/项目进展/项目状态 | `corporate-blue` |
-
-Classify content by numeric density: `narrative` < 5%, `mixed` 5-20%, `data` > 20%; short topics default to `mixed`.
+Quick reference: auto-detect `zh` when CJK is material; apply to placeholders, TOC labels, date display, and shell labels.
 
 ## `--plan` Flow
 
-1. Detect language and suggest theme.
-2. Classify `report_class`; optionally add `archetype` only when the report clearly matches `brief`, `research`, `comparison`, or `update`.
-3. For `regular-lumen` or periodic keywords, load `references/regular-report-content-rules.md`.
-4. Generate `.report.md` with complete frontmatter, 3-5 useful sections, source-faithful structure, and placeholders only where data is missing.
-5. Use real visual anchors only. Never use placeholder-only KPI/chart blocks; prefer callout, timeline, diagram, table, or prose scan anchors.
-6. KPI values must be short, real quantitative values. If the source has no actual metric, do not render a KPI card; explanations and status words belong in prose, badges, callouts, or tables.
-7. Use `theme_overrides` only for a small content-tone color hint; do not create a new design system in the IR.
-8. Save as `report-<slug>.report.md`.
-9. Tell the user the IR path, placeholder fields, suggested theme, and render command.
-10. Stop. Do not generate HTML in `--plan` mode.
+Load `references/plan-flow.md` for the full 10-step procedure and narrative rhythm rules.
 
-Narrative rhythm reminders: `lead-block`, `section-quote`, and `action-grid` are optional prose upgrades. `claim -> explanation -> scan anchor` is a cadence, not a quota. These are optional prose upgrades, not default required blocks. If uncertain, keep normal paragraphs and add one clearer scan anchor instead of forcing a cadence block. Do not add more than one of `lead-block` / `section-quote` / `action-grid` by default inside the same section unless the source material clearly warrants it.
+Key gates: save as `report-<slug>.report.md`; do not generate HTML; use real quantitative KPI values only.
 
 ## `--generate` Flow
 
-1. Read IR input only. With no file given, extract exactly one valid IR block from context. Treat this as IR from context, not chat history. If zero or multiple are present, stop and ask for an explicit file or single IR block. Never render the surrounding conversation.
-2. Load reference files minimally but reliably; load only the references that materially help the current render path. Standard HTML shell generation always loads the shell entry plus all `references/html-shell/*.md`; component rules load by IR inventory via `references/rendering-rules.md`.
-3. Parse frontmatter and resolve `lang`, `theme`, `report_class: mixed` default, `archetype`, date display, chart mode, TOC, animation, template, and theme overrides.
-4. Run guard validation before rendering:
-   - Use `scripts/guard_validate.py` with IR text from file or extracted context.
-   - If fatal metadata is missing, stop and report the error.
-   - If a block is invalid, apply its `auto_downgrade_target` (`kpi -> callout`, `chart -> table`, `timeline -> list`, `diagram -> callout`) and mention the downgrade.
-5. Render components using `references/rendering-rules.md`, `references/design-quality.md`, and the path-specific `references/rendering/*.md` files selected from the IR.
-6. Build the standard shell from `references/html-shell-template.md` plus all `references/html-shell/*.md`; follow Shell metadata, version/theme metadata, export completeness, and the duplicate-date guard.
-7. Compute and embed `<meta name="ir-hash" content="sha256:[ir-hash]">` from the exact IR text, not the file path.
-8. Assemble CSS through `references/theme-css.md`: theme before-marker, shared CSS, theme post-shared override, TOC/shell CSS, frontmatter overrides.
+Load `references/generate-flow.md` for steps 1-8 (input parsing, guard validation, render, shell assembly, CSS).
+
+Then run these quality gates in sequence — do not skip:
+
 9. Run pre-write validation and fix all violations:
    - no raw `:::` in HTML
    - valid `ir-hash`
@@ -174,16 +100,13 @@ When the report is explicitly comparing named vendors, models, or tools, set `da
 
 ## `--review` Flow
 
-When the user runs `/report --review [file]`:
-
 1. Read the HTML file.
 2. Load `references/review-checklist.md`.
-3. Apply hard rules automatically.
-4. Apply AI-advised rules only when confidence is high and factual accuracy is preserved.
-5. This is one-pass automatic refinement; no confirmation window.
-6. Use `references/review-report-template.md` when the user wants a structured summary.
-7. Write back unless the user asked for diagnosis only.
-8. Tell the user what changed and what was intentionally left untouched.
+3. Apply hard rules automatically; apply AI-advised rules only when confidence is high and factual accuracy is preserved.
+4. One-pass automatic refinement; no confirmation window.
+5. Use `references/review-report-template.md` when the user wants a structured summary.
+6. Write back unless the user asked for diagnosis only.
+7. Tell the user what changed and what was intentionally left untouched.
 
 ## `--themes` And `--export-image`
 
@@ -199,7 +122,7 @@ If Playwright is unavailable, print install instructions and skip image export w
 
 ## Shell And Template Boundary
 
-Generate complete self-contained HTML. The shell entry contract lives in `references/html-shell-template.md`; full shell structure, inline JS, export behavior, summary card, edit mode, TOC, print rules, and footer/watermark degradation rules live in `references/html-shell/*.md`.
+Generate complete self-contained HTML. Shell entry contract: `references/html-shell-template.md`; full shell structure, inline JS, export behavior, summary card, edit mode, TOC, print rules, and footer/watermark degradation rules: `references/html-shell/*.md`.
 
 All scripts are inline in the shell template. Never load nonexistent files such as `templates/scripts/*.js`.
 
