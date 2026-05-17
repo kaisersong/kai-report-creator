@@ -26,7 +26,7 @@ When invoked as `/report [flags] [content]`, parse flags first:
 | Flag | Action |
 |------|--------|
 | `--plan "topic"` | Write `.report.md` IR only. Stop after saving it. |
-| `--generate [file]` | Render one `.report.md` IR to HTML. With no file given, extract exactly one valid IR block from context. |
+| `--generate [file]` | Render one `.report.md` IR to HTML. With no file given, treat as IR from context: extract exactly one valid IR block from context. Never render the surrounding conversation. |
 | `--review [file]` | Refine an existing HTML report with `references/review-checklist.md`. |
 | `--themes` | Write the themes preview HTML. |
 | `--from <file>` | If the file starts with frontmatter, treat as IR; otherwise create IR, then render. |
@@ -42,7 +42,7 @@ Default output filename: `report-<YYYY-MM-DD>-<slug>.html`. Slug: lowercase ASCI
 
 ## Reference Loading
 
-Load references by route; do not read every reference by default.
+Load reference files minimally by route; do not read every reference by default. In short: load only the references that materially help the current render path.
 
 | Route | Always load | Conditional load |
 |-------|-------------|------------------|
@@ -61,8 +61,19 @@ Load `references/ir-contract.md` for the full frontmatter spec, validity terms, 
 
 Quick reference:
 - Three parts: YAML frontmatter, Markdown prose (`##`/`###`), component fences `:::tag [param=value]`.
-- `:::kpi` uses `items:`; use **ECharts** for ALL charts; badges are optional enhancements.
+- `:::kpi` uses `items:`; Use **ECharts** for ALL charts.
+- Badges are optional visual enhancements, not a first-class IR tag.
+- Validity taxonomy: `invalid_syntax`, `invalid_semantics`, `contract_conflict`, `auto_downgrade_target`.
+- Timeline details live in rendering references; Allowed `Date` tokens must be real time markers, not decorative labels.
 - Canonical component routing: `references/rendering-rules.md`; component details: `references/rendering/*.md`.
+
+Minimal frontmatter example:
+```yaml
+theme: corporate-blue                  # Optional. Default: corporate-blue
+report_class: mixed                    # Optional. Values: narrative, mixed, data
+archetype: research                    # Optional lightweight archetype hint for silent classification.
+```
+Supported archetypes: `brief`, `research`, `comparison`, `update`.
 
 ## Language And Theme
 
@@ -75,6 +86,10 @@ Quick reference: auto-detect `zh` when CJK is material; apply to placeholders, T
 Load `references/plan-flow.md` for the full 10-step procedure and narrative rhythm rules.
 
 Key gates: save as `report-<slug>.report.md`; do not generate HTML; use real quantitative KPI values only.
+
+Poster summary mode is opt-in. Do not infer `poster_title` or `poster_subtitle` from punctuation in `title`.
+
+Narrative cadence blocks (`lead-block`, `section-quote`, `action-grid`) follow claim -> explanation -> scan anchor. These are optional prose upgrades, not default required blocks. If uncertain, keep normal paragraphs and add one clearer scan anchor instead of forcing a cadence block. Do not add more than one of `lead-block` / `section-quote` / `action-grid` by default inside the same section unless the source material clearly warrants it.
 
 ## `--generate` Flow
 
@@ -122,7 +137,7 @@ If Playwright is unavailable, print install instructions and skip image export w
 
 ## Shell And Template Boundary
 
-Generate complete self-contained HTML. Shell entry contract: `references/html-shell-template.md`; full shell structure, inline JS, export behavior, summary card, edit mode, TOC, print rules, and footer/watermark degradation rules: `references/html-shell/*.md`.
+Generate complete self-contained HTML. Shell entry contract: `references/html-shell-template.md`; full shell structure, inline JS, export behavior, summary card, edit mode, TOC, print rules, Shell metadata, version/theme metadata, duplicate-date guard, and footer/watermark degradation rules: `references/html-shell/*.md`.
 
 All scripts are inline in the shell template. Never load nonexistent files such as `templates/scripts/*.js`.
 

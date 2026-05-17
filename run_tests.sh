@@ -23,6 +23,9 @@ if [ "${1-}" = "--fast" ]; then
     tests/test_skill_size.py \
     tests/test_validator_profile_artifacts.py \
     tests/test_reference_split_contract.py \
+    tests/test_reference_integrity.py \
+    tests/test_skill_eval_runner.py \
+    tests/test_skill_eval_baseline_compare.py \
     tests/test_color_system_docs.py \
     tests/test_html_shell_contract.py \
     tests/test_review_docs.py \

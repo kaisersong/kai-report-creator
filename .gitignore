@@ -8,6 +8,7 @@
 .gstack/
 .superpowers/
 outputs/
+evals/artifacts/
 docs
 __pycache__/
 tmp-*

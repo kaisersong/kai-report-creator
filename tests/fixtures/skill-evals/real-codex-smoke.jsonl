@@ -1,0 +1,5 @@
+{"type":"thread.started","thread_id":"019e31ac-0002-77d1-bdff-c752a950a480"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"`[features].codex_hooks` is deprecated. Use `[features].hooks` instead. (Enable it with `--enable hooks` or `[features].hooks` in config.toml. See https://developers.openai.com/codex/config-basic#feature-flags for details.)"}}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"SMOKE_OK"}}
+{"type":"turn.completed","usage":{"input_tokens":19070,"cached_input_tokens":2432,"output_tokens":38,"reasoning_output_tokens":34}}

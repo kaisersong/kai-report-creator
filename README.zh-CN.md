@@ -181,6 +181,13 @@ clawhub install kai-report-creator
 git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/kai-report-creator
 ```
 
+### Release 下载
+
+当前发布版本是 **v1.23.1**。可以从 GitHub Releases 下载源码包：
+
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.23.1
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.23.1.zip
+
 ---
 
 ## 使用方式
@@ -278,6 +285,50 @@ python scripts/run-report-evals.py --root . --packet-dir .tmp/eval-packets
 - `evals/rubric.schema.json` — grader 输出 JSON 契约
 - `evals/failure-map.md` — 某一层失败后应该去哪里修
 - `evals/cases/*` — 每个 case 的 source + IR 工件
+
+### 捕获运行轨迹的 Skill Evals
+
+`scripts/run-report-evals.py` 检查 repo 内已有的 source/IR/HTML 工件。它是 deterministic regression gate，不是完整的 agent-run skill eval。
+
+按 OpenAI eval-skills 的四类目标评测时，显式运行 captured-run harness：
+
+```bash
+python scripts/run-skill-evals.py --runner codex --run-live --format json --json-out .tmp/skill-evals/results.json
+```
+
+该命令读取 `evals/report-skill-prompts.csv`，把原始 trace 和归一化 metrics 保存到 `evals/artifacts/current/skill-runs/`，并按四类目标评分：
+
+- Outcome：任务是否完成，报告工件是否有效。
+- Process：是否按 skill 流程读取 reference、运行 guard validation 和 HTML quality gate。
+- Style：是否符合模板、主题、内容和异步阅读约定，可接入结构化 rubric。
+- Efficiency：shell 命令数量、重复失败、token 预算和总耗时。
+
+本地单元测试使用 fixture runner，不会真实调用任何 agent：
+
+```bash
+python scripts/run-skill-evals.py --runner fixture --format json
+```
+
+已保存的基线放在 `evals/baselines/`。后续修改 skill 行为前，先用新结果和基线比较：
+
+```bash
+python scripts/run-skill-evals.py --runner fixture \
+  --artifact-dir .tmp/check-skill-evals-fixture-artifacts \
+  --format json \
+  --json-out .tmp/check-skill-evals-fixture.json
+
+python scripts/compare-skill-eval-baseline.py \
+  --old evals/baselines/2026-05-17-skill-evals-fixture.json \
+  --new .tmp/check-skill-evals-fixture.json \
+  --format text
+```
+
+`evals/baselines/2026-05-17-baseline-summary.md` 记录了第一版保存分数：
+fixture runner 为 6/6 通过，平均分 93.33；加固后的 Codex live 基线为
+0/6 通过，平均分 64.5，因为超时未完成的运行会被 `runner.run_incomplete`
+硬门禁拦下。
+
+Codex 只是第一个 live runner adapter。Claude Code、Qoder 或其他 agent 要参与横向比较，必须先补自己的 trace adapter，不能复用 Codex 的事件格式。
 
 对复杂报告，建议在 IR frontmatter 里保留这些字段，方便直接评估压缩质量：`report_class`、`audience`、`decision_goal`、`must_include`、`must_avoid`。
 
@@ -494,6 +545,8 @@ OpenClaw 会自动：
 ---
 
 ## 版本日志
+
+**v1.23.1** — Captured-run skill eval 发布：新增 OpenAI-style skill eval prompts、fixture 与 Codex trace runners、超时 partial trace 归一化、baseline comparator、已保存的 fixture/live 基线、release verification 集成，并在 README 中写清如何用基线分数比较后续 skill 修改。
 
 **v1.23.0** — 最终 HTML 质量门发布：新增 `scripts/html_quality_gate.py`，校验渲染后的标准 shell ID、主题 CSS 保真、regular-lumen/fangsong 字体与布局标记，以及 KPI 值；所有 KPI 卡片都必须使用真实量化值；移除周期报告中的强制占位 KPI；修正 dark-board 状态型 KPI 示例；补充对应回归测试。
 

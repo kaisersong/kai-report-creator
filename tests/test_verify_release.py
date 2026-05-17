@@ -39,6 +39,7 @@ def test_verify_release_script_exists_and_reports_default_plan():
     assert any("scripts/run-late-context-evals.py" in step["command"] for step in payload["steps"])
     assert any("check-doc-sync.py" in step["command"] for step in payload["steps"])
     assert any("scripts/export-image.py" in step["command"] for step in payload["steps"])
+    assert "skill-evals" not in [step["name"] for step in payload["steps"]]
 
 
 def test_verify_release_respects_skip_flags():
@@ -59,3 +60,27 @@ def test_verify_release_respects_skip_flags():
         "report-evals",
         "cleanup-generated-final",
     ]
+
+
+def test_verify_release_includes_skill_evals_only_when_requested():
+    result = run_verify_release(
+        "--dry-run",
+        "--format",
+        "json",
+        "--include-skill-evals",
+        "--skill-evals-runner",
+        "fixture",
+        "--skill-evals-case-id",
+        "explicit-generate",
+        "--skill-evals-normalized-trace",
+        "tests/fixtures/skill-evals/explicit-generate-normalized.json",
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+
+    payload = json.loads(result.stdout)
+    steps = [step["name"] for step in payload["steps"]]
+    assert "skill-evals" in steps
+    skill_step = next(step for step in payload["steps"] if step["name"] == "skill-evals")
+    assert "scripts/run-skill-evals.py" in skill_step["command"]
+    assert "--runner fixture" in skill_step["command"]
+    assert "--normalized-trace" in skill_step["command"]

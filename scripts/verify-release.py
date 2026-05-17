@@ -107,6 +107,33 @@ def build_steps(root: Path, args: argparse.Namespace) -> list[Step]:
             )
         )
 
+    if args.include_skill_evals:
+        command = [
+            python,
+            str(resolve(root, "scripts/run-skill-evals.py")),
+            "--root",
+            str(root),
+            "--runner",
+            args.skill_evals_runner,
+            "--format",
+            "json",
+            "--json-out",
+            str(resolve(root, args.skill_evals_json_out)),
+        ]
+        if args.skill_evals_case_id:
+            command.extend(["--case-id", args.skill_evals_case_id])
+        if args.skill_evals_normalized_trace:
+            command.extend(["--normalized-trace", str(resolve(root, args.skill_evals_normalized_trace))])
+        else:
+            command.append("--run-live")
+        steps.append(
+            Step(
+                name="skill-evals",
+                command=command,
+                cwd=str(root),
+            )
+        )
+
     if not args.skip_doc_sync:
         steps.append(
             Step(
@@ -246,6 +273,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-doc-sync", action="store_true", help="Skip check-doc-sync.py.")
     parser.add_argument("--skip-export-smoke", action="store_true", help="Skip the screenshot export smoke check.")
     parser.add_argument("--skip-cleanup", action="store_true", help="Skip generated cache cleanup before/after verification.")
+    parser.add_argument("--include-skill-evals", action="store_true", help="Run captured-run skill evals. This may invoke a live agent runner.")
+    parser.add_argument("--skill-evals-runner", default="codex", help="Skill eval runner: fixture, codex, or a future verified adapter.")
+    parser.add_argument("--skill-evals-case-id", help="Run one captured-run skill eval case.")
+    parser.add_argument("--skill-evals-normalized-trace", help="Use one normalized trace fixture for selected skill eval cases.")
     parser.add_argument("--basetemp", default=".tmp/pytest", help="Pytest base temp path relative to repo root.")
     parser.add_argument(
         "--packet-dir",
@@ -256,6 +287,11 @@ def parse_args() -> argparse.Namespace:
         "--late-context-json-out",
         default=".tmp/verify-release/late-context-evals.json",
         help="Output path for late-context eval JSON, relative to repo root.",
+    )
+    parser.add_argument(
+        "--skill-evals-json-out",
+        default=".tmp/verify-release/skill-evals.json",
+        help="Output path for captured-run skill eval JSON, relative to repo root.",
     )
     parser.add_argument(
         "--export-fixture",

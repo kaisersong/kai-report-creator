@@ -247,6 +247,13 @@ clawhub install kai-report-creator
 git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/kai-report-creator
 ```
 
+### Release Downloads
+
+The current release is **v1.23.1**. Download source bundles from GitHub Releases:
+
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.23.1
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.23.1.zip
+
 ---
 
 ## Usage
@@ -346,6 +353,51 @@ Key files:
 - `evals/rubric.schema.json` — structured grader output contract
 - `evals/failure-map.md` — where to fix each layer when a case fails
 - `evals/cases/*` — source + IR artifacts for each case
+
+### Captured-Run Skill Evals
+
+`scripts/run-report-evals.py` checks repo-contained source/IR/HTML artifacts. It is a deterministic regression gate, not a full agent-run skill eval.
+
+For OpenAI-style skill evals, run the captured-run harness explicitly:
+
+```bash
+python scripts/run-skill-evals.py --runner codex --run-live --format json --json-out .tmp/skill-evals/results.json
+```
+
+The harness reads `evals/report-skill-prompts.csv`, stores raw/normalized traces under `evals/artifacts/current/skill-runs/`, and scores each case across four categories:
+
+- Outcome: report task completion and valid artifacts.
+- Process: skill flow, reference loading, guard validation, and HTML quality gate evidence from normalized runner metrics.
+- Style: template/theme/content conventions plus optional structured rubric grading.
+- Efficiency: shell command count, repeated failures, token budgets, and wall-clock budget.
+
+Use fixture mode for deterministic local tests without calling any live agent:
+
+```bash
+python scripts/run-skill-evals.py --runner fixture --format json
+```
+
+Saved baselines live under `evals/baselines/`. Compare a fresh run against the
+checked-in baseline before changing skill behavior:
+
+```bash
+python scripts/run-skill-evals.py --runner fixture \
+  --artifact-dir .tmp/check-skill-evals-fixture-artifacts \
+  --format json \
+  --json-out .tmp/check-skill-evals-fixture.json
+
+python scripts/compare-skill-eval-baseline.py \
+  --old evals/baselines/2026-05-17-skill-evals-fixture.json \
+  --new .tmp/check-skill-evals-fixture.json \
+  --format text
+```
+
+`evals/baselines/2026-05-17-baseline-summary.md` records the first saved scores:
+fixture mode passes 6/6 at 93.33 average, while the hardened Codex live baseline
+passes 0/6 at 64.5 average because incomplete timed-out runs are now gated by
+`runner.run_incomplete`.
+
+Codex is only the first live runner adapter. Other agents such as Claude Code or Qoder need their own trace adapter before they can be compared with the same prompt set and scoring rules.
 
 For complex reports, keep these IR frontmatter fields so evals can measure compression quality directly: `report_class`, `audience`, `decision_goal`, `must_include`, `must_avoid`.
 
@@ -564,6 +616,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 ---
 
 ## Version History
+
+**v1.23.1** — Captured-run skill eval release: add OpenAI-style skill eval prompts, fixture and Codex trace runners, normalized timeout handling, baseline comparison, saved fixture/live baselines, release-verification integration, and README guidance for comparing future skill changes against the saved scores.
 
 **v1.23.0** — Final HTML quality gate release: add `scripts/html_quality_gate.py` to validate rendered shell IDs, theme CSS fidelity, regular-lumen/fangsong typography and layout markers, and KPI values; require every KPI card to use a real quantitative value; remove forced placeholder KPIs from periodic reports; fix dark-board status KPI examples; and add regression coverage for the failure modes.
 

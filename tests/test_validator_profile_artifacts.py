@@ -71,3 +71,35 @@ def test_verify_release_includes_generated_file_cleanup():
     src = read("scripts/verify-release.py")
     assert "clean-generated" in src
     assert "cleanup-generated" in src
+
+
+def test_readmes_document_captured_run_skill_evals():
+    readme_en = read("README.md")
+    readme_zh = read("README.zh-CN.md")
+    for marker in [
+        "scripts/run-skill-evals.py",
+        "scripts/compare-skill-eval-baseline.py",
+        "evals/baselines/2026-05-17-skill-evals-fixture.json",
+        "--runner codex",
+        "--runner fixture",
+        "Outcome",
+        "Process",
+        "Style",
+        "Efficiency",
+        "v1.23.1",
+    ]:
+        assert marker in readme_en
+    for marker in [
+        "scripts/run-skill-evals.py",
+        "scripts/compare-skill-eval-baseline.py",
+        "evals/baselines/2026-05-17-skill-evals-fixture.json",
+        "--runner codex",
+        "--runner fixture",
+        "Outcome",
+        "Process",
+        "Style",
+        "Efficiency",
+        "四类目标",
+        "v1.23.1",
+    ]:
+        assert marker in readme_zh
