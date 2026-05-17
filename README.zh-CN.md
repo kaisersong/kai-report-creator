@@ -183,10 +183,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release 下载
 
-当前发布版本是 **v1.23.2**。可以从 GitHub Releases 下载源码包：
+当前发布版本是 **v1.23.3**。可以从 GitHub Releases 下载源码包：
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.23.2
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.23.2.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.23.3
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.23.3.zip
 
 ---
 
@@ -553,6 +553,8 @@ OpenClaw 会自动：
 ---
 
 ## 版本日志
+
+**v1.23.3** — No-agent eval gate 发布：release verification 默认使用 fixture skill eval，不依赖 Codex、Claude、Qoder、模型登录或网络；非 fixture runner 必须提供已记录 trace 或显式 live flag，否则直接拒绝。
 
 **v1.23.2** — Fixture rubric 完整性发布：新增正向 case 的 style rubric fixtures，要求 captured-run 结果必须 `eval_complete` 才能通过，comparator 开始比较完整性回归，并把 deterministic fixture 基线刷新为 6/6 通过、平均分 100.0、Style 25.0。
 

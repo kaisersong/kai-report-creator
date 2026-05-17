@@ -86,7 +86,7 @@ def test_readmes_document_captured_run_skill_evals():
         "Process",
         "Style",
         "Efficiency",
-        "v1.23.2",
+        "v1.23.3",
     ]:
         assert marker in readme_en
     for marker in [
@@ -100,6 +100,6 @@ def test_readmes_document_captured_run_skill_evals():
         "Style",
         "Efficiency",
         "四类目标",
-        "v1.23.2",
+        "v1.23.3",
     ]:
         assert marker in readme_zh

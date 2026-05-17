@@ -249,10 +249,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release Downloads
 
-The current release is **v1.23.2**. Download source bundles from GitHub Releases:
+The current release is **v1.23.3**. Download source bundles from GitHub Releases:
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.23.2
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.23.2.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.23.3
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.23.3.zip
 
 ---
 
@@ -630,6 +630,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 ---
 
 ## Version History
+
+**v1.23.3** — No-agent eval gate release: make release verification use fixture skill evals by default, document that skill evals do not require Codex/Claude/Qoder/model auth/network access, and reject non-fixture runners unless a recorded trace or explicit live flag is provided.
 
 **v1.23.2** — Complete fixture rubric release: add checked-in positive-case style rubrics, require `eval_complete` for green captured-run results, compare completeness regressions, and refresh the deterministic fixture baseline to 6/6 passing at 100.0 average with Style 25.0.
 
