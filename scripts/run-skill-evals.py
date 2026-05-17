@@ -42,8 +42,10 @@ class SkillEvalCase:
     case_id: str
     total_score: int
     passed: bool
+    eval_complete: bool
     scores: dict[str, int]
     failures: list[str]
+    style_rubric: dict[str, Any] | None
     metrics: dict[str, Any]
     artifact_dir: str
 
@@ -267,6 +269,65 @@ def html_text_for_case(root: Path, metrics: NormalizedTraceMetrics, artifact_dir
     return html_files[0].read_text(encoding="utf-8", errors="replace")
 
 
+def _display_path(root: Path, path: Path) -> str:
+    try:
+        return str(path.relative_to(root))
+    except ValueError:
+        return str(path)
+
+
+def default_style_rubric_fixture(root: Path, case_id: str) -> Path:
+    return root / "tests" / "fixtures" / "skill-evals" / f"{case_id}-style-rubric.json"
+
+
+def _validate_style_rubric(rubric: dict[str, Any], case_id: str) -> list[str]:
+    failures: list[str] = []
+    required = ["case_id", "overall_pass", "score", "checks", "summary"]
+    for key in required:
+        if key not in rubric:
+            failures.append(f"style.rubric_missing_{key}")
+
+    if rubric.get("case_id") != case_id:
+        failures.append("style.rubric_case_mismatch")
+    score = rubric.get("score")
+    if not isinstance(score, int) or score < 0 or score > 100:
+        failures.append("style.rubric_score_invalid")
+    if not isinstance(rubric.get("overall_pass"), bool):
+        failures.append("style.rubric_overall_pass_invalid")
+    checks = rubric.get("checks")
+    if not isinstance(checks, list) or len(checks) < 4:
+        failures.append("style.rubric_checks_invalid")
+    elif any(
+        not isinstance(check, dict)
+        or not isinstance(check.get("id"), str)
+        or not isinstance(check.get("pass"), bool)
+        or not isinstance(check.get("score"), int)
+        or not 1 <= check.get("score", 0) <= 5
+        or not isinstance(check.get("notes"), str)
+        or not check.get("notes", "").strip()
+        for check in checks
+    ):
+        failures.append("style.rubric_check_invalid")
+    if not isinstance(rubric.get("summary"), str) or not rubric.get("summary", "").strip():
+        failures.append("style.rubric_summary_invalid")
+    return failures
+
+
+def style_rubric_path_for_case(
+    root: Path,
+    case_id: str,
+    artifact_dir: Path,
+    allow_fixture_style_rubric: bool,
+) -> tuple[Path | None, str | None]:
+    artifact_path = artifact_dir / "style-rubric.json"
+    if artifact_path.exists():
+        return artifact_path, "artifact"
+    fixture_path = default_style_rubric_fixture(root, case_id)
+    if allow_fixture_style_rubric and fixture_path.exists():
+        return fixture_path, "fixture"
+    return None, None
+
+
 def score_outcome(
     root: Path,
     row: dict[str, str],
@@ -350,14 +411,15 @@ def score_style(
     row: dict[str, str],
     metrics: NormalizedTraceMetrics,
     artifact_dir: Path,
-) -> tuple[int, list[str]]:
+    allow_fixture_style_rubric: bool,
+) -> tuple[int, list[str], dict[str, Any] | None]:
     failures: list[str] = []
     if not bool_field(row, "should_trigger"):
-        return 25, []
+        return 25, [], None
 
     html_text = html_text_for_case(root, metrics, artifact_dir)
     if not html_text:
-        return 0, ["style.missing_html_artifact"]
+        return 0, ["style.missing_html_artifact"], None
 
     score = 0
     expected_theme = row.get("expected_theme", "").strip()
@@ -377,16 +439,34 @@ def score_style(
     else:
         failures.append("style.raw_ir_or_placeholder_text")
 
-    rubric_path = artifact_dir / "style-rubric.json"
-    if rubric_path.exists():
+    style_rubric = None
+    rubric_path, rubric_source = style_rubric_path_for_case(
+        root,
+        row["id"],
+        artifact_dir,
+        allow_fixture_style_rubric,
+    )
+    if rubric_path is not None and rubric_source is not None:
         rubric = json.loads(rubric_path.read_text(encoding="utf-8"))
-        score += round(int(rubric.get("score", 0)) * 10 / 100)
+        rubric_failures = _validate_style_rubric(rubric, row["id"])
+        if rubric_failures:
+            failures.extend(rubric_failures)
+            failures.append("eval.style_rubric_invalid")
+        else:
+            score += round(int(rubric.get("score", 0)) * 10 / 100)
+        style_rubric = {
+            "source": rubric_source,
+            "path": _display_path(root, rubric_path),
+            "score": int(rubric.get("score", 0)) if isinstance(rubric.get("score"), int) else None,
+            "overall_pass": bool(rubric.get("overall_pass")),
+        }
         if not rubric.get("overall_pass"):
             failures.append("style.rubric_needs_work")
     else:
         failures.append("style.rubric_missing")
+        failures.append("eval.style_rubric_missing")
 
-    return min(score, 25), failures
+    return min(score, 25), failures, style_rubric
 
 
 def score_efficiency(row: dict[str, str], metrics: NormalizedTraceMetrics) -> tuple[int, list[str]]:
@@ -525,6 +605,7 @@ def evaluate_case(
     normalized_trace: Path | None,
     raw_trace: Path | None,
     run_live: bool,
+    allow_fixture_style_rubric: bool,
 ) -> SkillEvalCase:
     case_id = row["id"]
     case_artifact_dir = artifact_root / case_id
@@ -536,7 +617,13 @@ def evaluate_case(
 
     outcome, outcome_failures = score_outcome(root, row, metrics, case_artifact_dir)
     process, process_failures = score_process(row, metrics)
-    style, style_failures = score_style(root, row, metrics, case_artifact_dir)
+    style, style_failures, style_rubric = score_style(
+        root,
+        row,
+        metrics,
+        case_artifact_dir,
+        allow_fixture_style_rubric,
+    )
     efficiency, efficiency_failures = score_efficiency(row, metrics)
     scores = {
         "outcome": outcome,
@@ -549,7 +636,8 @@ def evaluate_case(
     total_score = sum(scores.values())
     should_trigger = bool_field(row, "should_trigger")
     outcome_gate = outcome >= 20 if should_trigger else outcome == 25
-    passed = metrics.run_completed and outcome_gate and total_score >= 75 and not any(
+    eval_complete = metrics.run_completed and not any(failure.startswith("eval.") for failure in failures)
+    passed = eval_complete and outcome_gate and total_score >= 75 and not any(
         failure in {
             "outcome.negative_case_generated_report",
             "process.negative_case_used_report_generation_flow",
@@ -561,8 +649,10 @@ def evaluate_case(
         case_id=case_id,
         total_score=total_score,
         passed=passed,
+        eval_complete=eval_complete,
         scores=scores,
         failures=failures,
+        style_rubric=style_rubric,
         metrics=asdict(metrics),
         artifact_dir=str(case_artifact_dir),
     )
@@ -585,6 +675,7 @@ def build_payload(cases: list[SkillEvalCase]) -> dict[str, Any]:
             "total": len(cases),
             "passed": sum(1 for case in cases if case.passed),
             "failed": sum(1 for case in cases if not case.passed),
+            "incomplete": sum(1 for case in cases if not case.eval_complete),
             "average_score": round(sum(case.total_score for case in cases) / len(cases), 2) if cases else 0,
             "average_category_scores": {
                 category: round(sum(case.scores[category] for case in cases) / len(cases), 2) if cases else 0
@@ -604,6 +695,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--raw-trace", help="Normalize and score one raw runner trace for selected case(s).")
     parser.add_argument("--artifact-dir", default="evals/artifacts/current/skill-runs")
     parser.add_argument("--run-live", action="store_true", help="Invoke the selected live runner.")
+    parser.add_argument(
+        "--disable-fixture-style-rubric",
+        action="store_true",
+        help="Do not use checked-in style rubric fixtures when scoring fixture runs.",
+    )
     parser.add_argument("--format", choices=["text", "json"], default="text")
     parser.add_argument("--json-out", help="Optional JSON output path.")
     return parser.parse_args()
@@ -622,7 +718,16 @@ def main() -> int:
         raise SystemExit("--normalized-trace and --raw-trace require --case-id to select exactly one case")
 
     cases = [
-        evaluate_case(root, row, args.runner, artifact_root, normalized_trace, raw_trace, args.run_live)
+        evaluate_case(
+            root,
+            row,
+            args.runner,
+            artifact_root,
+            normalized_trace,
+            raw_trace,
+            args.run_live,
+            args.runner == "fixture" and not args.disable_fixture_style_rubric,
+        )
         for row in rows
     ]
     payload = build_payload(cases)

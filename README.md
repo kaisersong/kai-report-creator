@@ -249,10 +249,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release Downloads
 
-The current release is **v1.23.1**. Download source bundles from GitHub Releases:
+The current release is **v1.23.2**. Download source bundles from GitHub Releases:
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.23.1
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.23.1.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.23.2
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.23.2.zip
 
 ---
 
@@ -368,7 +368,7 @@ The harness reads `evals/report-skill-prompts.csv`, stores raw/normalized traces
 
 - Outcome: report task completion and valid artifacts.
 - Process: skill flow, reference loading, guard validation, and HTML quality gate evidence from normalized runner metrics.
-- Style: template/theme/content conventions plus optional structured rubric grading.
+- Style: template/theme/content conventions plus structured rubric grading for positive captured-run cases.
 - Efficiency: shell command count, repeated failures, token budgets, and wall-clock budget.
 
 Use fixture mode for deterministic local tests without calling any live agent:
@@ -376,6 +376,10 @@ Use fixture mode for deterministic local tests without calling any live agent:
 ```bash
 python scripts/run-skill-evals.py --runner fixture --format json
 ```
+
+Positive fixture cases use checked-in `tests/fixtures/skill-evals/*-style-rubric.json`.
+If a positive case has no rubric, the harness marks it `eval_complete: false`
+and fails the case instead of hiding the coverage gap behind a green score.
 
 Saved baselines live under `evals/baselines/`. Compare a fresh run against the
 checked-in baseline before changing skill behavior:
@@ -392,10 +396,12 @@ python scripts/compare-skill-eval-baseline.py \
   --format text
 ```
 
-`evals/baselines/2026-05-17-baseline-summary.md` records the first saved scores:
-fixture mode passes 6/6 at 93.33 average, while the hardened Codex live baseline
-passes 0/6 at 64.5 average because incomplete timed-out runs are now gated by
-`runner.run_incomplete`.
+`evals/baselines/2026-05-17-baseline-summary.md` records the saved scores:
+the deterministic fixture baseline passes 6/6 with `incomplete: 0`,
+`average_score: 100.0`, and Style `25.0`, while the hardened Codex live
+baseline passes 0/6 at 64.5 average because incomplete timed-out runs are gated
+by `runner.run_incomplete`. The comparator checks pass/fail state,
+`eval_complete`, total score, and each category score.
 
 Codex is only the first live runner adapter. Other agents such as Claude Code or Qoder need their own trace adapter before they can be compared with the same prompt set and scoring rules.
 
@@ -616,6 +622,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 ---
 
 ## Version History
+
+**v1.23.2** — Complete fixture rubric release: add checked-in positive-case style rubrics, require `eval_complete` for green captured-run results, compare completeness regressions, and refresh the deterministic fixture baseline to 6/6 passing at 100.0 average with Style 25.0.
 
 **v1.23.1** — Captured-run skill eval release: add OpenAI-style skill eval prompts, fixture and Codex trace runners, normalized timeout handling, baseline comparison, saved fixture/live baselines, release-verification integration, and README guidance for comparing future skill changes against the saved scores.
 

@@ -2,17 +2,22 @@
   "cases": [
     {
       "case_id": "explicit-generate",
-      "total_score": 90,
+      "total_score": 100,
       "passed": true,
+      "eval_complete": true,
       "scores": {
         "outcome": 25,
         "process": 25,
-        "style": 15,
+        "style": 25,
         "efficiency": 25
       },
-      "failures": [
-        "style.rubric_missing"
-      ],
+      "failures": [],
+      "style_rubric": {
+        "source": "fixture",
+        "path": "tests/fixtures/skill-evals/explicit-generate-style-rubric.json",
+        "score": 96,
+        "overall_pass": true
+      },
       "metrics": {
         "runner": "fixture",
         "trace_format_version": "normalized-v1",
@@ -51,17 +56,22 @@
     },
     {
       "case_id": "implicit-weekly-progress",
-      "total_score": 90,
+      "total_score": 100,
       "passed": true,
+      "eval_complete": true,
       "scores": {
         "outcome": 25,
         "process": 25,
-        "style": 15,
+        "style": 25,
         "efficiency": 25
       },
-      "failures": [
-        "style.rubric_missing"
-      ],
+      "failures": [],
+      "style_rubric": {
+        "source": "fixture",
+        "path": "tests/fixtures/skill-evals/implicit-weekly-progress-style-rubric.json",
+        "score": 95,
+        "overall_pass": true
+      },
       "metrics": {
         "runner": "fixture",
         "trace_format_version": "normalized-v1",
@@ -100,17 +110,22 @@
     },
     {
       "case_id": "contextual-research",
-      "total_score": 90,
+      "total_score": 100,
       "passed": true,
+      "eval_complete": true,
       "scores": {
         "outcome": 25,
         "process": 25,
-        "style": 15,
+        "style": 25,
         "efficiency": 25
       },
-      "failures": [
-        "style.rubric_missing"
-      ],
+      "failures": [],
+      "style_rubric": {
+        "source": "fixture",
+        "path": "tests/fixtures/skill-evals/contextual-research-style-rubric.json",
+        "score": 96,
+        "overall_pass": true
+      },
       "metrics": {
         "runner": "fixture",
         "trace_format_version": "normalized-v1",
@@ -149,17 +164,22 @@
     },
     {
       "case_id": "boundary-blueprint-report",
-      "total_score": 90,
+      "total_score": 100,
       "passed": true,
+      "eval_complete": true,
       "scores": {
         "outcome": 25,
         "process": 25,
-        "style": 15,
+        "style": 25,
         "efficiency": 25
       },
-      "failures": [
-        "style.rubric_missing"
-      ],
+      "failures": [],
+      "style_rubric": {
+        "source": "fixture",
+        "path": "tests/fixtures/skill-evals/boundary-blueprint-report-style-rubric.json",
+        "score": 95,
+        "overall_pass": true
+      },
       "metrics": {
         "runner": "fixture",
         "trace_format_version": "normalized-v1",
@@ -199,6 +219,7 @@
       "case_id": "negative-slide-deck",
       "total_score": 100,
       "passed": true,
+      "eval_complete": true,
       "scores": {
         "outcome": 25,
         "process": 25,
@@ -206,6 +227,7 @@
         "efficiency": 25
       },
       "failures": [],
+      "style_rubric": null,
       "metrics": {
         "runner": "fixture",
         "trace_format_version": "normalized-v1",
@@ -237,6 +259,7 @@
       "case_id": "negative-html-export",
       "total_score": 100,
       "passed": true,
+      "eval_complete": true,
       "scores": {
         "outcome": 25,
         "process": 25,
@@ -244,6 +267,7 @@
         "efficiency": 25
       },
       "failures": [],
+      "style_rubric": null,
       "metrics": {
         "runner": "fixture",
         "trace_format_version": "normalized-v1",
@@ -276,11 +300,12 @@
     "total": 6,
     "passed": 6,
     "failed": 0,
-    "average_score": 93.33,
+    "incomplete": 0,
+    "average_score": 100.0,
     "average_category_scores": {
       "outcome": 25.0,
       "process": 25.0,
-      "style": 18.33,
+      "style": 25.0,
       "efficiency": 25.0
     }
   }

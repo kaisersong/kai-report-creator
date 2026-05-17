@@ -183,10 +183,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release 下载
 
-当前发布版本是 **v1.23.1**。可以从 GitHub Releases 下载源码包：
+当前发布版本是 **v1.23.2**。可以从 GitHub Releases 下载源码包：
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.23.1
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.23.1.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.23.2
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.23.2.zip
 
 ---
 
@@ -300,7 +300,7 @@ python scripts/run-skill-evals.py --runner codex --run-live --format json --json
 
 - Outcome：任务是否完成，报告工件是否有效。
 - Process：是否按 skill 流程读取 reference、运行 guard validation 和 HTML quality gate。
-- Style：是否符合模板、主题、内容和异步阅读约定，可接入结构化 rubric。
+- Style：是否符合模板、主题、内容和异步阅读约定；正向 captured-run case 必须接入结构化 rubric。
 - Efficiency：shell 命令数量、重复失败、token 预算和总耗时。
 
 本地单元测试使用 fixture runner，不会真实调用任何 agent：
@@ -308,6 +308,9 @@ python scripts/run-skill-evals.py --runner codex --run-live --format json --json
 ```bash
 python scripts/run-skill-evals.py --runner fixture --format json
 ```
+
+正向 fixture case 使用仓库内的 `tests/fixtures/skill-evals/*-style-rubric.json`。
+如果缺 rubric，harness 会把 case 标成 `eval_complete: false` 并失败，不再用绿色分数掩盖覆盖缺口。
 
 已保存的基线放在 `evals/baselines/`。后续修改 skill 行为前，先用新结果和基线比较：
 
@@ -323,10 +326,11 @@ python scripts/compare-skill-eval-baseline.py \
   --format text
 ```
 
-`evals/baselines/2026-05-17-baseline-summary.md` 记录了第一版保存分数：
-fixture runner 为 6/6 通过，平均分 93.33；加固后的 Codex live 基线为
-0/6 通过，平均分 64.5，因为超时未完成的运行会被 `runner.run_incomplete`
-硬门禁拦下。
+`evals/baselines/2026-05-17-baseline-summary.md` 记录了保存分数：
+确定性的 fixture baseline 为 6/6 通过，`incomplete: 0`，平均分
+`100.0`，Style `25.0`；加固后的 Codex live 基线为 0/6 通过，平均分
+64.5，因为超时未完成的运行会被 `runner.run_incomplete` 硬门禁拦下。
+comparator 会比较 pass 状态、`eval_complete`、总分和四个分类分数。
 
 Codex 只是第一个 live runner adapter。Claude Code、Qoder 或其他 agent 要参与横向比较，必须先补自己的 trace adapter，不能复用 Codex 的事件格式。
 
@@ -545,6 +549,8 @@ OpenClaw 会自动：
 ---
 
 ## 版本日志
+
+**v1.23.2** — Fixture rubric 完整性发布：新增正向 case 的 style rubric fixtures，要求 captured-run 结果必须 `eval_complete` 才能通过，comparator 开始比较完整性回归，并把 deterministic fixture 基线刷新为 6/6 通过、平均分 100.0、Style 25.0。
 
 **v1.23.1** — Captured-run skill eval 发布：新增 OpenAI-style skill eval prompts、fixture 与 Codex trace runners、超时 partial trace 归一化、baseline comparator、已保存的 fixture/live 基线、release verification 集成，并在 README 中写清如何用基线分数比较后续 skill 修改。
 

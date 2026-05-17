@@ -17,10 +17,10 @@ scorer, prompt manifest, or fixture metrics intentionally change.
 
 | Case | Total | Outcome | Process | Style | Efficiency | Pass |
 |------|-------|---------|---------|-------|------------|------|
-| explicit-generate | 90 | 25 | 25 | 15 | 25 | yes |
-| implicit-weekly-progress | 90 | 25 | 25 | 15 | 25 | yes |
-| contextual-research | 90 | 25 | 25 | 15 | 25 | yes |
-| boundary-blueprint-report | 90 | 25 | 25 | 15 | 25 | yes |
+| explicit-generate | 100 | 25 | 25 | 25 | 25 | yes |
+| implicit-weekly-progress | 100 | 25 | 25 | 25 | 25 | yes |
+| contextual-research | 100 | 25 | 25 | 25 | 25 | yes |
+| boundary-blueprint-report | 100 | 25 | 25 | 25 | 25 | yes |
 | negative-slide-deck | 100 | 25 | 25 | 25 | 25 | yes |
 | negative-html-export | 100 | 25 | 25 | 25 | 25 | yes |
 
@@ -29,12 +29,14 @@ Summary:
 - Total: 6
 - Passed: 6
 - Failed: 0
-- Average score: 93.33
-- Average category scores: Outcome 25.0, Process 25.0, Style 18.33, Efficiency 25.0
+- Incomplete: 0
+- Average score: 100.0
+- Average category scores: Outcome 25.0, Process 25.0, Style 25.0, Efficiency 25.0
 
-The positive cases intentionally score Style 15/25 because no
-model-assisted `style-rubric.json` is present. The scorer records
-`style.rubric_missing` instead of treating fixture mode as a full style grade.
+Positive fixture cases now use checked-in `*-style-rubric.json` files. If a
+positive case has no style rubric, the scorer records `style.rubric_missing`
+and `eval.style_rubric_missing`, marks the case `eval_complete: false`, and
+fails the eval instead of hiding the coverage gap behind a green score.
 
 ## Captured-Run Skill Evals: Codex Live Runner
 

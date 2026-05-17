@@ -34,6 +34,7 @@ def summary_delta(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
         "total": numeric_delta(new_summary.get("total"), old_summary.get("total")),
         "passed": numeric_delta(new_summary.get("passed"), old_summary.get("passed")),
         "failed": numeric_delta(new_summary.get("failed"), old_summary.get("failed")),
+        "incomplete": numeric_delta(new_summary.get("incomplete"), old_summary.get("incomplete")),
         "average_score": numeric_delta(new_summary.get("average_score"), old_summary.get("average_score")),
         "average_category_scores": {
             category: numeric_delta(new_categories.get(category), old_categories.get(category))
@@ -67,12 +68,14 @@ def compare_cases(old: dict[str, Any], new: dict[str, Any]) -> tuple[list[dict[s
         }
         total_delta = numeric_delta(new_case.get("total_score"), old_case.get("total_score"))
         pass_delta = int(bool(new_case.get("passed"))) - int(bool(old_case.get("passed")))
+        complete_delta = int(bool(new_case.get("eval_complete", True))) - int(bool(old_case.get("eval_complete", True)))
         case_deltas.append(
             {
                 "case_id": case_id,
                 "status": "compared",
                 "total_score": total_delta,
                 "passed": pass_delta,
+                "eval_complete": complete_delta,
                 "scores": category_deltas,
                 "old_failures": old_case.get("failures", []),
                 "new_failures": new_case.get("failures", []),
@@ -81,6 +84,8 @@ def compare_cases(old: dict[str, Any], new: dict[str, Any]) -> tuple[list[dict[s
 
         if old_case.get("passed") and not new_case.get("passed"):
             regressions.append(f"case.{case_id}.pass_regressed")
+        if old_case.get("eval_complete", True) and not new_case.get("eval_complete", True):
+            regressions.append(f"case.{case_id}.completeness_regressed")
         if total_delta < 0:
             regressions.append(f"case.{case_id}.score_regressed")
         for category, delta in category_deltas.items():
@@ -118,7 +123,12 @@ def main() -> int:
             if case["status"] != "compared":
                 print(f"{case['status'].upper()} {case['case_id']}")
                 continue
-            print(f"{case['case_id']}: score {case['total_score']:+}, pass {case['passed']:+}")
+            print(
+                f"{case['case_id']}: "
+                f"score {case['total_score']:+}, "
+                f"pass {case['passed']:+}, "
+                f"complete {case['eval_complete']:+}"
+            )
         if payload["regressions"]:
             print("Regressions:")
             for regression in payload["regressions"]:
