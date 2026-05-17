@@ -51,9 +51,24 @@ def resolve(root: Path, relative_path: str) -> Path:
     return (root / relative_path).resolve()
 
 
+def validate_skill_eval_args(args: argparse.Namespace) -> None:
+    if not args.include_skill_evals:
+        return
+    if args.skill_evals_runner == "fixture":
+        return
+    if args.skill_evals_normalized_trace or args.skill_evals_raw_trace or args.skill_evals_run_live:
+        return
+    raise SystemExit(
+        f"--skill-evals-runner {args.skill_evals_runner!r} requires "
+        "--skill-evals-raw-trace, --skill-evals-normalized-trace, or --skill-evals-run-live"
+    )
+
+
 def build_steps(root: Path, args: argparse.Namespace) -> list[Step]:
     python = sys.executable
     steps: list[Step] = []
+
+    validate_skill_eval_args(args)
 
     if not args.skip_cleanup:
         steps.append(
@@ -124,7 +139,9 @@ def build_steps(root: Path, args: argparse.Namespace) -> list[Step]:
             command.extend(["--case-id", args.skill_evals_case_id])
         if args.skill_evals_normalized_trace:
             command.extend(["--normalized-trace", str(resolve(root, args.skill_evals_normalized_trace))])
-        else:
+        if args.skill_evals_raw_trace:
+            command.extend(["--raw-trace", str(resolve(root, args.skill_evals_raw_trace))])
+        if args.skill_evals_run_live:
             command.append("--run-live")
         steps.append(
             Step(
@@ -273,10 +290,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-doc-sync", action="store_true", help="Skip check-doc-sync.py.")
     parser.add_argument("--skip-export-smoke", action="store_true", help="Skip the screenshot export smoke check.")
     parser.add_argument("--skip-cleanup", action="store_true", help="Skip generated cache cleanup before/after verification.")
-    parser.add_argument("--include-skill-evals", action="store_true", help="Run captured-run skill evals. This may invoke a live agent runner.")
-    parser.add_argument("--skill-evals-runner", default="codex", help="Skill eval runner: fixture, codex, or a future verified adapter.")
+    parser.add_argument("--include-skill-evals", action="store_true", help="Run captured-run skill evals from fixtures or recorded traces.")
+    parser.add_argument("--skill-evals-runner", default="fixture", help="Skill eval runner: fixture, codex trace replay, or a future verified adapter.")
     parser.add_argument("--skill-evals-case-id", help="Run one captured-run skill eval case.")
     parser.add_argument("--skill-evals-normalized-trace", help="Use one normalized trace fixture for selected skill eval cases.")
+    parser.add_argument("--skill-evals-raw-trace", help="Use one recorded raw runner trace for the selected skill eval case.")
+    parser.add_argument(
+        "--skill-evals-run-live",
+        action="store_true",
+        help="Manually invoke the selected live runner. Not used by default release verification.",
+    )
     parser.add_argument("--basetemp", default=".tmp/pytest", help="Pytest base temp path relative to repo root.")
     parser.add_argument(
         "--packet-dir",

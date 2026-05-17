@@ -16,7 +16,7 @@ Observed Codex JSONL shape:
 - Token usage appears on `turn.completed` as `usage.input_tokens` and
   `usage.output_tokens`.
 - Runner warnings can come from `item.type == "error"` events or from a nonzero
-  live `codex exec` return code.
+  return code in a manually captured `codex exec` trace.
 
 Normalized fixture files use the runner-agnostic `normalized-v1` schema. Unit
 tests should score these normalized metrics directly so ordinary pytest never

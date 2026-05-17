@@ -290,23 +290,23 @@ python scripts/run-report-evals.py --root . --packet-dir .tmp/eval-packets
 
 `scripts/run-report-evals.py` 检查 repo 内已有的 source/IR/HTML 工件。它是 deterministic regression gate，不是完整的 agent-run skill eval。
 
-按 OpenAI eval-skills 的四类目标评测时，显式运行 captured-run harness：
+按 OpenAI eval-skills 的四类目标评测时，使用 checked-in fixture 或已捕获 trace 运行 captured-run harness：
 
 ```bash
-python scripts/run-skill-evals.py --runner codex --run-live --format json --json-out .tmp/skill-evals/results.json
+python scripts/run-skill-evals.py --runner fixture --format json --json-out .tmp/skill-evals/results.json
 ```
 
-该命令读取 `evals/report-skill-prompts.csv`，把原始 trace 和归一化 metrics 保存到 `evals/artifacts/current/skill-runs/`，并按四类目标评分：
+该命令读取 `evals/report-skill-prompts.csv`，默认回放确定性的 fixture metrics，并按四类目标评分：
 
 - Outcome：任务是否完成，报告工件是否有效。
 - Process：是否按 skill 流程读取 reference、运行 guard validation 和 HTML quality gate。
 - Style：是否符合模板、主题、内容和异步阅读约定；正向 captured-run case 必须接入结构化 rubric。
 - Efficiency：shell 命令数量、重复失败、token 预算和总耗时。
 
-本地单元测试使用 fixture runner，不会真实调用任何 agent：
+release verification 默认也使用 fixture runner，因此不依赖 Codex、Claude、Qoder、网络、模型登录或任何 live agent 环境：
 
 ```bash
-python scripts/run-skill-evals.py --runner fixture --format json
+python scripts/verify-release.py --include-skill-evals
 ```
 
 正向 fixture case 使用仓库内的 `tests/fixtures/skill-evals/*-style-rubric.json`。
@@ -328,11 +328,15 @@ python scripts/compare-skill-eval-baseline.py \
 
 `evals/baselines/2026-05-17-baseline-summary.md` 记录了保存分数：
 确定性的 fixture baseline 为 6/6 通过，`incomplete: 0`，平均分
-`100.0`，Style `25.0`；加固后的 Codex live 基线为 0/6 通过，平均分
-64.5，因为超时未完成的运行会被 `runner.run_incomplete` 硬门禁拦下。
+`100.0`，Style `25.0`；加固后的 Codex live 基线只是一次手动 runner
+采样的归档证据，不属于默认 release verification。
 comparator 会比较 pass 状态、`eval_complete`、总分和四个分类分数。
 
-Codex 只是第一个 live runner adapter。Claude Code、Qoder 或其他 agent 要参与横向比较，必须先补自己的 trace adapter，不能复用 Codex 的事件格式。
+如果确实要做 live 采样，必须显式打开，因为它依赖本机 runner 环境：
+
+```bash
+python scripts/run-skill-evals.py --runner codex --run-live --format json --json-out .tmp/skill-evals/codex-live.json
+```
 
 对复杂报告，建议在 IR frontmatter 里保留这些字段，方便直接评估压缩质量：`report_class`、`audience`、`decision_goal`、`must_include`、`must_avoid`。
 

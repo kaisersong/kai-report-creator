@@ -40,8 +40,8 @@ fails the eval instead of hiding the coverage gap behind a green score.
 
 ## Captured-Run Skill Evals: Codex Live Runner
 
-Live runner baseline records the current behavior of `codex exec` under the
-harness. It is not green today.
+Live runner baseline records one manual `codex exec` sample under the harness.
+It is archival evidence, not part of default release verification.
 
 This file was refreshed after runner hardening: the harness now passes the eval
 prompt through stdin with `codex exec ... -`, parses partial JSONL traces on
@@ -106,7 +106,11 @@ Dominant runner warnings:
 
 ```bash
 python3 scripts/run-skill-evals.py --runner fixture --artifact-dir .tmp/baseline-skill-evals-fixture-artifacts --format json --json-out evals/baselines/2026-05-17-skill-evals-fixture.json
-python3 scripts/run-skill-evals.py --runner codex --run-live --format json --json-out evals/baselines/2026-05-17-skill-evals-codex-live.json --artifact-dir evals/artifacts/current/skill-runs-baseline-2026-05-17
 python3 scripts/run-report-evals.py --root . --format json --json-out evals/baselines/2026-05-17-report-evals.json --packet-dir .tmp/baseline-report-eval-packets
 python3 scripts/run-late-context-evals.py --root . --format json --json-out evals/baselines/2026-05-17-late-context-evals.json
 ```
+
+Manual live sampling is intentionally excluded from the deterministic re-run
+commands. If a maintainer wants to refresh the archival Codex sample, run
+`python3 scripts/run-skill-evals.py --runner codex --run-live ...` explicitly
+outside the release gate.

@@ -358,23 +358,26 @@ Key files:
 
 `scripts/run-report-evals.py` checks repo-contained source/IR/HTML artifacts. It is a deterministic regression gate, not a full agent-run skill eval.
 
-For OpenAI-style skill evals, run the captured-run harness explicitly:
+For OpenAI-style skill evals, run the captured-run harness against checked-in
+fixtures or recorded traces:
 
 ```bash
-python scripts/run-skill-evals.py --runner codex --run-live --format json --json-out .tmp/skill-evals/results.json
+python scripts/run-skill-evals.py --runner fixture --format json --json-out .tmp/skill-evals/results.json
 ```
 
-The harness reads `evals/report-skill-prompts.csv`, stores raw/normalized traces under `evals/artifacts/current/skill-runs/`, and scores each case across four categories:
+The harness reads `evals/report-skill-prompts.csv`, replays deterministic
+fixture metrics by default, and scores each case across four categories:
 
 - Outcome: report task completion and valid artifacts.
 - Process: skill flow, reference loading, guard validation, and HTML quality gate evidence from normalized runner metrics.
 - Style: template/theme/content conventions plus structured rubric grading for positive captured-run cases.
 - Efficiency: shell command count, repeated failures, token budgets, and wall-clock budget.
 
-Use fixture mode for deterministic local tests without calling any live agent:
+Release verification also uses fixture mode by default, so it does not require
+Codex, Claude, Qoder, network access, model auth, or any live agent environment:
 
 ```bash
-python scripts/run-skill-evals.py --runner fixture --format json
+python scripts/verify-release.py --include-skill-evals
 ```
 
 Positive fixture cases use checked-in `tests/fixtures/skill-evals/*-style-rubric.json`.
@@ -399,11 +402,16 @@ python scripts/compare-skill-eval-baseline.py \
 `evals/baselines/2026-05-17-baseline-summary.md` records the saved scores:
 the deterministic fixture baseline passes 6/6 with `incomplete: 0`,
 `average_score: 100.0`, and Style `25.0`, while the hardened Codex live
-baseline passes 0/6 at 64.5 average because incomplete timed-out runs are gated
-by `runner.run_incomplete`. The comparator checks pass/fail state,
+baseline is archival evidence of one manual runner sample. It is not part of
+default release verification. The comparator checks pass/fail state,
 `eval_complete`, total score, and each category score.
 
-Codex is only the first live runner adapter. Other agents such as Claude Code or Qoder need their own trace adapter before they can be compared with the same prompt set and scoring rules.
+Manual live sampling is still possible, but it must be explicit because it
+depends on the local runner environment:
+
+```bash
+python scripts/run-skill-evals.py --runner codex --run-live --format json --json-out .tmp/skill-evals/codex-live.json
+```
 
 For complex reports, keep these IR frontmatter fields so evals can measure compression quality directly: `report_class`, `audience`, `decision_goal`, `must_include`, `must_avoid`.
 
