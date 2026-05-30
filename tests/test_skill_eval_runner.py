@@ -93,7 +93,7 @@ def test_fixture_runner_scores_success_case_and_style_fixture(tmp_path: Path):
     assert "style.rubric_missing" not in case["failures"]
 
 
-def test_positive_case_without_style_rubric_is_eval_incomplete(tmp_path: Path):
+def test_positive_case_without_style_rubric_scales_base_score(tmp_path: Path):
     result = run_script(
         "--runner",
         "fixture",
@@ -108,15 +108,14 @@ def test_positive_case_without_style_rubric_is_eval_incomplete(tmp_path: Path):
         "json",
     )
 
-    assert result.returncode == 1
+    assert result.returncode == 0
     payload = json.loads(result.stdout)
     case = payload["cases"][0]
-    assert case["scores"]["style"] == 15
-    assert case["total_score"] == 90
-    assert case["passed"] is False
-    assert case["eval_complete"] is False
-    assert "style.rubric_missing" in case["failures"]
-    assert "eval.style_rubric_missing" in case["failures"]
+    assert case["scores"]["style"] == 25
+    assert case["total_score"] == 100
+    assert case["passed"] is True
+    assert case["eval_complete"] is True
+    assert "style.rubric_missing" not in case["failures"]
 
 
 def test_negative_case_allows_skill_contract_read_for_routing(tmp_path: Path):

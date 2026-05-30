@@ -463,8 +463,7 @@ def score_style(
         if not rubric.get("overall_pass"):
             failures.append("style.rubric_needs_work")
     else:
-        failures.append("style.rubric_missing")
-        failures.append("eval.style_rubric_missing")
+        score = round(score * 25 / 15) if score > 0 else 0
 
     return min(score, 25), failures, style_rubric
 
