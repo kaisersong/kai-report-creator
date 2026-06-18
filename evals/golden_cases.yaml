@@ -96,3 +96,11 @@ cases:
     expected:
       max_lines: 320
       delegates_to: [references, scripts, tests]
+
+  - id: jsonld-contract-zh
+    type: shell-contract
+    source: references/output-metadata.md
+    expected:
+      required_fields: ["@context", "@type", "name", "inLanguage", "creator", "additionalProperty"]
+      metadataVersion: "1"
+      position: after-title-before-style

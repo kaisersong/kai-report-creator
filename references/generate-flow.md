@@ -11,6 +11,6 @@ Steps for `--generate` mode:
    - If a block is invalid, apply its `auto_downgrade_target` (`kpi -> callout`, `chart -> table`, `timeline -> list`, `diagram -> callout`) and mention the downgrade.
 5. Render components using `references/rendering-rules.md`, `references/design-quality.md`, and the path-specific `references/rendering/*.md` files selected from the IR.
 6. Build the standard shell from `references/html-shell-template.md` plus all `references/html-shell/*.md`; follow Shell metadata, version/theme metadata, export completeness, and the duplicate-date guard.
-7. Compute and embed `<meta name="ir-hash" content="sha256:[ir-hash]">` from the exact IR text, not the file path.
+7. Compute and embed `<meta name="ir-hash" content="sha256:[ir-hash]">` from the exact IR text, not the file path. Then emit `<script type="application/ld+json">` per `references/output-metadata.md` field contract (after `<title>`, before `<style>`); the ir-hash hex16 feeds both `@id` and `irHash` PropertyValue.
 8. Assemble CSS through `references/theme-css.md`: theme before-marker, shared CSS, theme post-shared override, TOC/shell CSS, frontmatter overrides.
 Steps 9-12 (quality gates) are defined in SKILL.md and always run after these setup steps.

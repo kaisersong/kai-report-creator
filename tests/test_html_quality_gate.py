@@ -69,7 +69,7 @@ def test_html_quality_gate_rejects_placeholder_and_status_kpi_values():
 
 def test_html_quality_gate_accepts_regular_lumen_theme_fidelity_without_shell_check():
     html = (ROOT / "templates" / "zh" / "regular-lumen.html").read_text(encoding="utf-8")
-    report = validate_html_text(html, standard_shell=False)
+    report = validate_html_text(html, standard_shell=False, jsonld_check=False)
 
     assert report["status"] == "valid"
 
@@ -86,6 +86,6 @@ def test_html_quality_gate_accepts_fangsong_theme_fidelity_without_shell_check()
 </html>
 """.strip()
 
-    report = validate_html_text(html, standard_shell=False)
+    report = validate_html_text(html, standard_shell=False, jsonld_check=False)
 
     assert report["status"] == "valid"

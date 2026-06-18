@@ -183,10 +183,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release 下载
 
-当前发布版本是 **v1.23.3**。可以从 GitHub Releases 下载源码包：
+当前发布版本是 **v1.24.0**。可以从 GitHub Releases 下载源码包：
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.23.3
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.23.3.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.24.0
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.24.0.zip
 
 ---
 
@@ -553,6 +553,8 @@ OpenClaw 会自动：
 ---
 
 ## 版本日志
+
+**v1.24.0** — JSON-LD 结构化元数据发布：每个渲染 HTML 嵌入 `<script type="application/ld+json">` schema.org Report 元数据（name、inLanguage、creator、theme、metadataVersion、irHash）；新增 `references/output-metadata.md` 字段契约；quality gate 新增 JSON-LD 验证（位置、转义、必填字段、hash 一致性、propertyID 白名单）；eval 新增 `jsonld` 维度；canonical templates 加入 JSON-LD；34 个新单元测试；跨 repo hash 计算标准化。
 
 **v1.23.3** — No-agent eval gate 发布：release verification 默认使用 fixture skill eval，不依赖 Codex、Claude、Qoder、模型登录或网络；非 fixture runner 必须提供已记录 trace 或显式 live flag，否则直接拒绝。
 

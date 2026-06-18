@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: Use when the user wants to CREATE or GENERATE a report, business summary, data dashboard, or research doc — 报告/数据看板/商业报告/研究文档/KPI仪表盘. Handles Chinese and English equally. Supports generating from raw notes, data, URLs, or an approved plan file. Use for --plan (structure first), --generate (render to HTML), --review (one-pass automatic refinement), --themes (preview styles), --from FILE, --bundle, --export-image flags. Does NOT apply to exporting finished HTML to PPTX/PNG (use kai-html-export) or creating slide decks (use kai-slide-creator).
-version: 1.23.3
+version: 1.24.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -47,7 +47,7 @@ Load reference files minimally by route; do not read every reference by default.
 | Route | Always load | Conditional load |
 |-------|-------------|------------------|
 | `--plan` | `references/spec-loading-matrix.md`, `references/plan-flow.md`, `references/theme-routing.md` | `references/regular-report-content-rules.md` for periodic reports |
-| `--generate` | `references/generate-flow.md`, `references/html-shell-template.md` + every `references/html-shell/*.md`, `references/theme-css.md`, `references/review-checklist.md` | `references/rendering-rules.md` then only the `references/rendering/*.md` files required by the IR; `references/anti-patterns.md` for visual anchors; `references/diagram-decision-rules.md` for diagrams; `references/regular-report-content-rules.md` for periodic reports |
+| `--generate` | `references/generate-flow.md`, `references/html-shell-template.md` + every `references/html-shell/*.md`, `references/theme-css.md`, `references/review-checklist.md`, `references/output-metadata.md` | `references/rendering-rules.md` then only the `references/rendering/*.md` files required by the IR; `references/anti-patterns.md` for visual anchors; `references/diagram-decision-rules.md` for diagrams; `references/regular-report-content-rules.md` for periodic reports |
 | `--review` | `references/review-checklist.md` | `references/review-report-template.md` if a structured change summary is requested |
 | custom theme/template | `references/theme-css.md`, `references/toc-and-template.md` | custom theme `reference.md` or `theme.css` |
 
@@ -107,7 +107,7 @@ Then run these quality gates in sequence — do not skip:
    - timeline dates are real time markers
    - no U+FE0F
    - no `text-align: justify`, black-background flood, body letter-spacing > `0.05em`, or mobile-hidden critical controls
-10. Run the final HTML quality gate with `scripts/html_quality_gate.py` on the rendered HTML. It must pass standard shell IDs, theme fidelity, and KPI value checks. If it fails, fix the HTML and rerun it before reporting success.
+10. Run the final HTML quality gate with `scripts/html_quality_gate.py` on the rendered HTML. It must pass standard shell IDs, theme fidelity, KPI value checks, and JSON-LD metadata checks. If it fails, fix the HTML and rerun until it passes before reporting success. For JSON-LD failures: regenerate from `references/output-metadata.md` field contract.
 11. Run L2 shell checks. Required: `data-template="kai-report-creator"`, `data-version`, `data-theme`, `id="toc-toggle-btn"`, `id="toc-sidebar"`, `id="card-mode-btn"`, `id="sc-overlay"`, `id="export-btn"`, `id="export-menu"`, `id="export-print"`, `id="export-png-desktop"`, `id="export-png-mobile"`, `id="export-im-share"`, `id="report-summary"`, plus the JS bindings for print/desktop/mobile/IM export. If any export item or binding is missing, rebuild the whole export block from `references/html-shell/export.md`.
 12. Run the silent final review pass from `references/review-checklist.md`, then write the HTML and report the path.
 
@@ -142,6 +142,10 @@ Generate complete self-contained HTML. Shell entry contract: `references/html-sh
 All scripts are inline in the shell template. Never load nonexistent files such as `templates/scripts/*.js`.
 
 For custom templates and TOC slug rules, use `references/toc-and-template.md`.
+
+## Output Metadata Contract
+
+Every rendered HTML embeds `<script type="application/ld+json">` in `<head>` (after `<title>`, before `<style>`). Field contract: `references/output-metadata.md`. Required fields: `@context`, `@type: "Report"`, `name`, `inLanguage`, `creator`, `additionalProperty` with `metadataVersion: "1"`. When `<meta name="ir-hash">` is present, also emit `@id` and `irHash` PropertyValue using the bare hex16 (no `sha256:` prefix). The quality gate (`scripts/html_quality_gate.py --no-jsonld-check` to skip) validates all fields, position, escaping, and hash parity.
 
 ## Final Output
 

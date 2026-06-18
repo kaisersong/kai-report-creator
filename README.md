@@ -249,10 +249,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release Downloads
 
-The current release is **v1.23.3**. Download source bundles from GitHub Releases:
+The current release is **v1.24.0**. Download source bundles from GitHub Releases:
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.23.3
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.23.3.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.24.0
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.24.0.zip
 
 ---
 
@@ -343,7 +343,7 @@ python scripts/run-report-evals.py --root . --packet-dir .tmp/eval-packets
 
 What it does:
 
-- Runs deterministic checks for `compression`, `ir_contract`, and `render_integrity`
+- Runs deterministic checks for `compression`, `ir_contract`, `render_integrity`, and `jsonld`
 - Emits rubric-ready JSON packets for `async_readability` instead of hiding quality behind vibes
 - Uses repo-contained cases from `evals/report-cases.csv`
 
@@ -630,6 +630,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 ---
 
 ## Version History
+
+**v1.24.0** — JSON-LD structured metadata release: every rendered HTML now embeds `<script type="application/ld+json">` with schema.org Report metadata (name, inLanguage, creator, theme, metadataVersion, irHash); add `references/output-metadata.md` field contract; add quality gate JSON-LD validation (position, escaping, required fields, hash parity, propertyID allow-list); add `jsonld` eval dimension; update canonical templates with JSON-LD; 34 new JSON-LD unit tests; normalize IR hash computation for cross-repo parity.
 
 **v1.23.3** — No-agent eval gate release: make release verification use fixture skill evals by default, document that skill evals do not require Codex/Claude/Qoder/model auth/network access, and reject non-fixture runners unless a recorded trace or explicit live flag is provided.
 

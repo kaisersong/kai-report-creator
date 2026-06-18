@@ -17,6 +17,7 @@ if str(ROOT) not in sys.path:
 
 from evals.contract_checks import (  # noqa: E402
     RECOMMENDED_FRONTMATTER_FIELDS,
+    check_jsonld_present,
     collect_heading_lines,
     component_counts,
     iter_blocks,
@@ -161,6 +162,16 @@ def check_render_integrity(html_text: str) -> list[LayerCheck]:
     return checks
 
 
+def check_jsonld_integrity(html_text: str) -> list[LayerCheck]:
+    validation = check_jsonld_present(html_text)
+    status = validation["status"]
+    if status == "valid":
+        return [LayerCheck(layer="jsonld", ok=True, detail="JSON-LD metadata valid")]
+    if status == "missing":
+        return [LayerCheck(layer="jsonld", ok=True, detail="JSON-LD metadata absent (advisory)")]
+    return [LayerCheck(layer="jsonld", ok=False, detail="JSON-LD metadata present but invalid")]
+
+
 def build_rubric_packet(
     case: dict[str, str],
     frontmatter: dict[str, object],
@@ -201,6 +212,7 @@ def evaluate_case(root: Path, case: dict[str, str], packet_dir: Path | None) -> 
     ir_checks, counts, headings = check_ir_contract(case, ir_text)
     checks.extend(ir_checks)
     checks.extend(check_render_integrity(html_text))
+    checks.extend(check_jsonld_integrity(html_text))
 
     packet_path: str | None = None
     rubric_ready = bool(frontmatter) and bool(headings)

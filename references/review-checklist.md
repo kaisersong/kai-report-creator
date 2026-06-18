@@ -79,6 +79,14 @@ An export menu with only some items still fails.
 
 **Fallback:** None. This is a shell integrity failure.
 
+### 0.6 JSON-LD Metadata
+
+**Trigger:** Every generated HTML report.
+
+**Detection:** Run `scripts/html_quality_gate.py` JSON-LD checks. Fails if: missing `<script type="application/ld+json">` in `<head>`, wrong position, invalid JSON, missing required fields, hash parity mismatch, or unallowed propertyIDs.
+
+**Auto-fix:** Regenerate the JSON-LD block from `references/output-metadata.md` field contract using frontmatter values. Place after `<title>`, before first `<style>`. Escape `</` as `<\/`.
+
 ## Category 1: Hard Rules
 
 These rules are deterministic enough to apply automatically.

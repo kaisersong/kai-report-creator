@@ -267,6 +267,18 @@ def validate_block(block: IRBlock, report_class: str) -> dict[str, str]:
     return result("valid")
 
 
+def check_jsonld_present(html: str) -> dict[str, str]:
+    from scripts.html_quality_gate import check_jsonld
+
+    findings = check_jsonld(html)
+    if not findings:
+        return result("valid")
+    codes = [f.code for f in findings]
+    if any(c == "jsonld.missing" for c in codes):
+        return result("missing")
+    return result("invalid")
+
+
 def collect_heading_lines(source: str) -> list[str]:
     _, body = parse_frontmatter(source)
     return [line[3:].strip() for line in body.splitlines() if line.startswith("## ")]

@@ -23,6 +23,7 @@ Use this index to load only the reference files needed for the current route. `S
 | `diagram-decision-rules.md` | Diagram or diagram-like content is being considered | Diagram go/no-go checks and safer downgrades |
 | `regular-report-content-rules.md` | Weekly/daily/monthly/periodic reports or `regular-lumen` | Periodic report extraction, KPI selection, timeline narrative, next-period plan |
 | `review-checklist.md` | `--review` and silent final review pass | Content/design review checkpoints and auto-fix boundaries |
+| `output-metadata.md` | Every `--generate` render (JSON-LD assembly) | JSON-LD field contract, hash dual-form, escaping, PropertyID allow-list, bump checklist |
 | `review-report-template.md` | User asks for structured review summary | Review report output format |
 | `spec-loading-matrix.md` | Before `--plan` and `--generate` | Silent classifier for `brief`, `research`, `comparison`, and `update` archetypes |
 | `toc-and-template.md` | TOC, custom template, or theme override work | TOC link rules, custom template placeholders, theme override injection |
