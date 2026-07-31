@@ -267,6 +267,12 @@ THEME_MARKERS = {
         ".report-wrapper { max-width: 920px",
         ".main-with-toc",
     ],
+    "forest-editorial": [
+        "/* Theme: forest-editorial",
+        "--bg: #f5f7f3",
+        "--fe-anchor: #102d27",
+        "body { font-family: var(--font-sans)",
+    ],
     "fangsong": [
         "/* Theme: fangsong",
         "--font-sans: 'FangSong'",

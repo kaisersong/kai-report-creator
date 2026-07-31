@@ -279,3 +279,33 @@ def test_shipped_animated_examples_pass_the_gate():
         path = ROOT / "examples" / "zh" / name
         report = validate_html_text(path.read_text(encoding="utf-8"))
         assert report["status"] == "valid", (name, report["findings"])
+
+
+def test_forest_editorial_theme_fingerprint():
+    """Built-in theme CSS must survive assembly; the marker set is the contract."""
+    theme_css = (ROOT / "templates" / "themes" / "forest-editorial.css").read_text(encoding="utf-8")
+    html = f"""
+<!DOCTYPE html>
+<html data-template="kai-report-creator" data-version="1.24.0" data-theme="forest-editorial">
+<head><style>{theme_css}</style></head>
+<body>
+<script type="application/json" id="report-summary">{{"title":"T","sections":[],"kpis":[]}}</script>
+</body>
+</html>
+""".strip()
+    report = validate_html_text(html, standard_shell=False, jsonld_check=False)
+    assert report["status"] == "valid", report["findings"]
+
+
+def test_forest_editorial_fingerprint_rejects_hand_rolled_css():
+    html = """
+<!DOCTYPE html>
+<html data-template="kai-report-creator" data-version="1.24.0" data-theme="forest-editorial">
+<head><style>body { background: #f5f7f3; font-family: sans-serif; }</style></head>
+<body>
+<script type="application/json" id="report-summary">{"title":"T","sections":[],"kpis":[]}</script>
+</body>
+</html>
+""".strip()
+    codes = {f["code"] for f in validate_html_text(html, standard_shell=False, jsonld_check=False)["findings"]}
+    assert "theme.fingerprint_mismatch" in codes

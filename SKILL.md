@@ -30,7 +30,7 @@ When invoked as `/report [flags] [content]`, parse flags first:
 | `--review [file]` | Refine an existing HTML report with `references/review-checklist.md`. |
 | `--themes` | Write the themes preview HTML. |
 | `--from <file>` | If the file starts with frontmatter, treat as IR; otherwise create IR, then render. |
-| `--theme <name>` | Override the theme. Built-ins: `corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`, `regular-lumen`, `fangsong`. |
+| `--theme <name>` | Override the theme. Built-ins: `corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`, `regular-lumen`, `fangsong`, `forest-editorial`. |
 | `--template <file>` | Use a custom HTML template. See `references/toc-and-template.md`. |
 | `--output <file>` | Save to this path instead of the default. |
 | `--bundle` | Inline CDN assets where supported. |

@@ -51,8 +51,8 @@ Using `minimal` as the base ensures all shared components render correctly even 
 
 ## Built-in Theme Names
 
-`corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`, `regular-lumen`, `fangsong`
+`corporate-blue`, `minimal`, `dark-tech`, `dark-board`, `data-story`, `newspaper`, `regular-lumen`, `fangsong`, `forest-editorial`
 
-**Themes with POST-SHARED OVERRIDE sections:** `dark-board`, `data-story`, `newspaper`, `regular-lumen`, `fangsong`
+**Themes with POST-SHARED OVERRIDE sections:** `dark-board`, `data-story`, `newspaper`, `regular-lumen`, `fangsong`, `forest-editorial`
 
 **Special code block note:** `dark-tech` and `dark-board` use `github-dark.min.css` instead of `github.min.css` for highlight.js.

@@ -359,7 +359,7 @@ python scripts/html_quality_gate.py report.html
 ### 核心功能
 
 - **零依赖** — 单个 `.html` 文件，`--bundle` 模式支持离线
-- **8 套内置主题** — corporate-blue、minimal、dark-tech、dark-board、data-story、newspaper、regular-lumen、fangsong
+- **9 套内置主题** — corporate-blue、minimal、dark-tech、dark-board、data-story、newspaper、regular-lumen、fangsong、forest-editorial
 - **9 种组件类型** — KPI 指标、图表、表格、时间线、流程图、代码块、标注、图片、列表
 - **Report Review 系统** — 13 项检查点自动优化
 - **AI 可读输出** — 三层机器可读结构
@@ -393,6 +393,7 @@ python scripts/html_quality_gate.py report.html
 | **newspaper** | 编辑感 | 行业分析、通讯 |
 | **regular-lumen** | Poster风格，暖色调 | 周期性工作报告（日报/周报/月报 · 本周期复盘 + 下周期规划）· Kami式阅读体验 |
 | **fangsong** | 传统中文，暖棕调 | 正式公文报告 · 标题衬线仿宋 + 正文非衬线仿宋 |
+| **forest-editorial** | 米绿纸感，编辑风 | 整体浅色但需要一块深色锚点的报告 · 深林绿锚区 + 金色 eyebrow + 大圆角 · 仅显式 `--theme` 选择 |
 
 ### corporate-blue
 

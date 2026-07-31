@@ -18,6 +18,12 @@ Use `zh` when CJK is material or appears in the title/topic; otherwise use `en`.
 | board/dashboard/status/看板 | `dark-board` |
 | generic project progress/项目进展/项目状态 | `corporate-blue` |
 
+`forest-editorial` is **explicit-selection only** — no auto-trigger keywords.
+Its signals (light business report with a dark anchor block) overlap heavily with
+`corporate-blue` and `minimal`, so adding a routing row would just make automatic
+selection noisier. Use it when the user names it or asks for 米绿/纸感/林绿/
+森林/editorial 这类风格.
+
 ## Report Class
 
 Classify content by numeric density: `narrative` < 5%, `mixed` 5-20%, `data` > 20%; short topics default to `mixed`.

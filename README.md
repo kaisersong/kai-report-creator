@@ -434,7 +434,7 @@ python scripts/html_quality_gate.py report.html
 ### Core
 
 - **Zero dependencies** — single `.html` file, works offline with `--bundle`
-- **8 built-in themes** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper, regular-lumen, fangsong
+- **9 built-in themes** — corporate-blue, minimal, dark-tech, dark-board, data-story, newspaper, regular-lumen, fangsong, forest-editorial
 - **9 component types** — KPIs, charts (ECharts), tables, timelines, diagrams, code blocks, callouts, images, lists
 - **Report Review System** — 13-checkpoint automatic refinement
 - **AI-readable output** — 3-layer machine-readable structure for downstream agents
@@ -468,6 +468,7 @@ python scripts/html_quality_gate.py report.html
 | **newspaper** | Editorial | Industry analysis, newsletters |
 | **regular-lumen** | Poster-style, warm-toned | Periodic work reports (日报/周报/月报 · 本周期复盘 + 下周期规划) · Kami-style reading experience |
 | **fangsong** | Traditional Chinese, warm brown | Formal reports with FangSong typography (标题衬线仿宋 + 正文非衬线仿宋) |
+| **forest-editorial** | Paper-green, editorial | Light reports that still want one dark anchor block (深林绿锚区 + 金色 eyebrow + 大圆角) · explicit `--theme` only |
 
 ### corporate-blue
 
