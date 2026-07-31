@@ -50,7 +50,12 @@ Poster summary mode is opt-in. Do not infer `poster_title` or `poster_subtitle` 
 
 - `:::kpi` canonical body uses `items:`.
 - Timeline Allowed `Date` tokens: `YYYY-MM-DD`, `YYYY-MM`, `YYYY`, `Q[1-4] YYYY`, `Day N`, `Week N`, `Month N`.
-- Use **ECharts** for ALL charts.
+- Use **ECharts** for ALL charts — **except** the animated render mode
+  (`animations: scrollytelling|iridescence`), which hand-builds SVG/CSS charts;
+  see `references/animated-shell/`.
 - Badges are optional visual enhancements, not a first-class IR tag.
+- `animations:` — `true` keeps the standard shell's scroll reveals;
+  `scrollytelling` / `iridescence` switch to the animated render mode, and in
+  that mode `theme:` must equal the `animations:` value.
 
 Canonical component routing lives in `references/rendering-rules.md`; component details live in `references/rendering/*.md`.

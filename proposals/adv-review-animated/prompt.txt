@@ -1,0 +1,23 @@
+你是对抗性评审员。评审对象是**已经落地并提交的代码**（不是方案），请攻击它，不要复述、不要客套。
+
+仓库路径：/Users/song/projects/report-creator（等同 ~/.agents/skills/kai-report-creator，是 symlink）。请直接读代码。
+
+评审对象（昨天从另一个 skill 迁移过来的 "animated render mode"）：
+1. references/animated-shell/overview.md、scrollytelling.md、iridescence.md —— 动效模式的配方（AI 按此手写 HTML）
+2. scripts/html_quality_gate.py 中的 animated profile：is_animated_html() / validate_animated_shell()，以及 validate_html_text() 里 animated 分支
+3. tests/test_html_quality_gate.py 末尾 5 个 animated 用例
+4. examples/zh/tesla-q2-2026.html（iridescence 模式产物）、examples/zh/tesla-q2-2026-scrollytelling.html（scrollytelling 模式产物）、examples/zh/tesla-q2-2026.report.md（IR）
+5. SKILL.md 的 "Animated Render Mode" 一节 + Reference Loading 表的 animated 行；references/ir-contract.md 的 animations 字段
+
+背景事实：
+- 主线（标准 shell）报告有 TOC/编辑/导出/摘要卡等控件，由 gate 的 STANDARD_REQUIRED_IDS 强制；animated 模式**跳过**这些检查，改用 validate_animated_shell 的断言。
+- animated 模式由 HTML 上的 data-render-mode="animated" 触发；data-animation 取值 scrollytelling|iridescence。
+- 渲染由 LLM agent 手写 HTML，没有模板引擎。
+- 两个 demo 均已通过 gate（status=valid）与浏览器人工 QA。
+
+请输出（按严重度排序，每条不超过3行，配具体反例或代码位置）：
+1) 致命问题：会导致 gate 被绕过、产物错误、或契约自相矛盾的（至多3条）；
+2) 应修但不致命的问题（至多3条）；
+3) 被忽略的更简做法或应删掉的多余设计（至多2条）；
+4) 一行结论：ACCEPT（可保持现状）或 NEEDS_FIX（须修改）。
+没有致命问题就直说，不要为显得严格而编造。

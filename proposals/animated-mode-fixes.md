@@ -1,0 +1,296 @@
+# 评审汇总与修复方案：animated render mode
+
+状态：**已实施并验证通过** · 2026-07-31
+实施结果：13/13 项验收拦截通过 · 267 pytest 全绿 · check-doc-sync 11 规则通过 ·
+对 29 个已交付 HTML 的 gate findings 零变化（无回归）
+评审轮次：6 轮 · codex/kiro/grok/xiaok/claude 第六轮**一致 ACCEPT**
+评审记录：`proposals/adv-review-animated/`
+（第一轮五方一致 **NEEDS_FIX** → v1..v5 逐轮修订 → 第六轮五方一致 **ACCEPT**）
+
+## 一、已实证确认的问题（含复现结果）
+
+| # | 问题 | 实证 | 提出方 |
+|---|---|---|---|
+| **F1** | animated 断言全是**全文子串匹配**，注释里写关键词即可通过；空白页（无 section/canvas/翻页 JS）+ 补 JSON-LD → gate `valid` | ✅ 已复现 | 四方一致 |
+| **F1b** | `is_animated_html()` 对全文匹配 `data-render-mode="animated"`，**一句注释即可劫持模式检测**，使标准报告改走极弱的 animated 断言 | ✅ `is_animated_html(注释污染)==True` | kiro/grok |
+| **F2** | animated 模式 **KPI 真实性零校验**：`kpi_values_from_html` 只认 `class="kpi-value"`，scrollytelling demo 命中 **0** 次（数字在 CountUp/DATA 的 JS 里）；把 282.4 改成 999999 后 gate 仍 `valid` | ✅ 已复现 | kiro/xiaok |
+| **F3** | **IR 契约冲突**：`ir-contract.md` 写死「Use ECharts for ALL charts」，animated overview 说该规则不适用 → agent 只信 contract 就会在零 CDN 的 iridescence 里塞 ECharts | ✅ 文本冲突可见 | grok |
+| **F4** | `--generate` 主路径未分叉：`generate-flow.md` 仍无条件「build standard shell / theme-css」，animated 只在 SKILL.md 另起一行 skip，**无单一真源** | ✅ 文本冲突可见 | grok |
+| **F5** | SRI 检查只查 tag 内有 `integrity=` 字样：`integrity="x"` 即过；**不校验 hash 格式、不校验三库身份与数量**，任意 cdnjs 脚本可过；零 CDN 的 scrollytelling 也 valid | ✅ 逻辑可见 | grok/kiro/xiaok |
+| **F6** | WebGL fallback 锁死字面量 `linear-gradient(135deg,#cfe0ff,#f0f6ff)`，换品牌色 fallback → 误报 `invalid`，与配方「按品牌着色」自相矛盾 | ✅ 已复现 | claude/grok/kiro/xiaok |
+| **F7** | 四套同义标记冗余：IR `animations:` + `theme:` + HTML `data-theme` + `data-animation`，三处可互相矛盾且 `data-theme` 任意值都过 | ✅ `data-theme="totally-bogus"` → valid | grok/claude |
+| **F8** | `theme_fidelity and not animated` 是死防御（`THEME_MARKERS` 无这两个键，本就返回空） | ✅ 逻辑可见 | kiro |
+| **F9** | 5 个 animated 用例全部 `jsonld_check=False`，默认 CLI 路径从未回归；且**没有一个用例断言「注释假阳性应被拒」** | ✅ 代码可见 | kiro |
+| **F10** | **产物违反溯源契约**：scrollytelling demo 的「低于市场预期的 $0.53」既不在 IR 中，页脚也只声明 Tesla 官方两份材料为来源（该数字实际来自第三方媒体报道，未披露） | ✅ 仅出现在 HTML:287，IR 无 | **codex** |
+| **F11** | **配方与基准产物不一致**：`iridescence.md` 要求「一个 `const DATA=[...]` 单一数据源」，demo 实际拆成 `QTRS/REV/NET/DEL/GWH/CONCLUSIONS/SEGMENTS/SOURCES` 八组常量 | ✅ 文本对照可见 | **codex** |
+| **F12** | 外部脚本正则只认带引号的 `src`：`<script src=https://evil.example/payload.js>` **绕过 iridescence 零 CDN 策略** → valid | ✅ 已复现 | **codex** |
+| **F5b** | `integrity=""` 空值即通过 SRI 检查 | ✅ 已复现 | codex |
+
+## 二、根因
+
+一句话：**把「无法静态判定的交互行为」硬塞进了一个纯文本 gate**，于是只能退化成
+关键词匹配；而关键词匹配又给了 CI 盖章的假信心，同时该模式还顺手关掉了主线的
+真检查（F1b）。次因是迁移时只加了旁路，没有同步修正 IR/generate-flow 的主契约
+（F3/F4）。
+
+## 三、修复方案（v2，按优先级；全部为小改动）
+
+> v1 → v2 修订（第二轮评审 kiro=REJECT / grok=ACCEPT-with-changes 的共同诉求）：
+> ① v1 的 P0-2 声称「注释伪造不了元素存在」是**错的**——`<[^>]*id=["']play-btn["']`
+> 会命中 `<!-- <button id="play-btn"> -->`（已实证）。故新增 **P0-0 全局注释剥离**
+> 作为所有结构化检查的前提。
+> ② v1 说「占位符/无数字已由现有 summary 分支覆盖」也是**错的**——现有代码是
+> `if value and not has_real_number(...)`，`value:""` 与缺失 `value` 会被短路跳过
+> （已实证 `kpis:[{"label":"营收","value":""}]` → valid）。P0-3 改为显式非空校验。
+> ③ 验收 §1 的「编造 KPI 数字 → invalid」**不可兑现**（999999 也是"真实数字"），
+> 收窄为「缺失/占位/空值 → invalid」。
+
+### P0-0 gate 统一预处理：剥离 HTML 注释（v2 新增，其余检查的前提）
+
+所有结构化检查（animated 断言、标准 shell 的 `id="..."` 子串判定、脚本 `src`
+扫描）改为在**注释剥离后的文本**上执行：
+
+```python
+_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
+def strip_comments(html: str) -> str:
+    return _COMMENT_RE.sub("", html)
+```
+
+范围按 kiro 建议**扩到整个 gate**（标准轨的 `f'id="{id}" not in html'` 是同类
+弱点，同样可被注释伪造）。JSON-LD/summary 的 JSON 解析路径不受影响（它们读
+`<script>` 内容，注释剥离不改变其语义）。
+
+### P0-1 模式检测锚定到**文档首个根元素**（修 F1b；v5）
+
+`is_animated_html()` 不再用正则。**v4 修正**（codex 第四轮反例：
+`<script>const x='<html data-render-mode="animated">'</script><html data-render-mode="standard">`
+会让「剥注释 + 首个 `<html>` 正则」误判为 animated —— 注释剥离管不到 script 文本）：
+改用 HTMLParser 取**第一个真实 `<html>` starttag** 的属性。
+
+```python
+class _RootAttrs(HTMLParser):
+    """v5: <html> 必须是文档的第一个 starttag（符合 HTML 规范）。
+    若首个 starttag 不是 html，则视为非 animated —— 堵住 codex 第五轮反例
+    `<title><html data-render-mode="animated"></title><html ... "standard">`。"""
+    def __init__(self): super().__init__(); self.attrs=None; self._first=True
+    def handle_starttag(self, tag, attrs):
+        if not self._first: return
+        self._first = False
+        if tag == "html": self.attrs = dict(attrs)
+
+def is_animated_html(html: str) -> bool:
+    p=_RootAttrs(); p.feed(html)
+    return (p.attrs or {}).get("data-render-mode") == "animated"
+```
+已实证：codex 的 title-RCDATA 反例 → 判定 standard ✅；真实 animated 文档
+（`<!DOCTYPE html>` + `<html data-render-mode="animated">`）→ True ✅。
+
+### P0-2 删掉「翻页/播放」的子串断言，改为**HTMLParser 解析真实元素**（修 F1；v4 加固）
+
+放弃 `"keydown" in html` 这类检查。改为**要求 animated 产物带真实可见元素 ID**
+（与标准 shell 用 `id="toc-toggle-btn"` 同一思路，且用户真的看得到）：
+
+- 必需：`id="play-btn"`（播放按钮）、`id="nav-sections"`（章节导航容器）。
+- **检查方式（v3 修正）**：不用正则，改用 `HTMLParser` 子类收集**真实标签**的
+  `id` 属性集合。理由（codex 第三轮反例）：正则即便剥离注释，
+  `<script>const x='<button id="play-btn">';</script>` 仍会命中——而 HTMLParser
+  会把 `<script>` 内容当 CDATA 文本，天然不产生标签事件。
+  gate 内已有 `_JsonLdExtractor(HTMLParser)` 可复用同一模式：
+
+```python
+class _IdCollector(HTMLParser):
+    """只收集真实、非 template 内的元素 id。
+    script/style 无需手动跳过 —— HTMLParser 对其内容自动进入 CDATA 模式，
+    内部的 '<button ...>' 只是文本，不产生 starttag 事件。"""
+    def __init__(self): super().__init__(); self.ids=set(); self._tpl=[]
+    def handle_starttag(self, tag, attrs):
+        if tag == "template": self._tpl.append(tag); return
+        if not self._tpl:
+            d=dict(attrs)
+            if d.get("id"): self.ids.add(d["id"])
+    def handle_endtag(self, tag):
+        if tag == "template" and self._tpl and self._tpl[-1] == "template":
+            self._tpl.pop()
+```
+
+**v4 修正**（codex 第四轮反例）：v3 的 `_skip` 计数器会被**不匹配的结束标签**
+清零——`<template></style><button id="play-btn">...</template>` 中的 `</style>`
+把 `_skip` 从 1 减到 0，于是 template 内的惰性元素冒充了必需 ID（已实证被绕过）。
+v4 改为 **template 专用栈**，且不再手动处理 script/style（HTMLParser 已自动
+CDATA）。已实证：该反例被拦截，真实元素仍放行。
+
+- 交互**行为**（方向键真的翻页、F5 真的进全屏）明确移出 gate，写入
+  `overview.md` 的浏览器 QA 清单——该模式本来就强制要求开浏览器验证。
+- 两个 demo 需同步补上这两个 ID（现为 `id="playBtn"`，改名统一）。
+
+### P0-3 animated 模式的 KPI 契约检查（修 F2；v2 收紧）
+
+animated 页数字常在 JS 里，DOM 扫描无效。改为校验 `report-summary` 的 kpis
+（该 JSON 是 animated 模式的强制契约，已存在）：
+
+```python
+if animated:
+    summary = extract_summary_json(html)
+    kpis = (summary or {}).get("kpis")
+    if not kpis:
+        findings.append(Finding("animated.missing_summary_kpis", ...))
+    else:
+        for item in kpis:                       # 显式非空，修掉现有 `if value` 短路
+            v = str((item or {}).get("value", "")).strip()
+            if not v or not has_real_number(v):
+                findings.append(Finding("animated.invalid_summary_kpi", ...))
+```
+
+**能力边界（写进方案，避免再次超卖）**：这只能保证「每个 KPI 有非占位的真实
+数值且可审计」，**不能**判定数值是否被编造（999999 也是合法数字），也**不做**
+`report-summary` 与 JS `DATA` 常量的交叉校验——常量名不固定、成本高且脆，
+与标准轨同级即可；数值正确性归浏览器/人工 QA 与 IR 溯源（见 P0-5）。
+
+另在 `overview.md` 铁律里写明：**动效页每个 KPI 必须同时出现在 report-summary**，
+使「数字藏在 JS 里」不再等于「无人可查」。
+
+### P0-4 消除 IR/主路径契约冲突（修 F3/F4）
+
+- `ir-contract.md`：ECharts 规则加例外句 —— 「animated render mode 手写
+  SVG/CSS 图表，不适用本规则，见 references/animated-shell/」。
+- `generate-flow.md`：开头加一行前置分叉 —— 「若 `animations:` 为
+  `scrollytelling|iridescence`，改走 `references/animated-shell/overview.md`，
+  本文件后续步骤（standard shell / theme-css）不适用」。
+- `SKILL.md` step 10 措辞改为「标准轨校验 shell IDs/theme fidelity；animated 轨
+  校验 animated 断言集」，消除与 Animated 节的自相矛盾。
+
+### P0-5 修正 demo 的溯源违规（修 F10）
+
+「低于市场预期的 $0.53」删除。理由：IR 是单一真源，IR 里没有的 claim 不得出现
+在产物中；若要保留，必须同时 ① 写入 IR、② 在来源区披露第三方媒体出处。
+选择删除（最小且最保守）。同时在 `overview.md` 铁律里补一句：
+**「产物中每个数字必须能在 IR 或来源区找到出处」**——这正是 F10 暴露的缺口。
+
+### P1-1 外部脚本策略改为**固定白名单**（修 F5、F5b、F12；v3 重写）
+
+codex 第三轮指出 v2 的两个漏洞：① `integrity="sha512-" + 40个A` 能通过 `{40,}`
+但不是合法 SHA-512；② `https://cdnjs.cloudflare.com/ajax/libs/evil/1/gsap.min.js`
+可用文件名冒充身份。因此放弃「格式 + 文件名」的弱校验，改为**完整对白名单**：
+
+- 配方本就要求三个 CDN **原样内联**（版本 + SRI 都已 pin），所以把这三组
+  `(src, integrity)` 常量直接写进 gate：
+
+```python
+SCROLLYTELLING_ALLOWED = {
+  ("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js",
+   "sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="),
+  ("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js",
+   "sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg=="),
+  ("https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.8.0/countUp.umd.min.js",
+   "sha512-kUIpdMjMlkYUVQgR3wVXJtmuwoD+G69Zt9JBa2rPH4C/+VPlAsQWKcqCv0SpJ8AnezBjfuM2JDjnc58Ee8Filw=="),
+}
+```
+
+- 判定：`scrollytelling` 的外部脚本集合必须**恰好等于**该白名单（多、少、
+  换 URL、换 hash 全部报错）；`iridescence` 必须为**空集**。
+- 脚本抽取同样用 **HTMLParser**（不用正则），顺带解决 F12 的无引号 `src`
+  ——parser 对 `src=https://x` 与 `src="https://x"` 一视同仁。
+- 副作用：升级 GSAP 版本时需同步更新白名单与配方——这是**期望行为**
+  （pin 版本 + SRI 的本意就是变更必须显式），在 `scrollytelling.md` 注明。
+
+### P1-1b 配方与产物对齐（修 F11）
+
+`iridescence.md` 的「一个 `const DATA=[...]`」措辞与实际产物不符。改为：
+**「所有数据必须集中声明在脚本顶部的常量区（一个或多个 const），且与 IR 一致；
+渲染函数内不得出现字面量数据」** —— 保留「单一数据源」的真实意图，去掉
+不可执行的字面要求。
+
+### P1-2 删掉 fallback 颜色硬编码（修 F6）
+
+改判「WebGL 失败分支里存在对 `canvas.style.background` 的赋值」：
+`re.search(r"canvas\.style\.background\s*=", html)`，与具体色值无关。
+
+### P1-3 元数据自洽 + 去冗余（修 F7/F8；v2 修正内部矛盾）
+
+- 校验 `data-theme == data-animation`（配方已如此要求，补上执行）——这是与
+  **色值无关**的元数据检查；
+- 删掉 `validate_theme_fidelity` 调用处多余的 `and not animated` 死防御
+  （`THEME_MARKERS` 无这两个键，本就返回空）；
+- **不给 animated 模式加 THEME_MARKERS 色值指纹**。理由（v2 修正 v1 的自相
+  矛盾）：① 现有两个 demo 里既无 `/* Theme: */` 注释、iridescence 也无 `--bg`
+  变量，指纹无从"提取"；② animated 配方明确鼓励按品牌着色，锁死具体色值就是
+  **重犯 F6 的过拟合错误**。动效模式的视觉保真由配方 + 浏览器 QA 承担，
+  gate 只锁「模式元数据自洽」这一与品牌无关的不变量。
+- IR 层保留单一字段 `animations:`（不新增 `render:`，避免二次迁移成本），
+  在 ir-contract 明确「animated 模式下 `theme:` 必须等于 animations 的值」。
+
+### P1-4 测试补强（修 F9）
+
+- 新增**反向用例**：注释里写满关键词的空白页必须 `invalid`（这是本轮最重要的
+  回归护栏）；
+- 至少 1 个用例走默认 `jsonld_check=True` 全路径；
+- 夹具不再用空实现骗过断言，改为带真实 `id="play-btn"` 元素。
+
+## 三之二、威胁模型（v5 明确边界）
+
+**gate 的对手是「AI 疏漏与偷懒」，不是「刻意构造 HTML 解析歧义的攻击者」。**
+
+> **前提假设（kiro 要求固化）**：本边界依赖不变量 —— `html_quality_gate.py`
+> **只校验本 skill 自己生成的 HTML，永不用于校验外部/不可信来源的 HTML**。
+> 若未来该脚本被复用于外部输入，此威胁模型必须重新评估。
+
+理由：
+1. 该 HTML 由本 skill 自己的 agent 生成，**不存在不可信输入源**；gate 是
+   自检工具，不是安全边界。
+2. AI 偷懒的真实形态是「不写翻页代码」「注释里留 TODO」「KPI 留占位符」
+   「照抄示例颜色」—— 这些 v1→v5 已逐条堵住并有反向用例。
+3. 要对「解析歧义」免疫，必须引入符合 HTML5 spec 的解析器（html5lib/lxml），
+   与本 skill 的 **zero-dependency 原则**冲突。
+4. **与标准轨同级即可**：标准轨用的是 `f'id="{id}" not in html'` 纯子串判定，
+   比 animated 轨的 HTMLParser **更弱**；要求 animated 轨单独达到「对抗构造
+   免疫」是双标。
+
+因此**明确不承诺**拦截下列构造（codex 第五轮反例，已实证可绕过 `_IdCollector`）：
+`<template><textarea></template><button id="play-btn"></textarea></template>` ——
+Python `HTMLParser` 的错误恢复行为与浏览器不同，此类嵌套错乱可无限构造。
+`_IdCollector` 的 template 栈只保证**非对抗场景**（AI 正常生成的 template/script/
+style 内容）不产生假阳性。
+
+如果未来需要把威胁模型扩展到对抗性构造，正确做法是引入 Playwright
+smoke test 读取**真实 DOM**（见 §五之二 责任归属表的 backlog 项），
+而不是继续在正则/HTMLParser 层打补丁。
+
+## 四、不做
+
+- 不给 gate 加 headless 渲染（超出该工具定位，成本与脆性都高）；
+- 不重构 animated 配方的视觉内容（评审未质疑视觉部分）；
+- 不改 lingee-gen-ppt（已迁走）。
+
+## 五、验收（v5：只承诺可兑现的）
+
+1. 下列绕过复现**全部必须变为 invalid**：
+   ① 空白页 + 注释关键词；② 注释里的**伪标签** `<!-- <button id="play-btn"> -->`；
+   ③ **`<script>` 内字符串伪造** `const x='<button id="play-btn">'`（v3 新增，
+   codex 反例）；④ 注释劫持模式检测（含假根元素前置）；⑤ 无引号 `src` 注入；
+   ⑥ `integrity=""` / `integrity="x"` / **`sha512-`+40个A 的伪 hash**（v3 新增）；
+   ⑦ **冒充文件名** `.../libs/evil/1/gsap.min.js`（v3 新增）；
+   ⑧ `kpis:[{"label":"x","value":""}]` 空值；⑨ `kpis` 缺失或为空数组；
+   ⑩ **script 文本内的假根元素** `<script>const x='<html data-render-mode="animated">'</script>`
+   置于真实 `<html data-render-mode="standard">` 之前（v4 新增，codex 反例）；
+   ⑪ **template 内惰性元素冒充 ID** `<template></style><button id="play-btn">…</template>`（v4 新增）；
+   ⑫ **title-RCDATA 假根元素** `<title><html data-render-mode="animated"></title>`（v5 新增，codex 反例）。
+2. 品牌色 fallback 不再误杀；`data-theme != data-animation` 被拦截。
+3. **明确不承诺**（见 §三之二 威胁模型）：① 无法静态判定「KPI 数值是否被编造」
+   （999999 亦为合法数字），不做 summary↔JS DATA 交叉校验；② 不拦截刻意构造的
+   HTML 解析歧义（如嵌套错乱的 `template`/`textarea`）——与标准轨同级。
+   两者分别由 IR 溯源 + 浏览器/人工 QA 承担。
+4. 两个 Tesla demo 修正（ID 统一 + 删除 F10 违规句）后仍 `valid`。
+5. 全量 pytest + check-doc-sync 全绿；反向用例（上述 12 项假阳性必须被拒）纳入回归。
+
+### 五之二、责任归属表（codex 要求：每个风险由谁拦）
+
+| 风险 | 拦截方 | 说明 |
+|---|---|---|
+| 空白页 / 注释伪造 ID / 注释劫持模式 | **静态 gate** | P0-0 + P0-1 + P0-2 |
+| 无引号 `src` / 弱 SRI / CDN 身份与数量 | **静态 gate** | P1-1 |
+| KPI 缺失 / 占位 / 空值 | **静态 gate** | P0-3 |
+| 翻页/播放**行为**真的可用（方向键、F5、wheel lock） | **浏览器 QA** | `overview.md` QA 清单；元素 ID 由 gate 保证存在，行为由人工/浏览器验证 |
+| KPI 数值是否被编造、summary 与 JS DATA 是否一致 | **IR 溯源 + 人工 QA** | P0-5 的「每个数字必须能在 IR 或来源区找到出处」；静态 gate 明确不承诺 |
+
+未来若要把「行为」也纳入自动化，需独立引入 Playwright smoke test（本方案
+§四「不做」：不在 gate 内加 headless 渲染）——留作 backlog，不阻塞本次修复。

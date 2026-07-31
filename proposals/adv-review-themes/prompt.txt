@@ -1,0 +1,120 @@
+你是对抗性评审员。攻击下面这份《为 kai-report-creator 新增两个主题》方案，不要复述方案、不要客套、不要泛泛而谈。
+
+背景事实：kai-report-creator 是一个 LLM agent 执行的 HTML 报告生成技能；主题=CSS 文件注入（自定义主题放 themes/<name>/theme.css 零管线改动；内置主题需 gate 指纹 THEME_MARKERS、theme-routing、--themes 预览、README、pytest 五处联动）；html_quality_gate.py 对未知主题名不做指纹校验；现有 8 个内置主题中已有 dark-board（暗色仪表盘）；渲染由 AI 手写 HTML 而非模板引擎。
+
+请输出（按严重度排序，每条不超过3行）：
+1) 最可能让方案失效的假设漏洞，至多3条，各配一个具体反例场景；
+2) 方案会引入的新风险/回归（质量、正确性、用户体验），至多3条；
+3) 被忽略的更优或更简单的替代方案，至多2条；
+4) 若只允许先做一件事，你选哪件，为什么（1条）。
+
+===== 方案全文 =====
+# 方案：为 kai-report-creator 新增两个主题 — forest-editorial 与 radar-board
+
+状态：草案 v1 · 2026-07-31 · 待对抗评审
+
+## 0. 一句话
+
+把两份参考页面的设计语言收敛为 report-creator 标准管线上的两个主题，
+分两阶段落地：**Phase 1 自定义主题**（`themes/<name>/`，零管线改动，当天可用）→
+**Phase 2 升内置**（`templates/themes/*.css` + gate 指纹 + 路由 + 预览 + 测试）。
+不新增渲染模式，不动 animated 路径。
+
+## 1. 风格来源与命名
+
+| 主题名 | 来源 | 一句话定位 |
+|---|---|---|
+| `forest-editorial` | 本地《AI 任务矩阵 × 灵基 Chat》页面 | 米绿纸感编辑风：浅色纸底 + 深林绿 hero 带 + 金/橙点缀，大圆角卡片 |
+| `radar-board` | ai-office-product-radar 站点 | 情报雷达盘：暗色指挥中心，mono 数字密度高，KPI/气泡/时间线/对比表 |
+
+与现有 8 主题的差异化：`forest-editorial` 填补「浅色但有深色锚区」的空档
+（现有浅色主题 corporate-blue/minimal/newspaper 均无深色 hero 带）；
+`radar-board` 是 `dark-board` 的情报监测变体（差异：绿金双 accent → 单色
+高亮 + 状态色、Geist 味 mono 栈、更新时间戳 chrome）。若评审认为与
+dark-board 差异不足，降级为 dark-board 的 `theme_overrides` 预设集而非独立主题。
+
+## 2. 设计 token 提取
+
+### forest-editorial（已从源文件 CSS 变量原样提取）
+
+```css
+:root{
+  --bg:#f5f7f3; --paper:#fff; --paper-2:#eef3ee;
+  --ink:#17211c; --muted:#68766e; --faint:#93a098;
+  --line:#dbe5dd; --line-strong:#bfcfc3;
+  --navy:#102d27; --navy-2:#173f35;          /* hero/锚区深色 */
+  --green:#0b6b55; --green-soft:#e3f0e9;     /* 主 accent */
+  --gold:#c7951d;  --gold-soft:#fff4d6;      /* eyebrow/次 accent */
+  --orange:#de6d40; --orange-soft:#fbe8df;
+  --blue:#4e6a9f;  --blue-soft:#e9edf8;
+  --radius-xl:26px; --radius-lg:17px; --radius-md:12px;
+  --shadow:0 20px 55px rgba(26,48,38,.09);
+}
+```
+
+映射规则：报告封面/海报摘要卡 → `--navy` 深色带 + 金色 eyebrow；正文区 →
+纸底白卡；KPI 值 → `--green`；badge 语义色 → gold/orange/blue-soft 三组。
+源文件的 `body.dark` 变量组**本期不做**（见 §5 风险 R1），记入 backlog。
+
+### radar-board
+
+```css
+:root{
+  --bg:#0b0e13; --paper:#12161d; --paper-2:#181d26;
+  --ink:#e8ecf2; --muted:#8b95a5; --line:#232a36;
+  --accent:#5ee1b4;                            /* 单一荧光高亮 */
+  --up:#5ee1b4; --down:#ff6b7a; --warn:#f0b249;/* 状态三色 */
+  --font-mono:'Geist Mono','JetBrains Mono',ui-monospace,Menlo,
+    'Microsoft YaHei','PingFang SC',monospace; /* 栈回退，不引字体 CDN */
+  --radius:10px;
+}
+```
+
+映射规则：KPI 值/表格数字/时间戳一律 mono + `tabular-nums`；
+「气泡定位图」= ECharts scatter（现有 `:::chart` 已支持，不新增组件）；
+「最近更新时间线」= 现有 `:::timeline`；不做自动刷新等动态 chrome（纯静态报告）。
+
+## 3. 落地步骤
+
+### Phase 1 — 自定义主题（零管线改动）
+
+1. `themes/forest-editorial/theme.css` + `themes/radar-board/theme.css`
+   （按 `themes/_example-warm-editorial` 惯例，含 `reference.md` 说明设计意图）。
+2. 用现有示例 IR（`examples/zh/business-report.report.md` 数据）各渲一份样张，
+   浏览器人工核验 + `html_quality_gate.py`（自定义主题不做指纹校验，天然通过）。
+3. 交付样张给用户确认视觉效果。**Phase 1 不改任何 references/scripts/tests。**
+
+### Phase 2 — 升内置（用户确认视觉后才做）
+
+1. CSS 移入 `templates/themes/<name>.css`，按 `POST-SHARED OVERRIDE` 双段结构重排。
+2. `html_quality_gate.py` `THEME_MARKERS` 增加两组指纹（主题注释 + 关键字体/底色变量）。
+3. `references/theme-routing.md` 加路由行（何时自动选它）；`ir-contract.md` 无需改。
+4. `--themes` 预览 HTML 重新生成；README 中英主题表各加一行。
+5. 测试：`test_html_quality_gate.py` 加两组指纹用例；跑全量 pytest + check-doc-sync。
+
+## 4. 验收标准
+
+- Phase 1：两份样张在浏览器中与参考页面的**辨识度一致**（用户主观确认）；
+  gate `valid`；不含外部字体请求。
+- Phase 2：全量测试通过；`--themes` 预览含 10 个主题；同一 IR 换主题渲染
+  不改动任何内容字节（主题只动 CSS）。
+
+## 5. 风险与对策
+
+- **R1 双模式诱惑**：forest 源文件自带明暗双主题，若跟着做 toggle 就要动标准
+  shell（新按钮 + JS）——超出主题边界。对策：本期只做浅色，`body.dark` 变量组
+  写进 `reference.md` 备注，等有第二个双模式需求再立项 shell 级方案。
+- **R2 与 dark-board 同质化**：radar-board 若做完发现与 dark-board 肉眼难辨，
+  会稀释主题表。对策：Phase 1 样张阶段并排对比截图，差异不足即降级为
+  overrides 预设，不进内置。
+- **R3 gate 指纹过拟合**：THEME_MARKERS 指纹选得太细（如具体阴影值）会让正常
+  微调频繁 break。对策：指纹只锁「主题注释 + 1 个字体变量 + 1 个底色变量」，
+  与现有主题同粒度。
+- **R4 参考站不可复访**：radar 站点是临时部署，可能下线。对策：本方案 §2 已
+  把 token 固化在文内，后续实现不依赖原站。
+
+## 6. 不做清单
+
+- 不新增组件类型（气泡图走 ECharts scatter）
+- 不做主题内动效/自动刷新/dark toggle
+- 不动 animated render mode 与 lingee-gen-ppt

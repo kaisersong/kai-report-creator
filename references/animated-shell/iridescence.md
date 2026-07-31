@@ -17,10 +17,12 @@ implemented vanilla).
   block (`#0a0a12`, every claim gets its source + 采集日期) → footer.
 - **Section chrome**: each block has mono index kicker (`02 / PLATFORMS`),
   big tight title (clamp, letter-spacing −.03em), right-aligned mono desc.
-- **Data honesty**: one `const DATA=[...]` at the top of the script is the
-  single source; undisclosed fields are `null`, rendered as 「未公开」 with a
-  **ghost bar** (`repeating-linear-gradient(45deg,#d9d9e2 0 6px,#ececf2 6px 12px)`,
-  width ~8%) — never fabricate a value to fill a chart.
+- **Data honesty**: declare **all** data as `const` blocks at the top of the
+  script (one per series/section is fine) and keep them consistent with the IR;
+  render functions must contain no literal data. Undisclosed fields are `null`,
+  rendered as 「未公开」 with a **ghost bar**
+  (`repeating-linear-gradient(45deg,#d9d9e2 0 6px,#ececf2 6px 12px)`, width ~8%)
+  — never fabricate a value to fill a chart.
 - **Hero layers**: `<canvas>` z-0 → white `veil` gradient overlay z-1
   (`rgba(255,255,255,.08)→.02→.45` top-to-bottom, keeps text readable) →
   content z-2 (nav, mono tag, clamp 44–108px title with accent `<em>`, sub,
@@ -56,8 +58,10 @@ gl_Position=vec4(position,0,1)`), TRIANGLE_FAN over
 
 ## Hard rules
 
-1. `getContext('webgl')` may fail (headless/no GPU) → fallback
-   `canvas.style.background='linear-gradient(135deg,#cfe0ff,#f0f6ff)'` and skip.
+1. `getContext('webgl')` may fail (headless/no GPU) → assign a static
+   `canvas.style.background` gradient and skip the RAF loop. The gate checks
+   that the assignment exists, **not** which colours it uses — tint the
+   fallback to match the report's brand.
 2. Clamp DPR: `Math.min(devicePixelRatio||1,2)`; resize canvas from
    `getBoundingClientRect()` on `resize`.
 3. **IntersectionObserver on the canvas** (threshold .05): pause the RAF loop
@@ -68,7 +72,8 @@ gl_Position=vec4(position,0,1)`), TRIANGLE_FAN over
    `.8s cubic-bezier(.2,.7,.2,1)`), triggered once per chart block by an
    IntersectionObserver (threshold ~.35) — no chart lib. Cards hover:
    `translateY(-4px)` + soft shadow.
-6. **Frame chrome (overview.md #1/#2) implemented vanilla**:
+6. **Frame chrome (overview.md #1/#2) implemented vanilla** — the play button
+   must carry `id="play-btn"` and the section nav `id="nav-sections"`:
    `secs=[...querySelectorAll('#hero,section.block')]`; `navSec` synced by an
    IntersectionObserver (`rootMargin:'-45% 0px -45% 0px'`) and set immediately
    in `goSec()`; fixed round ▶ button + `F5` toggle `body.playing` +

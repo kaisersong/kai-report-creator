@@ -62,7 +62,7 @@ Load `references/ir-contract.md` for the full frontmatter spec, validity terms, 
 
 Quick reference:
 - Three parts: YAML frontmatter, Markdown prose (`##`/`###`), component fences `:::tag [param=value]`.
-- `:::kpi` uses `items:`; Use **ECharts** for ALL charts.
+- `:::kpi` uses `items:`; Use **ECharts** for ALL charts (animated render mode excepted — it hand-builds charts).
 - Badges are optional visual enhancements, not a first-class IR tag.
 - Validity taxonomy: `invalid_syntax`, `invalid_semantics`, `contract_conflict`, `auto_downgrade_target`.
 - Timeline details live in rendering references; Allowed `Date` tokens must be real time markers, not decorative labels.
@@ -108,8 +108,8 @@ Then run these quality gates in sequence — do not skip:
    - timeline dates are real time markers
    - no U+FE0F
    - no `text-align: justify`, black-background flood, body letter-spacing > `0.05em`, or mobile-hidden critical controls
-10. Run the final HTML quality gate with `scripts/html_quality_gate.py` on the rendered HTML. It must pass standard shell IDs, theme fidelity, KPI value checks, and JSON-LD metadata checks. If it fails, fix the HTML and rerun until it passes before reporting success. For JSON-LD failures: regenerate from `references/output-metadata.md` field contract.
-11. Run L2 shell checks. Required: `data-template="kai-report-creator"`, `data-version`, `data-theme`, `id="toc-toggle-btn"`, `id="toc-sidebar"`, `id="card-mode-btn"`, `id="sc-overlay"`, `id="export-btn"`, `id="export-menu"`, `id="export-print"`, `id="export-png-desktop"`, `id="export-png-mobile"`, `id="export-im-share"`, `id="report-summary"`, plus the JS bindings for print/desktop/mobile/IM export. If any export item or binding is missing, rebuild the whole export block from `references/html-shell/export.md`.
+10. Run the final HTML quality gate with `scripts/html_quality_gate.py` on the rendered HTML. Standard track must pass standard shell IDs, theme fidelity, KPI value checks, and JSON-LD metadata checks; animated track swaps the shell/theme checks for the animated assertion set (chrome element IDs, pinned-script allow-list, summary KPI contract) — the script picks the track from `data-render-mode`. If it fails, fix the HTML and rerun until it passes before reporting success. For JSON-LD failures: regenerate from `references/output-metadata.md` field contract.
+11. Run L2 shell checks (**standard track only** — animated reports have no TOC/export chrome). Required: `data-template="kai-report-creator"`, `data-version`, `data-theme`, `id="toc-toggle-btn"`, `id="toc-sidebar"`, `id="card-mode-btn"`, `id="sc-overlay"`, `id="export-btn"`, `id="export-menu"`, `id="export-print"`, `id="export-png-desktop"`, `id="export-png-mobile"`, `id="export-im-share"`, `id="report-summary"`, plus the JS bindings for print/desktop/mobile/IM export. If any export item or binding is missing, rebuild the whole export block from `references/html-shell/export.md`.
 12. Run the silent final review pass from `references/review-checklist.md`, then write the HTML and report the path.
 
 When the report is explicitly comparing named vendors, models, or tools, set `data-report-mode="comparison"` on the outer report container and use `.badge--entity-a/.badge--entity-b/.badge--entity-c` only for entity identity.
@@ -118,10 +118,10 @@ When the report is explicitly comparing named vendors, models, or tools, set `da
 
 When frontmatter has `animations: scrollytelling` or `animations: iridescence`, or the user asks for a 动效网页 / 滚动叙事 / scrollytelling / 动画长页 / 虹彩 / iridescence page: this is a different shell contract. Load `references/animated-shell/overview.md` + the one mode file and hand-write ONE animated single-file HTML per that recipe.
 
-- Guard validation (step in `--generate` flow) and JSON-LD metadata still apply; `report-summary` JSON is still required.
+- Guard validation (step in `--generate` flow) and JSON-LD metadata still apply; `report-summary` JSON is still required, and every KPI must appear in it with a real number (that JSON is the audit face when numbers live in JS).
 - Skip `--generate` steps that assume the standard shell: html-shell references, theme CSS, and the L2 shell ID checks in step 11.
-- Step 10 still runs: `scripts/html_quality_gate.py` auto-detects `data-render-mode="animated"` and swaps in the animated assertion set (paging/play chrome, font & CDN policy, WebGL fallback).
-- QA additionally requires opening the file in a real browser and scrolling end-to-end once (charts fire once, keyboard paging works, play mode enters/exits fullscreen).
+- Step 10 still runs: the gate detects `data-render-mode="animated"` on the root element and applies the animated assertion set (chrome IDs `play-btn` / `nav-sections`, `data-theme == data-animation`, font policy, pinned-script allow-list, WebGL fallback, summary KPI contract).
+- The gate deliberately does **not** verify interaction *behaviour* or number truthfulness — QA requires opening the file in a real browser and scrolling end-to-end once (charts fire once, keyboard paging works, play mode enters/exits fullscreen), and every figure must trace back to the IR or the sources section.
 
 ## `--review` Flow
 

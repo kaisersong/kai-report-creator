@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import asdict, dataclass
 import html as html_lib
+from html.parser import HTMLParser
 import json
 import re
 import sys
@@ -18,6 +19,18 @@ from pathlib import Path
 
 
 PLACEHOLDER_RE = re.compile(r"\[(?:INSERT VALUE|数据待填写)\]")
+
+_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
+
+
+def strip_comments(html: str) -> str:
+    """Remove HTML comments before structural checks.
+
+    Substring checks like `id="export-btn" in html` are otherwise satisfiable
+    from inside a comment.
+    """
+    return _COMMENT_RE.sub("", html)
+
 
 STANDARD_REQUIRED_IDS = [
     "report-summary",
@@ -37,58 +50,205 @@ STANDARD_REQUIRED_IDS = [
 
 ANIMATED_MODES = ("scrollytelling", "iridescence")
 
-ANIMATED_ALLOWED_SCRIPT_HOSTS = ("https://cdnjs.cloudflare.com/",)
+ANIMATED_REQUIRED_IDS = ("play-btn", "nav-sections")
 
 FORBIDDEN_FONT_ORIGINS = ("fonts.googleapis.com", "fonts.gstatic.com")
 
+# scrollytelling may load exactly these three (src, integrity) pairs — pinned
+# version AND hash, so a CDN swap or a forged hash is a finding. Bumping GSAP
+# means updating this set and the recipe together, which is the point of pinning.
+SCROLLYTELLING_ALLOWED_SCRIPTS = frozenset({
+    (
+        "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js",
+        "sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg==",
+    ),
+    (
+        "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js",
+        "sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg==",
+    ),
+    (
+        "https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.8.0/countUp.umd.min.js",
+        "sha512-kUIpdMjMlkYUVQgR3wVXJtmuwoD+G69Zt9JBa2rPH4C/+VPlAsQWKcqCv0SpJ8AnezBjfuM2JDjnc58Ee8Filw==",
+    ),
+})
+
+# Elements whose text content must never be mistaken for markup. script/style
+# already switch HTMLParser into CDATA mode; template/textarea/title do not.
+_INERT_ELEMENTS = frozenset({"template", "textarea", "title", "script", "style"})
+
+
+class _RootAttrs(HTMLParser):
+    """Attributes of the document's first start tag, if that tag is <html>.
+
+    Requiring <html> to come first (per the HTML spec) stops a fake root inside
+    RCDATA content — e.g. `<title><html data-render-mode="animated"></title>` —
+    from deciding the render mode.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.attrs: dict[str, str | None] | None = None
+        self._first = True
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if not self._first:
+            return
+        self._first = False
+        if tag == "html":
+            self.attrs = dict(attrs)
+
+
+class _IdCollector(HTMLParser):
+    """Collect `id` values of real elements, skipping inert element content."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.ids: set[str] = set()
+        self._inert: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag in _INERT_ELEMENTS:
+            self._inert.append(tag)
+            return
+        if self._inert:
+            return
+        element_id = dict(attrs).get("id")
+        if element_id:
+            self.ids.add(element_id)
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in _INERT_ELEMENTS and tag in self._inert:
+            while self._inert and self._inert.pop() != tag:
+                pass
+
+
+class _ScriptCollector(HTMLParser):
+    """Collect (src, integrity) of every external script, quoted or not."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.external: list[tuple[str, str]] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag != "script":
+            return
+        attrs_d = dict(attrs)
+        src = attrs_d.get("src")
+        if src:
+            self.external.append((src, attrs_d.get("integrity") or ""))
+
+
+def real_element_ids(html: str) -> set[str]:
+    parser = _IdCollector()
+    parser.feed(html)
+    return parser.ids
+
+
+def external_scripts(html: str) -> list[tuple[str, str]]:
+    parser = _ScriptCollector()
+    parser.feed(html)
+    return parser.external
+
 
 def is_animated_html(html: str) -> bool:
-    return bool(re.search(r'data-render-mode=["\']animated["\']', html))
+    parser = _RootAttrs()
+    parser.feed(html)
+    return (parser.attrs or {}).get("data-render-mode") == "animated"
 
 
 def validate_animated_shell(html: str) -> list[Finding]:
+    """Animated-track assertions.
+
+    Scope (see proposals/animated-mode-fixes.md §threat model): this catches
+    generator omissions — missing chrome, placeholder KPIs, unpinned CDNs — not
+    hand-crafted HTML parsing ambiguities. The input is always HTML this skill
+    generated itself.
+    """
     findings: list[Finding] = []
+    scrubbed = strip_comments(html)
+
     for attr in ('data-template="kai-report-creator"', "data-version=", "data-theme="):
-        if attr.replace('"', "'") not in html and attr not in html:
+        if attr.replace('"', "'") not in scrubbed and attr not in scrubbed:
             findings.append(Finding("animated.missing_attr", f"Missing marker: {attr}"))
 
-    mode_match = re.search(r'data-animation=["\']([^"\']+)["\']', html)
+    mode_match = re.search(r'data-animation=["\']([^"\']+)["\']', scrubbed)
     mode = mode_match.group(1) if mode_match else None
     if mode not in ANIMATED_MODES:
         findings.append(
             Finding("animated.invalid_mode", f"data-animation must be one of {ANIMATED_MODES}, got {mode!r}.")
         )
 
-    # Frame chrome: keyboard paging + play mode
-    if "keydown" not in html or "scrollIntoView" not in html:
-        findings.append(Finding("animated.missing_paging", "Keyboard section paging (keydown + scrollIntoView) not found."))
-    if "playing" not in html or "requestFullscreen" not in html:
-        findings.append(Finding("animated.missing_play_mode", "Play mode (body.playing + requestFullscreen) not found."))
-    if re.search(r"body\.playing\s*\{[^}]*overflow\s*:\s*hidden", html):
+    theme_match = re.search(r'data-theme=["\']([^"\']+)["\']', scrubbed)
+    theme = theme_match.group(1) if theme_match else None
+    if mode in ANIMATED_MODES and theme != mode:
+        findings.append(
+            Finding("animated.theme_mode_mismatch", f"data-theme must equal data-animation ({mode!r}), got {theme!r}.")
+        )
+
+    # Frame chrome: require the real elements users interact with. Whether the
+    # keys actually page is verified in a browser (recipe QA checklist), not here.
+    element_ids = real_element_ids(html)
+    for required in ANIMATED_REQUIRED_IDS:
+        if required not in element_ids:
+            findings.append(
+                Finding("animated.missing_chrome", f"Missing animated chrome element id={required!r}.")
+            )
+    if re.search(r"body\.playing\s*\{[^}]*overflow\s*:\s*hidden", scrubbed):
         findings.append(Finding("animated.playing_overflow_hidden", "body.playing must not set overflow:hidden (breaks paging)."))
 
-    # Font policy: no external font origins
     for origin in FORBIDDEN_FONT_ORIGINS:
-        if origin in html:
+        if origin in scrubbed:
             findings.append(Finding("animated.external_font", f"External font origin forbidden: {origin}"))
 
-    # External script policy
-    ext_srcs = re.findall(r'<script\b[^>]*\bsrc=["\']([^"\']+)["\']', html)
+    scripts = external_scripts(html)
     if mode == "iridescence":
-        if ext_srcs:
-            findings.append(Finding("animated.external_script", f"iridescence mode must have zero CDNs, found: {ext_srcs}"))
-        if not re.search(r"getContext\(\s*['\"]webgl", html):
+        if scripts:
+            findings.append(
+                Finding("animated.external_script", f"iridescence mode must have zero CDNs, found: {[s for s, _ in scripts]}")
+            )
+        if not re.search(r"getContext\(\s*['\"]webgl", scrubbed):
             findings.append(Finding("animated.missing_webgl", "iridescence mode requires a WebGL canvas."))
-        elif "linear-gradient(135deg,#cfe0ff,#f0f6ff)" not in html:
-            findings.append(Finding("animated.missing_webgl_fallback", "Missing WebGL-unavailable fallback gradient."))
+        elif not re.search(r"canvas\.style\.background\s*=", scrubbed):
+            findings.append(
+                Finding("animated.missing_webgl_fallback", "Missing WebGL-unavailable fallback (canvas.style.background assignment).")
+            )
     elif mode == "scrollytelling":
-        for src in ext_srcs:
-            if not src.startswith(ANIMATED_ALLOWED_SCRIPT_HOSTS):
-                findings.append(Finding("animated.external_script", f"Script origin not allowed: {src}"))
-        script_tags = re.findall(r"<script\b[^>]*\bsrc=[^>]*>", html)
-        for tag in script_tags:
-            if "integrity=" not in tag:
-                findings.append(Finding("animated.missing_sri", f"CDN script missing integrity attr: {tag[:100]}"))
+        loaded = set(scripts)
+        unexpected = loaded - SCROLLYTELLING_ALLOWED_SCRIPTS
+        for src, integrity in sorted(unexpected):
+            findings.append(
+                Finding(
+                    "animated.external_script",
+                    f"Script not in the pinned (src, integrity) allow-list: {src} integrity={integrity[:24]!r}",
+                )
+            )
+        for src, _ in sorted(SCROLLYTELLING_ALLOWED_SCRIPTS - loaded):
+            findings.append(Finding("animated.missing_pinned_script", f"Required pinned script missing: {src}"))
+
+    findings.extend(validate_animated_summary_kpis(html))
+    return findings
+
+
+def validate_animated_summary_kpis(html: str) -> list[Finding]:
+    """Animated pages keep numbers in JS, so the summary JSON is the audit face.
+
+    This proves each KPI is present and non-placeholder. It cannot prove a value
+    is truthful — that is IR sourcing plus human QA (see §threat model).
+    """
+    findings: list[Finding] = []
+    summary = extract_summary_json(html)
+    kpis = (summary or {}).get("kpis")
+    if not kpis or not isinstance(kpis, list):
+        findings.append(
+            Finding("animated.missing_summary_kpis", "Animated reports need a non-empty report-summary.kpis list.")
+        )
+        return findings
+    for item in kpis:
+        value = str((item or {}).get("value", "")).strip() if isinstance(item, dict) else ""
+        if not value or not has_real_number(value):
+            findings.append(
+                Finding("animated.invalid_summary_kpi", f"Summary KPI value must be a real number, got {value!r}.")
+            )
     return findings
 
 
@@ -160,16 +320,23 @@ def kpi_values_from_html(html: str) -> list[str]:
 
 def validate_standard_shell(html: str) -> list[Finding]:
     findings: list[Finding] = []
+    scrubbed = strip_comments(html)
+    element_ids = real_element_ids(html)
     for element_id in STANDARD_REQUIRED_IDS:
-        if f'id="{element_id}"' not in html and f"id='{element_id}'" not in html:
-            findings.append(
-                Finding("shell.missing_id", f"Missing standard shell element id={element_id!r}.")
-            )
-    if 'data-template="kai-report-creator"' not in html and "data-template='kai-report-creator'" not in html:
+        if element_id in element_ids:
+            continue
+        # report-summary lives on a <script> element, which _IdCollector treats
+        # as inert, so fall back to a comment-stripped substring check.
+        if f'id="{element_id}"' in scrubbed or f"id='{element_id}'" in scrubbed:
+            continue
+        findings.append(
+            Finding("shell.missing_id", f"Missing standard shell element id={element_id!r}.")
+        )
+    if 'data-template="kai-report-creator"' not in scrubbed and "data-template='kai-report-creator'" not in scrubbed:
         findings.append(Finding("shell.missing_template_attr", "Missing data-template marker."))
-    if 'data-version=' not in html:
+    if 'data-version=' not in scrubbed:
         findings.append(Finding("shell.missing_version_attr", "Missing data-version marker."))
-    if 'data-theme=' not in html:
+    if 'data-theme=' not in scrubbed:
         findings.append(Finding("shell.missing_theme_attr", "Missing data-theme marker."))
     return findings
 
@@ -508,10 +675,15 @@ def validate_html_text(
     findings: list[Finding] = []
     animated = is_animated_html(html)
     if animated:
+        # Animated pages have their own chrome contract; the standard shell IDs
+        # do not apply. Theme fidelity still runs — THEME_MARKERS has no
+        # animated keys, so it is a no-op, and animated visual fidelity is
+        # deliberately left to the recipe plus browser QA rather than locked to
+        # brand-specific colour values.
         findings.extend(validate_animated_shell(html))
     if standard_shell and not animated:
         findings.extend(validate_standard_shell(html))
-    if theme_fidelity and not animated:
+    if theme_fidelity:
         findings.extend(validate_theme_fidelity(html))
     if kpi_values:
         findings.extend(validate_kpi_values(html))

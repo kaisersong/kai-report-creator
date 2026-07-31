@@ -165,9 +165,9 @@ footer .mn{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:#8F
 <div class="bg-layer"><div class="glow a"></div><div class="glow b"></div></div>
 <div id="progress"></div>
 <div class="brandbar"><span class="dot"></span>TESLA INC · TSLA · Q2 2026 READ</div>
-<nav class="nav-pills" id="navPills"></nav>
+<nav class="nav-pills" id="nav-sections"></nav>
 <button class="to-top" id="toTop" aria-label="回到顶部">↑</button>
-<button class="play-btn" id="playBtn" aria-label="播放" title="播放 (F5)">▶</button>
+<button class="play-btn" id="play-btn" aria-label="播放" title="播放 (F5)">▶</button>
 <div id="curtain"></div>
 
 <main>
@@ -284,7 +284,7 @@ footer .mn{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:#8F
   <div class="risk-grid">
     <div class="glass risk"><span class="lvl hi">HIGH</span><div class="ttl">利润率压缩</div><div class="txt">运营利润率 1.4%（−269bp），运营费用 +47% 远快于收入 +26%——投入曲线必须尽快兑换成回报。</div></div>
     <div class="glass risk"><span class="lvl hi">HIGH</span><div class="ttl">自由现金流转负</div><div class="txt">FCF −10.9 亿美元：资本开支 57.9 亿（+142%）吞掉了 47 亿经营现金流，高投入期还将持续。</div></div>
-    <div class="glass risk"><span class="lvl md">MED</span><div class="ttl">EPS 不及预期</div><div class="txt">非 GAAP EPS $0.33（−18%），低于市场预期的 $0.53——盈利预期与投入节奏的落差在放大。</div></div>
+    <div class="glass risk"><span class="lvl md">MED</span><div class="ttl">每股收益走弱</div><div class="txt">非 GAAP 摊薄 EPS $0.33，同比 −18%；净利润同比 −5% 而 EPS 降幅更大，盈利质量承压。</div></div>
     <div class="glass risk"><span class="lvl md">MED</span><div class="ttl">新业务爬坡</div><div class="txt">Cybercab、Optimus、Megafactory Texas 均处投产爬坡期，量产节奏不及预期会拉长回收周期。</div></div>
     <div class="glass risk"><span class="lvl md">MED</span><div class="ttl">电池产能瓶颈</div><div class="txt">公司明示电池包产能是近期整车放量的主要限制因素——供给侧瓶颈直接约束交付上限。</div></div>
   </div>
@@ -328,7 +328,7 @@ var MARGINS=[['毛利率',16.8,'#FFB3B5'],['Adj. EBITDA',11.6,'#FF4D52'],['运�
 var NAVN=['开场','核心盘面','五季度节奏','利润率三环','收入水系','交付与储能','体感换算','风险清单'];
 
 /* frame */
-var pills=$('#navPills');
+var pills=$('#nav-sections');
 NAVN.forEach(function(n,i){
   var b=document.createElement('button');b.className='pill';b.setAttribute('aria-label',n);
   var t=document.createElement('span');t.className='tag';t.textContent=(i+1)+' · '+n;
@@ -513,7 +513,7 @@ ScrollTrigger.create({trigger:'#s8',start:'top 60%',end:'bottom 30%',
 var secs=[].slice.call(document.querySelectorAll('.sec'));
 var navSec=0;
 function goSec(i){i=Math.max(0,Math.min(i,secs.length-1));navSec=i;secs[i].scrollIntoView({behavior:'smooth'});}
-var playBtn=$('#playBtn'),wheelLock=0;
+var playBtn=$('#play-btn'),wheelLock=0;
 function setPlay(on){
   document.body.classList.toggle('playing',on);
   if(playBtn){playBtn.textContent=on?'✕':'▶';playBtn.title=on?'退出播放 (Esc)':'播放 (F5)';}

@@ -18,6 +18,10 @@ pipeline invariants, IR mapping, and shared frame chrome.
     integrity="sha512-kUIpdMjMlkYUVQgR3wVXJtmuwoD+G69Zt9JBa2rPH4C/+VPlAsQWKcqCv0SpJ8AnezBjfuM2JDjnc58Ee8Filw=="
     crossorigin="anonymous"></script>
   ```
+  These three `(src, integrity)` pairs are mirrored in
+  `scripts/html_quality_gate.py` (`SCROLLYTELLING_ALLOWED_SCRIPTS`) and the gate
+  requires the page to load **exactly** them — bumping a version means updating
+  both this recipe and that set, which is the point of pinning.
   **No fonts CDN, no local assets** — declare font stacks with graceful
   fallbacks. Default UI stack is **CJK-first**: `'Microsoft YaHei','PingFang
   SC',sans-serif`. 金句/标题 stack on CJK pages: `'Microsoft YaHei','PingFang
@@ -65,11 +69,12 @@ directly; do not ask style questions.
 
 1. Top **2px white progress bar** — `gsap.to(bar,{scaleX:1,scrollTrigger:{scrub:.3}})`.
 2. Fixed centered **brand bar** (mono, uppercase, blurred pill).
-3. Right **pill nav**: one dot per section; hover shows label; active dot =
+3. Right **pill nav** (container `id="nav-sections"`): one dot per section; hover shows label; active dot =
    bright + glow. Wire with a per-section `ScrollTrigger{start:'top 50%',
    end:'bottom 50%',onToggle}` — NOT `Math.round(scrollY/innerHeight)` (breaks
    when sections ≠ 100vh).
-4. Round **back-to-top** button (appears after ~500px).
+4. Round **back-to-top** button (appears after ~500px); the play button uses
+   `id="play-btn"`.
 5. **Curtain flash** on chapter change: fixed white overlay,
    `gsap.fromTo(curtain,{opacity:0},{opacity:.12,duration:.15,yoyo:true,repeat:1})`.
 6. **Keyboard section paging (always on)** — see overview.md frame chrome #1;

@@ -110,8 +110,8 @@ table.cmp td.num{font-family:var(--mono);font-size:12.5px;font-weight:600}
 footer{background:#0a0a12;color:#666880;padding:28px 0;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.1em}
 
 /* play / present mode */
-#playBtn{position:fixed;right:24px;bottom:24px;z-index:50;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.9);backdrop-filter:blur(8px);cursor:pointer;font-size:15px;color:var(--ink);box-shadow:0 8px 24px -12px rgba(20,20,60,.3);transition:transform .2s ease}
-#playBtn:hover{transform:scale(1.08)}
+#play-btn{position:fixed;right:24px;bottom:24px;z-index:50;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.9);backdrop-filter:blur(8px);cursor:pointer;font-size:15px;color:var(--ink);box-shadow:0 8px 24px -12px rgba(20,20,60,.3);transition:transform .2s ease}
+#play-btn:hover{transform:scale(1.08)}
 body.playing .scroll-cue{display:none}
 </style>
 </head>
@@ -126,7 +126,7 @@ body.playing .scroll-cue{display:none}
   <div class="hero-inner">
     <nav>
       <div class="brand">TESLA<span>·</span>Q2 2026</div>
-      <div class="links">
+      <div class="links" id="nav-sections">
         <a href="#kpi">KPI</a>
         <a href="#charts">Charts</a>
         <a href="#sources">Sources</a>
@@ -261,7 +261,7 @@ body.playing .scroll-cue{display:none}
 </section>
 
 <footer>TSLA · Q2 2026 IRIDESCENCE READ · SAMPLE OF kai-report-creator ANIMATED MODE</footer>
-<button id="playBtn" title="播放模式 (F5)">▶</button>
+<button id="play-btn" title="播放模式 (F5)">▶</button>
 
 <script>
 /* ===== 数据（单一数据源）：Tesla Q2 2026 Update + 交付公告，2026-07-30 采集 ===== */
@@ -403,7 +403,7 @@ render();
   secs.forEach(s=>secIO.observe(s));
   function goSec(i){i=Math.max(0,Math.min(i,secs.length-1));navSec=i;secs[i].scrollIntoView({behavior:'smooth'});}
 
-  const playBtn=document.getElementById('playBtn');
+  const playBtn=document.getElementById('play-btn');
   let wheelLock=0;
   function setPlay(on){
     document.body.classList.toggle('playing',on);

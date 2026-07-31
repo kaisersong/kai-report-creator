@@ -1,6 +1,12 @@
 # Generate Flow
 
-Steps for `--generate` mode:
+> **Fork first.** If frontmatter `animations:` is `scrollytelling` or
+> `iridescence`, this file does **not** apply beyond step 4 (guard validation):
+> load `references/animated-shell/overview.md` plus the one mode file and follow
+> that contract instead. Standard shell assembly (`html-shell/*`) and theme CSS
+> are skipped in that mode.
+
+Steps for `--generate` mode (standard shell):
 
 1. Read IR input only. With no file given, extract exactly one valid IR block from context. Treat this as IR from context, not chat history. If zero or multiple are present, stop and ask for an explicit file or single IR block. Never render the surrounding conversation.
 2. Load reference files minimally but reliably; load only the references that materially help the current render path. Standard HTML shell generation always loads the shell entry plus all `references/html-shell/*.md`; component rules load by IR inventory via `references/rendering-rules.md`.

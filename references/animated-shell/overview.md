@@ -25,17 +25,31 @@ Mode recipes: [scrollytelling.md](scrollytelling.md) (dark, GSAP) ·
 1. `scripts/guard_validate.py` on the IR before render.
 2. Never fabricate numbers. Undisclosed fields render as 「未公开」 with ghost
    bars (see mode recipes) — never estimate to fill a chart.
+   **Every figure on the page must trace back to the IR or to the sources
+   section.** A number that appears in neither is a contract violation even if
+   it came from a real article — either add it to the IR and disclose the
+   source, or drop it.
 3. `<html lang>` + JSON-LD metadata per [output-metadata.md](../output-metadata.md).
 4. `report-summary` JSON script (machine-readable KPIs), same contract as the
    standard shell.
-5. Root container attributes:
+5. Root `<html>` attributes (the gate reads `data-render-mode` off the
+   document's **first** start tag, so these belong on `<html>` itself):
    `data-template="kai-report-creator"`, `data-version="<skill version>"`,
    `data-theme="<animation mode>"`, `data-render-mode="animated"`,
    `data-animation="scrollytelling|iridescence"`.
-6. Post-render gate: `scripts/html_quality_gate.py <file>` — the animated
-   profile is auto-detected from `data-render-mode="animated"` and replaces
-   the standard shell/theme checks with animated assertions (paging JS, play
-   mode, font/CDN policy, shader fallback).
+   `data-theme` **must equal** `data-animation` (the gate enforces this).
+6. **Chrome element IDs are a contract**: the play button must be
+   `id="play-btn"` and the section-navigation container `id="nav-sections"`.
+   The gate checks these as real elements (HTMLParser, not substring), because
+   whether the keys actually page can only be verified in a browser.
+7. Every KPI shown on the page must also appear in the `report-summary` JSON
+   with a real number — when the numbers live in JS, that JSON is the only
+   auditable surface.
+8. Post-render gate: `scripts/html_quality_gate.py <file>` — the animated
+   profile is detected from `data-render-mode="animated"` on the root element
+   and replaces the standard shell checks with animated assertions (chrome IDs,
+   mode/theme agreement, font policy, pinned-script allow-list, shader
+   fallback, summary KPI contract).
 
 ## IR mapping
 
@@ -67,8 +81,20 @@ default arc (see mode recipes).
 
 ## Delivery & QA
 
-Write to the requested path (default report filename rules apply). QA = open
-in a real browser and scroll end-to-end once: charts fire exactly once,
-keyboard paging lands each section, play mode enters/exits fullscreen, no
-console errors, KPIs not stuck at 0. Then run
-`python scripts/html_quality_gate.py <file>` and fix findings until it passes.
+Write to the requested path (default report filename rules apply).
+
+**The gate cannot verify behaviour** — it only proves the chrome elements exist.
+So the browser pass is mandatory, not optional. Walk this checklist once:
+
+1. Scroll end-to-end: every chart fires exactly once, no console errors,
+   KPIs are not stuck at 0.
+2. `→ / ↓ / PageDown / Space` advance one section; `← / ↑ / PageUp` go back;
+   `Home / End` jump to first/last.
+3. `F5` (or the ▶ button) enters fullscreen play mode; wheel and click page one
+   section per gesture; `Esc` exits and restores the ▶ icon.
+4. iridescence only: the shader animates, pauses when the hero scrolls out of
+   view, and the page issues no network requests besides the file itself.
+5. Every figure on the page traces back to the IR or the sources section.
+
+Then run `python scripts/html_quality_gate.py <file>` and fix findings until it
+passes.
