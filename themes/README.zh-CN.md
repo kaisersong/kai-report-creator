@@ -94,6 +94,48 @@ theme: your-theme-name
 - 主题名只支持字母、数字和连字符，例如 `my-brand`、`warm-editorial`
 - 自定义主题与内置主题同等优先级，同名时自定义主题优先
 
+## 内置：forest-editorial（米绿纸感编辑风）
+
+`themes/forest-editorial/` —— 米绿纸底（`#f5f7f3`）+ 标题区深林绿锚块
+（`#102d27`，带金色 eyebrow 细线）+ 17–26px 大圆角与柔和长阴影。
+适合「整体要浅色易读、但需要一块深色视觉锚点」的报告。
+
+```yaml
+theme: forest-editorial
+```
+
+主题绿走 `.kpi-card` 顶边，而不是 KPI 数字 —— `shared.css` 刻意把
+`.kpi-value` 锁为中性色，本主题遵守该约定。图表配色（ECharts 不读 CSS 变量）
+写在 `theme.css` 顶部的 `chart palette:` 注释里。
+
+## 预设：radar-board（dark-board + 一个 override）
+
+`dark-board` 的情报盘风味。它是**预设而非独立主题**：冻结夹具换肤对比显示，
+它与 `dark-board` 的差别只有 accent 色，不值得在主题表里单独占一行。
+
+```yaml
+theme: dark-board
+theme_overrides:
+  primary_color: "#5ee1b4"
+```
+
+能力边界：`theme_overrides` 只映射 `primary_color` → `--primary` 与
+`font_family` → `--font-sans`。状态三色、底色微调、KPI 等宽数字、
+「最近更新」时间戳栏都**超出 overrides 能力**；要完整 radar 风格需升格为独立
+主题（触发条件：≥2 个真实用户显式要求）。
+
+## 用冻结夹具对比主题
+
+判断一个主题是否真的有辨识度，请给**冻结夹具**换肤，而不是各生成一份样张
+——AI 渲染的样张在措辞和结构上会漂移，污染对比：
+
+```bash
+python tests/fixtures/skin_fixture.py minimal forest-editorial dark-board
+python tests/fixtures/skin_fixture.py dark-board --overrides primary_color=#5ee1b4 --label radar-board
+```
+
+产物写到 `/tmp/theme-skin/`，并排打开即可。
+
 ## 分享主题
 
 将主题文件夹发布为 git 仓库，其他人 clone 进自己的 `themes/` 目录即可使用：

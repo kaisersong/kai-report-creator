@@ -1,6 +1,8 @@
 # 方案：为 kai-report-creator 新增主题 — forest-editorial（+ radar 覆盖预设）
 
-状态：**已通过五方对抗评审（v2.1 定稿）** · 2026-07-31
+状态：**Step 0 spike 已完成并通过** · 2026-07-31
+（forest-editorial 作为自定义主题落地并实证；radar 降级决定被实证坐实。
+ Phase 2「升内置」尚未做——等用户确认视觉后再启动。）
 评审记录：`proposals/adv-review-themes/`（两轮，codex/kiro/xiaok/grok/claude 五方
 第二轮一致 ACCEPT；本版已合并 4 条「动工前小修」）
 
@@ -21,6 +23,45 @@
 | 5 | radar 与 dark-board 路由必撞车（board/看板/监测词重叠），且 `.kpi-value` 写死 sans 栈，mono 差异化会蒸发 | radar 不立独立主题：做成文档化的 `theme_overrides` 预设，不加路由行 |
 | 6 | ECharts 颜色不读 CSS 变量，暗色图表可读性无保障 | forest 主题文件头部附**图表色板注释块**（AI 写 chart 配色的唯一来源，与现有主题惯例一致） |
 | 7 | 「五处联动」漏项：主题截图资产测试、SKILL.md 内置名单、theme-css.md 名单、context_isolation、README 截图栅格 | §5 联动清单扩为 9 项 |
+
+## Step 0 spike 结果（2026-07-31，已完成）
+
+夹具：`tests/fixtures/theme-skin-fixture.html`（class 取自真实渲染产物
+`examples/zh/business-report.html` + `shared.css`；scatter 用静态 SVG 替身，
+不内联 ECharts）。换肤脚本：`tests/fixtures/skin_fixture.py`，按
+`theme-css.md` 的真实装配顺序注入。
+
+### forest-editorial：**通过**（§4 硬断言 5/5，headless getComputedStyle）
+
+| 断言 | 实测值 |
+|---|---|
+| `body` 背景 | `rgb(245, 247, 243)` = `#f5f7f3` ✅ |
+| 锚区背景 | `linear-gradient(150deg, rgb(16,45,39), rgb(23,63,53))` 含 `#102d27` ✅ |
+| 锚区圆角 | `26px`（主题声明值，证明 POST-SHARED 级联生效）✅ |
+| `.kpi-card` 顶边 | `rgb(11, 107, 85)` = `#0b6b55` ✅ |
+| `.kpi-value` | `rgb(23, 33, 28)` 中性 —— 符合 §2 gap 的既定选择 ✅ |
+
+与 minimal 对照（同一 DOM）：minimal 为白底 + Georgia 衬线 + 4px 圆角 + 近黑
+顶边；forest 为纸绿底 + 系统无衬线 + 17/26px 圆角 + 深绿锚区。**一眼可辨**。
+
+### radar-board：**坐实降级**（不立独立主题）
+
+`dark-board` 与 `dark-board + primary_color=#5ee1b4` 的实测差异**只有 accent 色**：
+
+| 项 | dark-board | radar-board 预设 |
+|---|---|---|
+| `body` 背景 | `rgb(13,17,23)` | `rgb(13,17,23)`（同） |
+| `.kpi-card` 顶边 | `rgb(88,166,255)` 蓝 | `rgb(94,225,180)` 荧光绿 |
+| 圆角 / 字体 | `6px` / Inter | `6px` / Inter（同） |
+
+即 §5 R2 预期的结果 —— 已按 §6 写成 `themes/README*.md` 的预设配方，
+并注明 mono KPI / 时间戳 chrome 超出 overrides 能力。
+
+### 交付物
+
+- `themes/forest-editorial/theme.css`（双段结构，含 POST-SHARED 与 chart palette 注释）
+- `tests/fixtures/theme-skin-fixture.html` + `tests/fixtures/skin_fixture.py`
+- `themes/README.md` / `README.zh-CN.md`：forest 用法 + radar 预设 + 夹具对比命令
 
 ## 1. 范围
 

@@ -94,6 +94,54 @@ See `templates/themes/corporate-blue.css` for all available variables.
 - Theme names support only letters, numbers, and hyphens: `my-brand`, `warm-editorial`
 - Custom themes take priority over built-in themes with the same name
 
+## Bundled: forest-editorial
+
+`themes/forest-editorial/` — 米绿纸感编辑风: paper-green canvas (`#f5f7f3`), a
+deep forest-green anchor block behind the report title (`#102d27`) with a gold
+eyebrow rule, generous 17–26px radii and soft long shadows. Use it when a report
+should read light but still needs one dark visual anchor.
+
+```yaml
+theme: forest-editorial
+```
+
+The theme green rides the `.kpi-card` top border, not the KPI number —
+`shared.css` deliberately keeps `.kpi-value` neutral, and this theme respects
+that. Chart colours (ECharts does not read CSS variables) are listed in the
+`chart palette:` comment at the top of `theme.css`.
+
+## Preset: radar-board (dark-board + one override)
+
+An intelligence-dashboard flavour of `dark-board`. It is a **preset, not a
+theme** — a frozen-fixture comparison showed the only difference from
+`dark-board` is the accent colour, which is not worth a separate entry in the
+theme table:
+
+```yaml
+theme: dark-board
+theme_overrides:
+  primary_color: "#5ee1b4"
+```
+
+Boundary: `theme_overrides` maps `primary_color` → `--primary` and
+`font_family` → `--font-sans`, nothing else. Status tri-colour, background
+tuning, mono KPI digits and an "updated at" chrome bar are **out of reach** for
+overrides; a full radar look would need its own theme (bar: two or more real
+users asking for it explicitly).
+
+## Comparing themes on a frozen fixture
+
+To see whether a theme is genuinely distinguishable, skin the frozen fixture
+instead of generating sample reports — AI-rendered samples drift in wording and
+structure, which pollutes the comparison:
+
+```bash
+python tests/fixtures/skin_fixture.py minimal forest-editorial dark-board
+python tests/fixtures/skin_fixture.py dark-board --overrides primary_color=#5ee1b4 --label radar-board
+```
+
+Outputs land in `/tmp/theme-skin/`; open them side by side.
+
 ## Sharing Themes
 
 Publish your theme folder as a git repo — others clone it into their `themes/` directory:
