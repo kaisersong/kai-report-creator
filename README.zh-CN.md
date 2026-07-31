@@ -363,6 +363,7 @@ python scripts/html_quality_gate.py report.html
 - **9 种组件类型** — KPI 指标、图表、表格、时间线、流程图、代码块、标注、图片、列表
 - **Report Review 系统** — 13 项检查点自动优化
 - **AI 可读输出** — 三层机器可读结构
+- **动效渲染模式** — `animations: scrollytelling`（暗色 GSAP 滚动叙事）或 `animations: iridescence`（浅色 WebGL 虹彩首页、零 CDN）；单文件动效网页，内置方向键翻页与全屏播放模式，由 `html_quality_gate.py` 的 animated 断言组校验
 
 ### 交互功能
 
@@ -531,6 +532,9 @@ OpenClaw 会自动：
 | [examples/zh/business-report.html](examples/zh/business-report.html) | 2024 Q3 销售业绩报告（中文）|
 | [examples/zh/monthly-progress-reviewed-demo.html](examples/zh/monthly-progress-reviewed-demo.html) | 月报 reviewed demo（中文）|
 | [examples/en/business-report.html](examples/en/business-report.html) | Q3 Sales Report（英文）|
+| [examples/zh/tesla-q2-2026.report.md](examples/zh/tesla-q2-2026.report.md) | Tesla 2026 Q2 IR 源文件（动效模式）|
+| [examples/zh/tesla-q2-2026.html](examples/zh/tesla-q2-2026.html) | Tesla 2026 Q2 · 虹彩动效示例（WebGL 首页、零 CDN）|
+| [examples/zh/tesla-q2-2026-scrollytelling.html](examples/zh/tesla-q2-2026-scrollytelling.html) | Tesla 2026 Q2 · 滚动叙事动效示例（暗色 GSAP）|
 | [examples/review-reports/](examples/review-reports/) | 结构化 review report 示例 |
 
 ---

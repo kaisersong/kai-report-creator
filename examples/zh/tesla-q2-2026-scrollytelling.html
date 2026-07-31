@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh" data-template="kai-report-creator" data-version="1.24.0" data-theme="scrollytelling" data-render-mode="animated" data-animation="scrollytelling">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tesla 2026 Q2 · 动效速读</title>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org/",
+  "@type": "Report",
+  "name": "Tesla 2026 Q2 动效速读",
+  "inLanguage": "zh-CN",
+  "dateCreated": "2026-07-31",
+  "creator": { "@type": "Organization", "name": "kai-report-creator" },
+  "additionalProperty": [
+    { "@type": "PropertyValue", "propertyID": "https://kai.app/ns#reportTheme", "value": "scrollytelling" },
+    { "@type": "PropertyValue", "propertyID": "https://kai.app/ns#metadataVersion", "value": "1" }
+  ]
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+  integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+  integrity="sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg=="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.8.0/countUp.umd.min.js"
+  integrity="sha512-kUIpdMjMlkYUVQgR3wVXJtmuwoD+G69Zt9JBa2rPH4C/+VPlAsQWKcqCv0SpJ8AnezBjfuM2JDjnc58Ee8Filw=="
+  crossorigin="anonymous"></script>
+<style>
+:root{
+  --bg0:#0a0405; --bg1:#140708;
+  --p:#E82127; --p-bright:#FF4D52; --p-hi:#FFB3B5;
+  --teal:#00C2A8; --amber:#F0A93B; --white:#fff; --ink:#F5E9EA;
+  --serif:'Microsoft YaHei','PingFang SC',serif;
+  --ui:'Microsoft YaHei','PingFang SC','Inter',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,'Microsoft YaHei','PingFang SC',monospace;
+  --glass:rgba(46,16,18,.42); --glass-bd:rgba(255,77,82,.16);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:linear-gradient(180deg,var(--bg0),var(--bg1));color:var(--ink);
+  font-family:var(--ui);overflow-x:hidden;min-height:100vh}
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;transition:filter .8s ease}
+.glow{position:absolute;border-radius:50%}
+.glow.a{top:-12%;left:-8%;width:64%;height:64%;background:radial-gradient(circle,rgba(232,33,39,.05),transparent 65%)}
+.glow.b{bottom:-14%;right:-8%;width:66%;height:66%;background:radial-gradient(circle,rgba(0,194,168,.04),transparent 65%)}
+body.risk-mode .bg-layer{filter:hue-rotate(-24deg) brightness(.95)}
+
+#progress{position:fixed;top:0;left:0;height:2px;width:100%;background:var(--white);z-index:200;
+  transform:scaleX(0);transform-origin:left center;box-shadow:0 0 10px rgba(255,255,255,.6)}
+.brandbar{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:150;padding:7px 18px;
+  border-radius:0 0 12px 12px;background:rgba(20,7,8,.6);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.08);border-top:none;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.22em;color:#D8A3A6;text-transform:uppercase;display:flex;gap:10px;align-items:center;white-space:nowrap}
+.brandbar .dot{width:6px;height:6px;border-radius:50%;background:var(--p-bright);box-shadow:0 0 8px var(--p-bright)}
+.nav-pills{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:150;display:flex;flex-direction:column;gap:13px}
+.pill{position:relative;width:10px;height:10px;border-radius:50%;cursor:pointer;border:1px solid rgba(255,77,82,.4);
+  background:rgba(255,255,255,.05);transition:.3s;padding:0}
+.pill .tag{position:absolute;right:20px;top:50%;transform:translateY(-50%);white-space:nowrap;
+  font-family:var(--mono);font-size:10px;color:#F5C6C8;background:rgba(20,7,8,.85);backdrop-filter:blur(12px);
+  padding:3px 9px;border-radius:14px;border:1px solid var(--glass-bd);opacity:0;pointer-events:none;transition:.25s}
+.pill:hover .tag{opacity:1}
+.pill.active{background:var(--p-bright);border-color:var(--p-hi);box-shadow:0 0 12px var(--p-bright),0 0 22px rgba(255,77,82,.5)}
+.to-top{position:fixed;right:18px;bottom:22px;z-index:150;width:44px;height:44px;border-radius:50%;
+  background:rgba(20,7,8,.6);backdrop-filter:blur(18px);border:1px solid var(--glass-bd);color:var(--p-hi);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;
+  opacity:0;transform:translateY(14px);transition:.3s;pointer-events:none}
+.to-top.show{opacity:1;transform:none;pointer-events:auto}
+.play-btn{position:fixed;right:18px;bottom:76px;z-index:150;width:44px;height:44px;border-radius:50%;
+  background:rgba(20,7,8,.6);backdrop-filter:blur(18px);border:1px solid var(--glass-bd);color:var(--p-hi);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;padding-left:2px;transition:.25s}
+.play-btn:hover{background:rgba(232,33,39,.22);transform:scale(1.06)}
+body.playing .scroll-hint{display:none}
+#curtain{position:fixed;inset:0;z-index:180;background:#fff;pointer-events:none;opacity:0}
+
+.sec{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:110px 8vw 80px;position:relative;z-index:2}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--p-bright);
+  text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.kicker::before{content:"";width:26px;height:1px;background:var(--p-bright)}
+.h-title{font-family:var(--serif);font-style:italic;font-size:clamp(30px,4.6vw,56px);line-height:1.12;
+  color:var(--white);font-weight:400;margin-bottom:12px;text-align:center}
+.h-sub{font-size:14.5px;color:#D8A3A6;max-width:660px;line-height:1.7;margin-bottom:38px;text-align:center}
+.glass{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--glass-bd);border-radius:20px}
+.svg-chart{width:100%;height:auto;display:block;overflow:visible}
+.chart-wrap{width:100%;max-width:1020px;padding:32px 28px}
+.legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:18px;justify-content:center}
+.legend .li{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:#E6B6B8}
+.legend .sw{width:11px;height:11px;border-radius:3px}
+.tick{font-family:var(--mono);font-size:10.5px;fill:#B47E82}
+.grid-line{stroke:rgba(255,255,255,.05)}
+.bar-label{font-family:var(--mono);font-size:11px}
+
+#s1{overflow:hidden}
+.orbits{position:absolute;top:50%;left:50%;width:0;height:0;z-index:1}
+.orbit{position:absolute;top:50%;left:50%;border-radius:50%;border:1px dashed rgba(255,77,82,.16)}
+.orbit.o1{width:540px;height:540px;margin:-270px 0 0 -270px}
+.orbit.o2{width:800px;height:800px;margin:-400px 0 0 -400px;border-color:rgba(0,194,168,.10)}
+.orbit.o1::after{content:"";position:absolute;bottom:-4px;left:50%;width:6px;height:6px;border-radius:50%;
+  background:var(--p-hi);box-shadow:0 0 12px var(--p-hi)}
+.orbit.o2::after{content:"";position:absolute;top:-4px;left:50%;width:7px;height:7px;border-radius:50%;
+  background:var(--teal);box-shadow:0 0 12px var(--teal)}
+.micro{position:absolute;border-radius:50%;pointer-events:none;z-index:1}
+@keyframes floaty{0%,100%{transform:translate(0,0)}25%{transform:translate(10px,-16px)}50%{transform:translate(-7px,-9px)}75%{transform:translate(6px,12px)}}
+.logo-stage{position:relative;z-index:5;margin-bottom:28px;cursor:pointer}
+.logo-sweep{position:absolute;inset:-8px -30px;overflow:hidden;border-radius:14px;pointer-events:none}
+.logo-sweep i{position:absolute;top:0;left:-60%;width:45%;height:100%;
+  background:linear-gradient(105deg,transparent,rgba(255,179,181,.5),transparent);transform:skewX(-16deg)}
+.ripple{position:absolute;border:2px solid rgba(255,77,82,.65);border-radius:50%;pointer-events:none}
+.hero-mask{overflow:hidden;display:block;text-align:center}
+.hero-line{display:block;transform:translateY(112%);font-family:var(--serif);font-style:italic;
+  font-size:clamp(22px,3.2vw,38px);color:var(--p-hi);line-height:1.4}
+.hero-line.dim{color:#E6B6B8;font-size:clamp(16px,2.2vw,24px)}
+.scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:6;
+  font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:#A35D61;display:flex;flex-direction:column;align-items:center;gap:9px}
+.scroll-hint .bar{width:1px;height:40px;background:linear-gradient(var(--p-bright),transparent);animation:scrolly 2s ease-in-out infinite}
+@keyframes scrolly{0%,100%{opacity:.35;transform:scaleY(.5);transform-origin:top}50%{opacity:1;transform:scaleY(1)}}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;width:100%;max-width:1080px}
+.kpi{padding:30px 26px;position:relative;overflow:hidden}
+.kpi::after{content:"";position:absolute;right:-28px;top:-28px;width:110px;height:110px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,77,82,.10),transparent 70%)}
+.kpi .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:#C48E91;text-transform:uppercase;margin-bottom:14px}
+.kpi .val{font-family:var(--ui);font-weight:800;font-variant-numeric:tabular-nums lining-nums;letter-spacing:-.01em;font-size:38px;line-height:1;color:var(--white)}
+.kpi .val .u{font-size:19px;color:var(--p-bright)}
+.kpi .note{font-family:var(--mono);font-size:11px;color:var(--teal);margin-top:12px}
+.kpi .cap{font-family:var(--mono);font-size:9.5px;color:#A35D61;margin-top:5px}
+
+.ring-track{fill:none;stroke:rgba(255,255,255,.06);stroke-width:12}
+.ring-val{fill:none;stroke-width:12;stroke-linecap:round}
+.ring-lbl{font-family:var(--mono);font-size:10.5px;fill:#D8A3A6}
+.ring-big{font-family:var(--ui);font-weight:800;font-size:22px;fill:#fff}
+
+.sk-lbl{font-family:var(--mono);font-size:10.5px;fill:#F5C6C8}
+.sk-val{font-family:var(--mono);font-size:9.5px;fill:#B47E82}
+
+.anchor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;width:100%;max-width:1080px}
+.anchor{padding:32px 28px}
+.anchor .tag{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:#C48E91;text-transform:uppercase}
+.anchor .big{font-family:var(--ui);font-weight:800;font-variant-numeric:tabular-nums lining-nums;letter-spacing:-.01em;font-size:34px;color:var(--p-hi);line-height:1.1;margin-top:10px}
+.anchor .desc{font-family:var(--serif);font-style:italic;font-size:16px;color:#E6B6B8;margin-top:14px;line-height:1.6}
+.anchor .eq{font-family:var(--mono);font-size:10.5px;color:#B47E82;margin-top:12px}
+
+.risk-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;width:100%;max-width:1180px}
+.risk{padding:26px 20px;border-left:3px solid var(--amber)}
+.risk .lvl{font-family:var(--mono);font-size:9px;letter-spacing:.2em;padding:3px 8px;border-radius:12px;display:inline-block;margin-bottom:12px}
+.lvl.hi{color:#FF8A7B;background:rgba(255,122,107,.12)}
+.lvl.md{color:var(--amber);background:rgba(240,169,59,.12)}
+.risk .ttl{font-family:var(--ui);font-weight:700;font-size:17px;color:#fff;margin-bottom:10px}
+.risk .txt{font-size:12.5px;color:#D8A3A6;line-height:1.6}
+.risk-banner{font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:.22em;margin-top:30px;opacity:0;transition:.5s}
+body.risk-mode .risk-banner{opacity:1}
+
+footer{position:relative;z-index:2;padding:46px 8vw;text-align:center;border-top:1px solid rgba(255,255,255,.05)}
+footer .mn{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:#8F4E52;text-transform:uppercase;line-height:2}
+
+@media(max-width:980px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.anchor-grid,.risk-grid{grid-template-columns:1fr}.nav-pills{display:none}}
+</style>
+</head>
+<body>
+<script type="application/json" id="report-summary">
+{"title":"Tesla 2026 Q2 动效速读","theme":"scrollytelling","sections":["开场","核心盘面","五季度节奏","利润率三环","收入水系","交付与储能","体感换算","风险清单"],"kpis":[{"label":"总营收","value":"$282.4亿"},{"label":"车辆交付","value":"48.0万辆"},{"label":"GAAP 净利润","value":"$11.1亿"},{"label":"储能装机","value":"13.5GWh"}]}
+</script>
+<div class="bg-layer"><div class="glow a"></div><div class="glow b"></div></div>
+<div id="progress"></div>
+<div class="brandbar"><span class="dot"></span>TESLA INC · TSLA · Q2 2026 READ</div>
+<nav class="nav-pills" id="navPills"></nav>
+<button class="to-top" id="toTop" aria-label="回到顶部">↑</button>
+<button class="play-btn" id="playBtn" aria-label="播放" title="播放 (F5)">▶</button>
+<div id="curtain"></div>
+
+<main>
+<!-- s1 HERO -->
+<section class="sec" id="s1">
+  <div class="orbits"><div class="orbit o1" id="orb1"></div><div class="orbit o2" id="orb2"></div></div>
+  <div class="logo-stage" id="logoStage">
+    <div class="logo-sweep"><i id="sweep"></i></div>
+    <svg width="340" height="72" viewBox="0 0 340 72" style="overflow:visible">
+      <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#FF4D52"/><stop offset="1" stop-color="#E82127"/></linearGradient></defs>
+      <path d="M12 18 L64 18 L60 28 L43 28 L43 58 L33 58 L33 28 L16 28 Z" fill="url(#lg)"/>
+      <text x="84" y="47" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="32" font-weight="800" fill="#fff" letter-spacing="6">TESLA</text>
+    </svg>
+  </div>
+  <span class="hero-mask"><span class="hero-line" id="hl1">千亿营收，微薄利润。</span></span>
+  <span class="hero-mask"><span class="hero-line dim" id="hl2">交付创纪录，钱都投给了 AI 与产能。</span></span>
+  <div class="scroll-hint"><span>SCROLL</span><span class="bar"></span></div>
+</section>
+
+<!-- s2 KPI -->
+<section class="sec" id="s2">
+  <div class="kicker">01 · 核心盘面</div>
+  <h2 class="h-title">四个数字，先看张力。</h2>
+  <p class="h-sub">全部为 Q2 2026 公告口径（未经审计），同比对 Q2 2025；采集日期 2026-07-30。</p>
+  <div class="kpi-grid">
+    <div class="glass kpi"><div class="lbl">总营收</div><div class="val">$<span class="cu" data-t="282.4" data-d="1">0</span><span class="u"> 亿</span></div><div class="note">同比 +26% · 单季纪录</div><div class="cap">TTM 首破 $1,000 亿</div></div>
+    <div class="glass kpi"><div class="lbl">车辆交付</div><div class="val"><span class="cu" data-t="48.0" data-d="1">0</span><span class="u"> 万辆</span></div><div class="note">同比 +25% · Q2 纪录</div><div class="cap">精确值 480,126 辆</div></div>
+    <div class="glass kpi"><div class="lbl">GAAP 净利润</div><div class="val">$<span class="cu" data-t="11.1" data-d="1">0</span><span class="u"> 亿</span></div><div class="note">同比 −5% · 运营利润率 1.4%</div><div class="cap">运营利润 $3.98 亿 −57%</div></div>
+    <div class="glass kpi"><div class="lbl">储能装机</div><div class="val"><span class="cu" data-t="13.5" data-d="1">0</span><span class="u"> GWh</span></div><div class="note">同比 +41%</div><div class="cap">TTM 装机创纪录</div></div>
+  </div>
+</section>
+
+<!-- s3 five-quarter revenue bars + net income line -->
+<section class="sec" id="s3">
+  <div class="kicker">02 · 五季度节奏</div>
+  <h2 class="h-title">收入创新高，净利在低位横盘。</h2>
+  <p class="h-sub">柱状为季度总营收（亿美元），青色折线为 GAAP 净利润（右轴，亿美元）。</p>
+  <div class="glass chart-wrap">
+    <svg class="svg-chart" viewBox="0 0 900 430" id="tSvg">
+      <defs><linearGradient id="gbar" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#FFB3B5"/><stop offset="1" stop-color="#E82127"/></linearGradient></defs>
+      <g id="tGrid"></g><g id="tBars"></g>
+      <path id="tLine" fill="none" stroke="#00C2A8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <g id="tDots"></g>
+    </svg>
+    <div class="legend">
+      <span class="li"><span class="sw" style="background:linear-gradient(#FFB3B5,#E82127)"></span>总营收（亿美元）</span>
+      <span class="li"><span class="sw" style="background:#00C2A8;border-radius:50%"></span>GAAP 净利润（亿美元，右轴）</span>
+    </div>
+  </div>
+</section>
+
+<!-- s4 margin rings -->
+<section class="sec" id="s4">
+  <div class="kicker">03 · 利润率三环</div>
+  <h2 class="h-title">越往里越薄：1.4% 的运营利润率。</h2>
+  <p class="h-sub">Q2 2026 三个口径的利润率（满环 = 25%）—— 毛利率 16.8%，Adj. EBITDA 11.6%，运营利润率 1.4%。</p>
+  <div class="glass chart-wrap" style="max-width:720px">
+    <svg class="svg-chart" viewBox="-360 -170 720 340" id="ringSvg"><g id="ringGroup"></g></svg>
+    <div class="legend">
+      <span class="li"><span class="sw" style="background:#FFB3B5"></span>毛利率 16.8%（−41bp）</span>
+      <span class="li"><span class="sw" style="background:#FF4D52"></span>Adj. EBITDA 11.6%（−353bp）</span>
+      <span class="li"><span class="sw" style="background:#00C2A8"></span>运营利润率 1.4%（−269bp）</span>
+    </div>
+  </div>
+</section>
+
+<!-- s5 sankey -->
+<section class="sec" id="s5">
+  <div class="kicker">04 · 收入水系</div>
+  <h2 class="h-title">282 亿美元，从哪里来？</h2>
+  <p class="h-sub">Q2 2026 分部收入：总营收 → 汽车 / 能源发电与储能 / 服务及其他（亿美元）。</p>
+  <div class="glass chart-wrap" style="padding:30px 22px">
+    <svg class="svg-chart" viewBox="0 0 940 520" id="skSvg"><g id="skG"></g></svg>
+  </div>
+</section>
+
+<!-- s6 dual axis deliveries + storage -->
+<section class="sec" id="s6">
+  <div class="kicker">05 · 交付与储能</div>
+  <h2 class="h-title">两条产品曲线，一起爬坡。</h2>
+  <p class="h-sub">柱状为季度交付（万辆，左轴），青色折线为储能装机（GWh，右轴）。</p>
+  <div class="glass chart-wrap">
+    <svg class="svg-chart" viewBox="0 0 900 420" id="duSvg">
+      <g id="duGrid"></g><g id="duBars"></g>
+      <path id="duLine" fill="none" stroke="#00C2A8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <g id="duDots"></g>
+    </svg>
+    <div class="legend">
+      <span class="li"><span class="sw" style="background:linear-gradient(#FFB3B5,#E82127)"></span>交付（万辆）</span>
+      <span class="li"><span class="sw" style="background:#00C2A8;border-radius:50%"></span>储能装机（GWh）</span>
+    </div>
+  </div>
+</section>
+
+<!-- s7 anchors -->
+<section class="sec" id="s7">
+  <div class="kicker">06 · 换算成体感</div>
+  <h2 class="h-title">这个季度值多少？翻译一下。</h2>
+  <p class="h-sub">把公告里的抽象数字，换算成能直接感受的尺度。</p>
+  <div class="anchor-grid">
+    <div class="glass anchor"><div class="tag">交付密度</div><div class="big">5,276 辆 / 天</div><div class="desc">480,126 辆 ÷ 91 天——平均每天交付五千多辆车，每 16 秒就有一台新 Tesla 上路。</div><div class="eq">480,126 ÷ 91</div></div>
+    <div class="glass anchor"><div class="tag">投入强度</div><div class="big">$6,360 万 / 天</div><div class="desc">57.9 亿美元资本开支 ÷ 91 天——每天砸六千多万美元进产能与 AI，这就是自由现金流转负的原因。</div><div class="eq">$57.9亿 ÷ 91</div></div>
+    <div class="glass anchor"><div class="tag">订阅飞轮</div><div class="big">148 万 FSD</div><div class="desc">FSD 活跃订阅一年 +56%——车队越大，软件收入的滚雪球越快，这是利润率反转的期权。</div><div class="eq">Q2 2026 · +56% YoY</div></div>
+  </div>
+</section>
+
+<!-- s8 risk -->
+<section class="sec" id="s8">
+  <div class="kicker">07 · 风险清单</div>
+  <h2 class="h-title">纪录交付之后，盯这五件事。</h2>
+  <p class="h-sub">滚到这一节，页面切入"风险视角"——色相偏移提醒你保持警觉。</p>
+  <div class="risk-grid">
+    <div class="glass risk"><span class="lvl hi">HIGH</span><div class="ttl">利润率压缩</div><div class="txt">运营利润率 1.4%（−269bp），运营费用 +47% 远快于收入 +26%——投入曲线必须尽快兑换成回报。</div></div>
+    <div class="glass risk"><span class="lvl hi">HIGH</span><div class="ttl">自由现金流转负</div><div class="txt">FCF −10.9 亿美元：资本开支 57.9 亿（+142%）吞掉了 47 亿经营现金流，高投入期还将持续。</div></div>
+    <div class="glass risk"><span class="lvl md">MED</span><div class="ttl">EPS 不及预期</div><div class="txt">非 GAAP EPS $0.33（−18%），低于市场预期的 $0.53——盈利预期与投入节奏的落差在放大。</div></div>
+    <div class="glass risk"><span class="lvl md">MED</span><div class="ttl">新业务爬坡</div><div class="txt">Cybercab、Optimus、Megafactory Texas 均处投产爬坡期，量产节奏不及预期会拉长回收周期。</div></div>
+    <div class="glass risk"><span class="lvl md">MED</span><div class="ttl">电池产能瓶颈</div><div class="txt">公司明示电池包产能是近期整车放量的主要限制因素——供给侧瓶颈直接约束交付上限。</div></div>
+  </div>
+  <div class="risk-banner">⚠ RISK MODE · HUE-SHIFTED BACKGROUND</div>
+</section>
+</main>
+
+<footer><div class="mn">TESLA INC · TSLA · 数据取自 Q2 2026 Update（未经审计）与官方交付公告 · 采集 2026-07-30 · 非投资建议</div></footer>
+
+<script>
+(function(){
+'use strict';
+gsap.registerPlugin(ScrollTrigger);
+var NS='http://www.w3.org/2000/svg';
+function $(s,p){return (p||document).querySelector(s);}
+function el(t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function catmullRomPath(p){if(p.length<2)return '';
+  var d='M '+p[0][0]+' '+p[0][1];
+  for(var i=0;i<p.length-1;i++){
+    var a=p[i-1]||p[i],b=p[i],c=p[i+1],e2=p[i+2]||c;
+    d+=' C '+(b[0]+(c[0]-a[0])/6)+' '+(b[1]+(c[1]-a[1])/6)+', '+(c[0]-(e2[0]-b[0])/6)+' '+(c[1]-(e2[1]-b[1])/6)+', '+c[0]+' '+c[1];}
+  return d;}
+function drawIn(path,delay){var L=path.getTotalLength();
+  gsap.set(path,{strokeDasharray:L,strokeDashoffset:L});
+  gsap.to(path,{strokeDashoffset:0,duration:1.4,delay:delay||0,ease:'power2.inOut'});}
+function countTo(node,end,dec,dur){
+  if(window.countUp&&countUp.CountUp){
+    try{var c=new countUp.CountUp(node,end,{decimalPlaces:dec||0,duration:dur||2.2});
+      if(!c.error){c.start();return;}}catch(e){}}
+  var t0=performance.now(),D=(dur||2.2)*1000;
+  (function tick(){var p=Math.min((performance.now()-t0)/D,1),e=1-Math.pow(1-p,3);
+    node.textContent=(end*e).toFixed(dec||0);if(p<1)requestAnimationFrame(tick);})();}
+
+/* DATA — Tesla Q2 2026 Update（未经审计）+ 官方交付公告，2026-07-30 采集 */
+var QTR=['Q2-25','Q3-25','Q4-25','Q1-26','Q2-26'];
+var REV=[224.96,280.95,249.01,223.87,282.36];   /* 总营收(亿美元) */
+var NET=[11.72,13.73,8.40,4.77,11.14];          /* GAAP净利(亿美元) */
+var DEL=[38.4,49.7,41.8,35.8,48.0];             /* 交付(万辆) */
+var GWH=[9.6,12.5,14.2,8.8,13.5];               /* 储能(GWh) */
+var MARGINS=[['毛利率',16.8,'#FFB3B5'],['Adj. EBITDA',11.6,'#FF4D52'],['运营利润率',1.4,'#00C2A8']];
+var NAVN=['开场','核心盘面','五季度节奏','利润率三环','收入水系','交付与储能','体感换算','风险清单'];
+
+/* frame */
+var pills=$('#navPills');
+NAVN.forEach(function(n,i){
+  var b=document.createElement('button');b.className='pill';b.setAttribute('aria-label',n);
+  var t=document.createElement('span');t.className='tag';t.textContent=(i+1)+' · '+n;
+  b.appendChild(t);b.onclick=function(){$('#s'+(i+1)).scrollIntoView({behavior:'smooth'});};
+  pills.appendChild(b);
+});
+gsap.to('#progress',{scaleX:1,ease:'none',scrollTrigger:{trigger:document.body,start:'top top',end:'bottom bottom',scrub:.3}});
+var curSec=0;
+document.querySelectorAll('.sec').forEach(function(sec,i){
+  ScrollTrigger.create({trigger:sec,start:'top 50%',end:'bottom 50%',
+    onToggle:function(self){if(self.isActive){navSec=i;
+      document.querySelectorAll('.pill').forEach(function(p,k){p.classList.toggle('active',k===i);});
+      if(curSec!==i){curSec=i;
+        gsap.fromTo('#curtain',{opacity:0},{opacity:.10,duration:.14,yoyo:true,repeat:1,ease:'power2.inOut'});}
+    }}});
+});
+ScrollTrigger.create({start:'top -400',onToggle:function(s){$('#toTop').classList.toggle('show',s.isActive);}});
+$('#toTop').onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};
+
+/* s1 hero */
+gsap.to('#orb1',{rotation:360,duration:60,repeat:-1,ease:'none'});
+gsap.to('#orb2',{rotation:-360,duration:90,repeat:-1,ease:'none'});
+(function(){var s1=$('#s1'),cols=['#FF4D52','#FFB3B5','#00C2A8'];
+  for(var i=0;i<26;i++){var d=document.createElement('div');d.className='micro';
+    var sz=1.5+Math.random()*3,c=cols[i%3];
+    d.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(4+Math.random()*92)+'%;top:'+(6+Math.random()*88)+
+      '%;background:'+c+';box-shadow:0 0 '+(sz*3)+'px '+c+';opacity:'+(0.15+Math.random()*0.35).toFixed(2)+
+      ';animation:floaty '+(3.5+Math.random()*4).toFixed(1)+'s ease-in-out '+(Math.random()*4).toFixed(1)+'s infinite';
+    s1.appendChild(d);}})();
+gsap.set(['#hl1','#hl2'],{y:0,yPercent:112});
+gsap.timeline({delay:.4})
+  .from('.logo-stage svg',{opacity:0,scale:.85,duration:.7,ease:'power2.out'})
+  .fromTo('#sweep',{left:'-60%'},{left:'130%',duration:1,ease:'power2.inOut'})
+  .to(['#hl1','#hl2'],{yPercent:0,duration:.9,stagger:.18,ease:'power3.out'},'-=.4');
+$('#logoStage').addEventListener('click',function(e){
+  var r=this.getBoundingClientRect(),rip=document.createElement('div');rip.className='ripple';
+  rip.style.left=(e.clientX-r.left-14)+'px';rip.style.top=(e.clientY-r.top-14)+'px';
+  rip.style.width='28px';rip.style.height='28px';this.appendChild(rip);
+  gsap.fromTo(rip,{scale:0,opacity:.8},{scale:5,opacity:0,duration:.7,ease:'power2.out',onComplete:function(){rip.remove();}});
+});
+var ready=false;setTimeout(function(){ready=true;},1700);
+document.addEventListener('mousemove',function(e){
+  if(!ready)return;
+  var mx=(e.clientX/innerWidth-.5)*2,my=(e.clientY/innerHeight-.5)*2;
+  gsap.to('.logo-stage',{x:mx*16,y:my*10,duration:.7,ease:'power2.out'});
+  gsap.to('.orbits',{x:-mx*22,y:-my*16,duration:.9,ease:'power2.out'});
+});
+
+/* s2 KPI */
+ScrollTrigger.create({trigger:'#s2',start:'top 60%',once:true,onEnter:function(){
+  document.querySelectorAll('.cu').forEach(function(n){
+    countTo(n,parseFloat(n.dataset.t),parseInt(n.dataset.d||0),2.4);});
+  gsap.from('.kpi',{y:34,opacity:0,duration:.7,stagger:.12,ease:'power3.out'});
+}});
+
+/* s3 revenue bars + net line (right axis) */
+ScrollTrigger.create({trigger:'#s3',start:'top 58%',once:true,onEnter:function(){
+  var W=900,H=430,pl=64,pb=56,pt=30,pr=64,cH=H-pb-pt,maxR=300;
+  var nMax=16;                              /* right axis for net income */
+  var n=QTR.length,bw=88,gapX=(W-pl-pr-n*bw)/(n+1);
+  var x=function(i){return pl+gapX+i*(bw+gapX);};
+  var yN=function(v){return pt+cH-(v/nMax*cH);};
+  var g=$('#tGrid');
+  for(var v=0;v<=300;v+=100){var y=pt+cH-(v/maxR*cH);
+    g.appendChild(el('line',{class:'grid-line',x1:pl,x2:W-pr,y1:y,y2:y}));
+    var t=el('text',{x:pl-8,y:y+4,'text-anchor':'end',class:'tick'});t.textContent=v;g.appendChild(t);}
+  [0,8,16].forEach(function(v){var t2=el('text',{x:W-pr+10,y:yN(v)+4,class:'tick',fill:'#3FD9C4'});
+    t2.textContent=v;g.appendChild(t2);});
+  var bg=$('#tBars');
+  REV.forEach(function(v,i){
+    var bh=v/maxR*cH,bx=x(i),by=pt+cH-bh;
+    var b=el('rect',{x:bx,y:by,width:bw,height:bh,rx:7,fill:'url(#gbar)'});
+    bg.appendChild(b);
+    gsap.fromTo(b,{scaleY:0,svgOrigin:(bx+bw/2)+' '+(by+bh)},{scaleY:1,duration:.9,delay:i*.14,ease:'power3.out'});
+    var tl=el('text',{x:bx+bw/2,y:by-10,'text-anchor':'middle',class:'bar-label',fill:'#FFB3B5'});
+    tl.textContent=v.toFixed(0);bg.appendChild(tl);gsap.from(tl,{opacity:0,duration:.4,delay:i*.14+.5});
+    var xr=el('text',{x:bx+bw/2,y:H-pb+24,'text-anchor':'middle',class:'tick'});xr.textContent=QTR[i];bg.appendChild(xr);
+  });
+  var pts=NET.map(function(v,i){return [x(i)+bw/2,yN(v)];});
+  $('#tLine').setAttribute('d',catmullRomPath(pts));drawIn($('#tLine'),.6);
+  pts.forEach(function(p,i){
+    var d=el('circle',{cx:p[0],cy:p[1],r:4.5,fill:'#00C2A8',stroke:'#0a0405','stroke-width':1.5});
+    $('#tDots').appendChild(d);gsap.from(d,{opacity:0,duration:.35,delay:.9+i*.15});
+    var lb=el('text',{x:p[0],y:p[1]-13,'text-anchor':'middle',class:'bar-label',fill:'#3FD9C4'});
+    lb.textContent=NET[i].toFixed(1);$('#tDots').appendChild(lb);
+    gsap.from(lb,{opacity:0,duration:.35,delay:1.1+i*.15});
+  });
+}});
+
+/* s4 margin rings, 满环=25% */
+ScrollTrigger.create({trigger:'#s4',start:'top 58%',once:true,onEnter:function(){
+  var g=$('#ringGroup');
+  MARGINS.forEach(function(r,i){
+    var rad=[128,96,64][i];
+    g.appendChild(el('circle',{class:'ring-track',r:rad}));
+    var arc=el('circle',{class:'ring-val',r:rad,stroke:r[2],transform:'rotate(-90)'});g.appendChild(arc);
+    var C=2*Math.PI*rad;
+    gsap.set(arc,{strokeDasharray:C,strokeDashoffset:C});
+    gsap.to(arc,{strokeDashoffset:C*(1-r[1]/25),duration:1.6,delay:i*.2,ease:'power2.out'});
+    var t=el('text',{class:'ring-lbl','text-anchor':'middle',y:-rad+16});
+    t.textContent=r[0]+' '+r[1]+'%';g.appendChild(t);gsap.from(t,{opacity:0,duration:.6,delay:.8+i*.2});
+  });
+  var c=el('text',{class:'ring-big','text-anchor':'middle',y:9});c.textContent='Margins';g.appendChild(c);
+}});
+
+/* s5 sankey 1→3 (Q2 2026 分部) */
+ScrollTrigger.create({trigger:'#s5',start:'top 55%',once:true,onEnter:function(){
+  var H=520,scale=(H-140)/282.36,gap=14,NW=16;
+  var g=$('#skG');
+  var c0=[{n:'总营收 $282.4亿',v:282.36,x:120}];
+  var c1=[{n:'汽车 $205.2亿 (+23%)',v:205.16,x:700},
+          {n:'服务及其他 $45.8亿 (+50%)',v:45.81,x:700},
+          {n:'能源与储能 $31.4亿 (+13%)',v:31.39,x:700}];
+  function layout(col){var sum=col.reduce(function(a,b){return a+b.v*scale;},0)+(col.length-1)*gap;
+    var yy=(H-sum)/2;col.forEach(function(nd){nd.h=Math.max(nd.v*scale,3);nd.y=yy;yy+=nd.h+gap;});}
+  [c0,c1].forEach(layout);
+  function ribbon(s,t,color,delay){
+    s.outOff=s.outOff||0;t.inOff=t.inOff||0;
+    var v=t.v*scale,y1=s.y+s.outOff+v/2,y2=t.y+t.inOff+v/2,x1=s.x+NW,x2=t.x,cx=(x1+x2)/2;
+    var p=el('path',{d:'M '+x1+' '+y1+' C '+cx+' '+y1+', '+cx+' '+y2+', '+x2+' '+y2,
+      fill:'none',stroke:color,'stroke-width':Math.max(v,2),opacity:0});
+    g.insertBefore(p,g.firstChild);
+    var L=p.getTotalLength();gsap.set(p,{strokeDasharray:L,strokeDashoffset:L});
+    gsap.to(p,{strokeDashoffset:0,opacity:.42,duration:.9,delay:delay,ease:'power2.out'});
+    s.outOff+=v;t.inOff+=v;}
+  ribbon(c0[0],c1[0],'#FF4D52',.2);
+  ribbon(c0[0],c1[1],'#FFB3B5',.4);
+  ribbon(c0[0],c1[2],'#00C2A8',.6);
+  [c0,c1].forEach(function(col,ci){col.forEach(function(nd){
+    var r=el('rect',{x:nd.x,y:nd.y,width:NW,height:nd.h,rx:4,fill:'#FFB3B5'});
+    g.appendChild(r);gsap.from(r,{opacity:0,duration:.5});
+    var anchor=ci===0?'end':'start',lx=ci===0?nd.x-8:nd.x+NW+8;
+    var lb=el('text',{class:'sk-lbl',x:lx,y:nd.y+nd.h/2+3,'text-anchor':anchor});
+    lb.textContent=nd.n;g.appendChild(lb);
+    gsap.from(lb,{opacity:0,duration:.5,delay:.5});});});
+}});
+
+/* s6 dual axis deliveries + storage */
+ScrollTrigger.create({trigger:'#s6',start:'top 58%',once:true,onEnter:function(){
+  var W=900,H=420,pl=60,pb=56,pt=28,pr=58,cH=H-pb-pt,maxB=52,maxP=16;
+  var n=DEL.length,bw=88,gapX=(W-pl-pr-n*bw)/(n+1);
+  var x=function(i){return pl+gapX+i*(bw+gapX);};
+  var g=$('#duGrid');
+  for(var v=0;v<=52;v+=13){var y=pt+cH-(v/maxB*cH);
+    g.appendChild(el('line',{class:'grid-line',x1:pl,x2:W-pr,y1:y,y2:y}));
+    var t=el('text',{x:pl-8,y:y+4,'text-anchor':'end',class:'tick'});t.textContent=v;g.appendChild(t);}
+  for(var e2=0;e2<=16;e2+=4){var y2=pt+cH-(e2/maxP*cH);
+    var t2=el('text',{x:W-pr+8,y:y2+4,class:'tick',fill:'#3FD9C4'});t2.textContent=e2;g.appendChild(t2);}
+  var bg=$('#duBars');
+  DEL.forEach(function(u,i){
+    var bh=u/maxB*cH,bx=x(i),by=pt+cH-bh;
+    var b=el('rect',{x:bx,y:by,width:bw,height:bh,rx:7,fill:'url(#gbar)'});bg.appendChild(b);
+    gsap.fromTo(b,{scaleY:0,svgOrigin:(bx+bw/2)+' '+(by+bh)},{scaleY:1,duration:.85,delay:i*.12,ease:'power3.out'});
+    var tl=el('text',{x:bx+bw/2,y:by-10,'text-anchor':'middle',class:'bar-label',fill:'#FFB3B5'});
+    tl.textContent=u.toFixed(1);bg.appendChild(tl);gsap.from(tl,{opacity:0,duration:.4,delay:i*.12+.5});
+    var xr=el('text',{x:bx+bw/2,y:H-pb+24,'text-anchor':'middle',class:'tick'});xr.textContent=QTR[i];bg.appendChild(xr);
+  });
+  var pts=GWH.map(function(u,i){return [x(i)+bw/2,pt+cH-(u/maxP*cH)];});
+  $('#duLine').setAttribute('d',catmullRomPath(pts));drawIn($('#duLine'),.5);
+  pts.forEach(function(p,i){
+    var d=el('circle',{cx:p[0],cy:p[1],r:4.5,fill:'#00C2A8',stroke:'#0a0405','stroke-width':1.5});
+    $('#duDots').appendChild(d);gsap.from(d,{opacity:0,duration:.35,delay:.8+i*.12});
+    var lb=el('text',{x:p[0],y:p[1]-13,'text-anchor':'middle',class:'bar-label',fill:'#3FD9C4'});
+    lb.textContent=GWH[i].toFixed(1);$('#duDots').appendChild(lb);gsap.from(lb,{opacity:0,duration:.35,delay:1+i*.12});
+  });
+}});
+
+/* s7 anchors */
+ScrollTrigger.create({trigger:'#s7',start:'top 62%',once:true,onEnter:function(){
+  gsap.from('.anchor',{y:40,opacity:0,duration:.75,stagger:.15,ease:'power3.out'});
+}});
+
+/* s8 risk — intentionally NO once:true */
+ScrollTrigger.create({trigger:'#s8',start:'top 60%',end:'bottom 30%',
+  onEnter:function(){document.body.classList.add('risk-mode');
+    gsap.fromTo('.risk',{y:32,opacity:0},{y:0,opacity:1,duration:.6,stagger:.1,ease:'power3.out'});},
+  onLeave:function(){document.body.classList.remove('risk-mode');},
+  onEnterBack:function(){document.body.classList.add('risk-mode');},
+  onLeaveBack:function(){document.body.classList.remove('risk-mode');}});
+
+/* keyboard section paging + play (present) mode */
+var secs=[].slice.call(document.querySelectorAll('.sec'));
+var navSec=0;
+function goSec(i){i=Math.max(0,Math.min(i,secs.length-1));navSec=i;secs[i].scrollIntoView({behavior:'smooth'});}
+var playBtn=$('#playBtn'),wheelLock=0;
+function setPlay(on){
+  document.body.classList.toggle('playing',on);
+  if(playBtn){playBtn.textContent=on?'✕':'▶';playBtn.title=on?'退出播放 (Esc)':'播放 (F5)';}
+  if(on){var el2=document.documentElement;
+    if(el2.requestFullscreen)el2.requestFullscreen().catch(function(){});}
+  else if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(function(){});
+}
+if(playBtn)playBtn.addEventListener('click',function(){setPlay(!document.body.classList.contains('playing'));});
+document.addEventListener('fullscreenchange',function(){
+  ScrollTrigger.refresh();
+  if(!document.fullscreenElement&&document.body.classList.contains('playing'))setPlay(false);});
+document.addEventListener('keydown',function(e){
+  if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName||''))return;
+  if(e.key==='F5'){e.preventDefault();setPlay(true);return;}
+  if(e.key==='Escape'){if(document.body.classList.contains('playing'))setPlay(false);return;}
+  if(['ArrowRight','ArrowDown','PageDown',' '].indexOf(e.key)>=0){e.preventDefault();goSec(navSec+1);}
+  else if(['ArrowLeft','ArrowUp','PageUp'].indexOf(e.key)>=0){e.preventDefault();goSec(navSec-1);}
+  else if(e.key==='Home'){e.preventDefault();goSec(0);}
+  else if(e.key==='End'){e.preventDefault();goSec(secs.length-1);}
+});
+window.addEventListener('wheel',function(e){
+  if(!document.body.classList.contains('playing'))return;
+  e.preventDefault();
+  var now=Date.now();if(now-wheelLock<700)return;wheelLock=now;
+  goSec(navSec+(e.deltaY>0?1:-1));
+},{passive:false});
+document.addEventListener('click',function(e){
+  if(!document.body.classList.contains('playing'))return;
+  if(e.target.closest('button,a,.pill'))return;
+  goSec(navSec+(e.clientX<innerWidth*0.25?-1:1));
+});
+
+window.addEventListener('load',function(){ScrollTrigger.refresh();});
+})();
+</script>
+</body>
+</html>

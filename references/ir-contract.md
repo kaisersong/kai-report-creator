@@ -24,7 +24,7 @@ must_avoid:
   - Decorative placeholder chart
 charts: cdn
 toc: true
-animations: true
+animations: true                       # true = standard-shell scroll reveals; scrollytelling | iridescence = animated render mode (references/animated-shell/)
 abstract: "One-sentence summary"
 poster_title: "Optional stronger poster headline"
 poster_subtitle: "Optional poster subtitle"

@@ -48,6 +48,7 @@ Load reference files minimally by route; do not read every reference by default.
 |-------|-------------|------------------|
 | `--plan` | `references/spec-loading-matrix.md`, `references/plan-flow.md`, `references/theme-routing.md` | `references/regular-report-content-rules.md` for periodic reports |
 | `--generate` | `references/generate-flow.md`, `references/html-shell-template.md` + every `references/html-shell/*.md`, `references/theme-css.md`, `references/review-checklist.md`, `references/output-metadata.md` | `references/rendering-rules.md` then only the `references/rendering/*.md` files required by the IR; `references/anti-patterns.md` for visual anchors; `references/diagram-decision-rules.md` for diagrams; `references/regular-report-content-rules.md` for periodic reports |
+| animated (`animations: scrollytelling\|iridescence`) | `references/animated-shell/overview.md` + the one mode file (`scrollytelling.md` or `iridescence.md`), `references/output-metadata.md` | `references/anti-patterns.md`; skip `html-shell*` and `theme-css.md` entirely |
 | `--review` | `references/review-checklist.md` | `references/review-report-template.md` if a structured change summary is requested |
 | custom theme/template | `references/theme-css.md`, `references/toc-and-template.md` | custom theme `reference.md` or `theme.css` |
 
@@ -112,6 +113,15 @@ Then run these quality gates in sequence — do not skip:
 12. Run the silent final review pass from `references/review-checklist.md`, then write the HTML and report the path.
 
 When the report is explicitly comparing named vendors, models, or tools, set `data-report-mode="comparison"` on the outer report container and use `.badge--entity-a/.badge--entity-b/.badge--entity-c` only for entity identity.
+
+## Animated Render Mode
+
+When frontmatter has `animations: scrollytelling` or `animations: iridescence`, or the user asks for a 动效网页 / 滚动叙事 / scrollytelling / 动画长页 / 虹彩 / iridescence page: this is a different shell contract. Load `references/animated-shell/overview.md` + the one mode file and hand-write ONE animated single-file HTML per that recipe.
+
+- Guard validation (step in `--generate` flow) and JSON-LD metadata still apply; `report-summary` JSON is still required.
+- Skip `--generate` steps that assume the standard shell: html-shell references, theme CSS, and the L2 shell ID checks in step 11.
+- Step 10 still runs: `scripts/html_quality_gate.py` auto-detects `data-render-mode="animated"` and swaps in the animated assertion set (paging/play chrome, font & CDN policy, WebGL fallback).
+- QA additionally requires opening the file in a real browser and scrolling end-to-end once (charts fire once, keyboard paging works, play mode enters/exits fullscreen).
 
 ## `--review` Flow
 

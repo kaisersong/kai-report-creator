@@ -89,3 +89,72 @@ def test_html_quality_gate_accepts_fangsong_theme_fidelity_without_shell_check()
     report = validate_html_text(html, standard_shell=False, jsonld_check=False)
 
     assert report["status"] == "valid"
+
+
+def _animated_html(mode: str, body_extra: str = "", scripts: str = "") -> str:
+    webgl = (
+        "const gl=canvas.getContext('webgl');"
+        "if(!gl){canvas.style.background='linear-gradient(135deg,#cfe0ff,#f0f6ff)';}"
+        if mode == "iridescence"
+        else ""
+    )
+    return f"""
+<!DOCTYPE html>
+<html lang="zh" data-template="kai-report-creator" data-version="1.25.0" data-theme="{mode}" data-render-mode="animated" data-animation="{mode}">
+<head>{scripts}</head>
+<body>
+<script type="application/json" id="report-summary">{{"title":"T","sections":[],"kpis":[{{"label":"营收","value":"282亿"}}]}}</script>
+<canvas id="c"></canvas>
+{body_extra}
+<script>
+{webgl}
+document.addEventListener('keydown',e=>{{}});
+document.querySelector('#c').scrollIntoView();
+document.body.classList.toggle('playing');
+document.documentElement.requestFullscreen;
+</script>
+</body>
+</html>
+""".strip()
+
+
+def test_html_quality_gate_animated_iridescence_passes_without_standard_shell():
+    report = validate_html_text(_animated_html("iridescence"), jsonld_check=False)
+    assert report["status"] == "valid", report["findings"]
+
+
+def test_html_quality_gate_animated_skips_standard_shell_ids():
+    report = validate_html_text(_animated_html("iridescence"), jsonld_check=False)
+    codes = {f["code"] for f in report["findings"]}
+    assert "shell.missing_id" not in codes
+
+
+def test_html_quality_gate_animated_rejects_external_font_and_missing_paging():
+    html = _animated_html(
+        "iridescence",
+        scripts='<link href="https://fonts.googleapis.com/css2?family=X" rel="stylesheet">',
+    ).replace("keydown", "keyup")
+    report = validate_html_text(html, jsonld_check=False)
+    codes = {f["code"] for f in report["findings"]}
+    assert "animated.external_font" in codes
+    assert "animated.missing_paging" in codes
+
+
+def test_html_quality_gate_animated_iridescence_rejects_cdn_script():
+    html = _animated_html(
+        "iridescence",
+        scripts='<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>',
+    )
+    report = validate_html_text(html, jsonld_check=False)
+    codes = {f["code"] for f in report["findings"]}
+    assert "animated.external_script" in codes
+
+
+def test_html_quality_gate_animated_scrollytelling_requires_sri():
+    html = _animated_html(
+        "scrollytelling",
+        scripts='<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>',
+    )
+    report = validate_html_text(html, jsonld_check=False)
+    codes = {f["code"] for f in report["findings"]}
+    assert "animated.missing_sri" in codes

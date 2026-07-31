@@ -35,6 +35,63 @@ STANDARD_REQUIRED_IDS = [
     "export-im-share",
 ]
 
+ANIMATED_MODES = ("scrollytelling", "iridescence")
+
+ANIMATED_ALLOWED_SCRIPT_HOSTS = ("https://cdnjs.cloudflare.com/",)
+
+FORBIDDEN_FONT_ORIGINS = ("fonts.googleapis.com", "fonts.gstatic.com")
+
+
+def is_animated_html(html: str) -> bool:
+    return bool(re.search(r'data-render-mode=["\']animated["\']', html))
+
+
+def validate_animated_shell(html: str) -> list[Finding]:
+    findings: list[Finding] = []
+    for attr in ('data-template="kai-report-creator"', "data-version=", "data-theme="):
+        if attr.replace('"', "'") not in html and attr not in html:
+            findings.append(Finding("animated.missing_attr", f"Missing marker: {attr}"))
+
+    mode_match = re.search(r'data-animation=["\']([^"\']+)["\']', html)
+    mode = mode_match.group(1) if mode_match else None
+    if mode not in ANIMATED_MODES:
+        findings.append(
+            Finding("animated.invalid_mode", f"data-animation must be one of {ANIMATED_MODES}, got {mode!r}.")
+        )
+
+    # Frame chrome: keyboard paging + play mode
+    if "keydown" not in html or "scrollIntoView" not in html:
+        findings.append(Finding("animated.missing_paging", "Keyboard section paging (keydown + scrollIntoView) not found."))
+    if "playing" not in html or "requestFullscreen" not in html:
+        findings.append(Finding("animated.missing_play_mode", "Play mode (body.playing + requestFullscreen) not found."))
+    if re.search(r"body\.playing\s*\{[^}]*overflow\s*:\s*hidden", html):
+        findings.append(Finding("animated.playing_overflow_hidden", "body.playing must not set overflow:hidden (breaks paging)."))
+
+    # Font policy: no external font origins
+    for origin in FORBIDDEN_FONT_ORIGINS:
+        if origin in html:
+            findings.append(Finding("animated.external_font", f"External font origin forbidden: {origin}"))
+
+    # External script policy
+    ext_srcs = re.findall(r'<script\b[^>]*\bsrc=["\']([^"\']+)["\']', html)
+    if mode == "iridescence":
+        if ext_srcs:
+            findings.append(Finding("animated.external_script", f"iridescence mode must have zero CDNs, found: {ext_srcs}"))
+        if not re.search(r"getContext\(\s*['\"]webgl", html):
+            findings.append(Finding("animated.missing_webgl", "iridescence mode requires a WebGL canvas."))
+        elif "linear-gradient(135deg,#cfe0ff,#f0f6ff)" not in html:
+            findings.append(Finding("animated.missing_webgl_fallback", "Missing WebGL-unavailable fallback gradient."))
+    elif mode == "scrollytelling":
+        for src in ext_srcs:
+            if not src.startswith(ANIMATED_ALLOWED_SCRIPT_HOSTS):
+                findings.append(Finding("animated.external_script", f"Script origin not allowed: {src}"))
+        script_tags = re.findall(r"<script\b[^>]*\bsrc=[^>]*>", html)
+        for tag in script_tags:
+            if "integrity=" not in tag:
+                findings.append(Finding("animated.missing_sri", f"CDN script missing integrity attr: {tag[:100]}"))
+    return findings
+
+
 THEME_MARKERS = {
     "corporate-blue": ["/* Theme: corporate-blue", "--font-sans:", "body { font-family: var(--font-sans)"],
     "minimal": ["/* Theme: minimal", "--font-sans:", "body { font-family: var(--font-sans)"],
@@ -449,9 +506,12 @@ def validate_html_text(
     jsonld_check: bool = True,
 ) -> dict[str, object]:
     findings: list[Finding] = []
-    if standard_shell:
+    animated = is_animated_html(html)
+    if animated:
+        findings.extend(validate_animated_shell(html))
+    if standard_shell and not animated:
         findings.extend(validate_standard_shell(html))
-    if theme_fidelity:
+    if theme_fidelity and not animated:
         findings.extend(validate_theme_fidelity(html))
     if kpi_values:
         findings.extend(validate_kpi_values(html))

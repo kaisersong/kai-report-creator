@@ -438,6 +438,7 @@ python scripts/html_quality_gate.py report.html
 - **9 component types** — KPIs, charts (ECharts), tables, timelines, diagrams, code blocks, callouts, images, lists
 - **Report Review System** — 13-checkpoint automatic refinement
 - **AI-readable output** — 3-layer machine-readable structure for downstream agents
+- **Animated render mode** — `animations: scrollytelling` (dark GSAP scroll narrative) or `animations: iridescence` (light WebGL-shader hero, zero CDN); single-file animated web page with keyboard paging and fullscreen play mode, validated by the animated profile of `html_quality_gate.py`
 
 ### Interaction
 
@@ -608,6 +609,9 @@ OpenClaw will:
 | [examples/en/business-report.html](examples/en/business-report.html) | Q3 Sales Report (EN) |
 | [examples/en/business-report-reviewed-demo.html](examples/en/business-report-reviewed-demo.html) | Reviewed demo with stronger BLUF (EN) |
 | [examples/zh/business-report.html](examples/zh/business-report.html) | Q3 销售业绩报告（中文）|
+| [examples/zh/tesla-q2-2026.report.md](examples/zh/tesla-q2-2026.report.md) | Tesla Q2 2026 IR source (animated mode) |
+| [examples/zh/tesla-q2-2026.html](examples/zh/tesla-q2-2026.html) | Tesla Q2 2026 — iridescence animated demo (WebGL hero, zero CDN) |
+| [examples/zh/tesla-q2-2026-scrollytelling.html](examples/zh/tesla-q2-2026-scrollytelling.html) | Tesla Q2 2026 — scrollytelling animated demo (dark, GSAP) |
 | [examples/review-reports/](examples/review-reports/) | Structured review report examples |
 
 ---

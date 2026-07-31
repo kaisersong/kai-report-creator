@@ -28,3 +28,6 @@ Use this index to load only the reference files needed for the current route. `S
 | `spec-loading-matrix.md` | Before `--plan` and `--generate` | Silent classifier for `brief`, `research`, `comparison`, and `update` archetypes |
 | `toc-and-template.md` | TOC, custom template, or theme override work | TOC link rules, custom template placeholders, theme override injection |
 | `design-quality.md` | Design judgment is needed beyond deterministic shell/component rules | Visual quality baseline, typography, color discipline, rhythm guidance |
+| `animated-shell/overview.md` | `animations: scrollytelling\|iridescence` or user asks 动效网页/滚动叙事/虹彩 | Animated mode pipeline invariants, IR mapping, frame chrome (paging + play mode), gate profile |
+| `animated-shell/scrollytelling.md` | Animated mode = scrollytelling | Dark GSAP scroll-narrative recipe: 3-CDN SRI contract, design system, section patterns, 铁律, helpers |
+| `animated-shell/iridescence.md` | Animated mode = iridescence | Light WebGL-hero recipe: zero-CDN contract, verbatim shader, fallback/DPR/IO rules |
