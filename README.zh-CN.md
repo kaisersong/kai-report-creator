@@ -183,10 +183,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release 下载
 
-当前发布版本是 **v1.24.0**。可以从 GitHub Releases 下载源码包：
+当前发布版本是 **v1.25.0**。可以从 GitHub Releases 下载源码包：
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.24.0
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.24.0.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.25.0
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.25.0.zip
 
 ---
 
@@ -558,6 +558,8 @@ OpenClaw 会自动：
 ---
 
 ## 版本日志
+
+**v1.25.0** — 动效渲染模式与 forest-editorial 主题：把 scrollytelling / iridescence 配方从 lingee-gen-ppt 迁入 `references/animated-shell/`，由 `animations: scrollytelling|iridescence` 路由；重写 quality gate 的 animated 断言组，改为校验真实元素而非子串（HTMLParser 判定模式与 chrome ID、CDN 的 `(src, integrity)` 精确白名单、逐项 summary KPI 校验、`data-theme == data-animation`、与色值无关的 WebGL 降级检查）；标准轨的 id 检查同样先剥离注释；新增第 9 个内置主题 `forest-editorial` 及其指纹；新增冻结夹具 `tests/fixtures/skin_fixture.py`，让主题对比不受 AI 渲染漂移干扰；新增 20 个 playwright 行为测试覆盖动效翻页与播放模式；明确门禁的职责边界——抓生成器疏漏，不抓刻意构造的解析歧义，也不判断数字真假。
 
 **v1.24.0** — JSON-LD 结构化元数据发布：每个渲染 HTML 嵌入 `<script type="application/ld+json">` schema.org Report 元数据（name、inLanguage、creator、theme、metadataVersion、irHash）；新增 `references/output-metadata.md` 字段契约；quality gate 新增 JSON-LD 验证（位置、转义、必填字段、hash 一致性、propertyID 白名单）；eval 新增 `jsonld` 维度；canonical templates 加入 JSON-LD；34 个新单元测试；跨 repo hash 计算标准化。
 

@@ -249,10 +249,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release Downloads
 
-The current release is **v1.24.0**. Download source bundles from GitHub Releases:
+The current release is **v1.25.0**. Download source bundles from GitHub Releases:
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.24.0
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.24.0.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.25.0
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.25.0.zip
 
 ---
 
@@ -635,6 +635,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 ---
 
 ## Version History
+
+**v1.25.0** — Animated render mode and forest-editorial theme: migrate the scrollytelling and iridescence recipes from lingee-gen-ppt into `references/animated-shell/` with `animations: scrollytelling|iridescence` routing; rebuild the quality gate's animated profile so it verifies real elements instead of substrings (HTMLParser-based mode detection and chrome IDs, an exact `(src, integrity)` allow-list for pinned CDNs, per-KPI summary checks, `data-theme == data-animation`, colour-agnostic WebGL fallback); strip comments before the standard-track id checks too; add `forest-editorial` as the 9th built-in theme with its fingerprint; add a frozen theme-skinning fixture (`tests/fixtures/skin_fixture.py`) so themes can be compared without AI rendering drift; add 20 playwright behaviour tests for animated paging and play mode; document that the gate catches generator omissions, not hand-crafted parsing ambiguity, and never judges whether a number is truthful.
 
 **v1.24.0** — JSON-LD structured metadata release: every rendered HTML now embeds `<script type="application/ld+json">` with schema.org Report metadata (name, inLanguage, creator, theme, metadataVersion, irHash); add `references/output-metadata.md` field contract; add quality gate JSON-LD validation (position, escaping, required fields, hash parity, propertyID allow-list); add `jsonld` eval dimension; update canonical templates with JSON-LD; 34 new JSON-LD unit tests; normalize IR hash computation for cross-repo parity.
 
