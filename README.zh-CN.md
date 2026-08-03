@@ -29,6 +29,10 @@
 </tr>
 <tr>
 <td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/regular-lumen.html"><img src="templates/screenshots/regular-lumen.png" width="360" alt="regular-lumen"/><br/><b>regular-lumen</b></a><br/><sub>周期报告 · 周报/日报/月报</sub></td>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/forest-editorial.html"><img src="templates/screenshots/forest-editorial.png" width="360" alt="forest-editorial"/><br/><b>forest-editorial</b></a><br/><sub>米绿纸感 · 编辑风</sub></td>
+</tr>
+<tr>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/zh/radar-board.html"><img src="templates/screenshots/radar-board.png" width="360" alt="radar-board"/><br/><b>radar-board</b></a><br/><sub>dark-board 预设 · 情报看板</sub></td>
 </tr>
 </table>
 

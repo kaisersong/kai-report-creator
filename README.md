@@ -29,6 +29,10 @@ Click any screenshot to open the live demo:
 </tr>
 <tr>
 <td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/regular-lumen.html"><img src="templates/screenshots/regular-lumen.png" width="360" alt="regular-lumen"/><br/><b>regular-lumen</b></a><br/><sub>Periodic Reports · Weekly/Daily/Monthly</sub></td>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/forest-editorial.html"><img src="templates/screenshots/forest-editorial.png" width="360" alt="forest-editorial"/><br/><b>forest-editorial</b></a><br/><sub>Paper-Green · Editorial</sub></td>
+</tr>
+<tr>
+<td align="center"><a href="https://kaisersong.github.io/kai-report-creator/templates/en/radar-board.html"><img src="templates/screenshots/radar-board.png" width="360" alt="radar-board"/><br/><b>radar-board</b></a><br/><sub>dark-board preset · Intelligence Dashboard</sub></td>
 </tr>
 </table>
 
