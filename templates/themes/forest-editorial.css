@@ -37,8 +37,10 @@ blockquote { border-left: 3px solid var(--accent); margin: .8rem 0; padding: .55
 .report-wrapper { max-width: 960px; margin: 0 auto; padding: 2.4rem 2rem 3rem; }
 .report-meta { color: var(--text-muted); font-family: var(--font-mono); font-size: .78rem; letter-spacing: .04em; }
 
-/* 深林绿锚区 —— 本主题的识别特征。h1 所在的报告头整块深色。 */
+/* 深林绿锚区 —— 本主题的识别特征。h1 所在的报告头整块深色。
+   标准 shell 会把 h1 包进 .title-row 以放摘要卡按钮，所以两种结构都要命中。 */
 .report-wrapper > h1:first-of-type,
+.report-wrapper > .title-row:first-of-type,
 .fe-anchor {
   background: linear-gradient(150deg, var(--fe-anchor), var(--fe-anchor-2));
   color: #f3f7f3;
@@ -51,13 +53,25 @@ blockquote { border-left: 3px solid var(--accent); margin: .8rem 0; padding: .55
 }
 /* 锚区内的金色 eyebrow 细线 */
 .report-wrapper > h1:first-of-type::before,
+.report-wrapper > .title-row:first-of-type::before,
 .fe-anchor::before {
   content: "";
   position: absolute; left: 2rem; top: 1.35rem;
   width: 34px; height: 3px; border-radius: 2px;
   background: var(--accent);
 }
-.report-wrapper > h1:first-of-type { padding-top: 2.6rem; }
+.report-wrapper > h1:first-of-type,
+.report-wrapper > .title-row:first-of-type { padding-top: 2.6rem; }
+/* 包在锚区里的 h1 自己不再成块，摘要卡按钮改为深色底上的浅色描边 */
+.report-wrapper > .title-row:first-of-type > h1 {
+  background: none; box-shadow: none; padding: 0; margin: 0; color: inherit; border-radius: 0;
+}
+.report-wrapper > .title-row:first-of-type > .card-mode-btn {
+  background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.3); color: #e8efe9;
+}
+.report-wrapper > .title-row:first-of-type > .card-mode-btn:hover {
+  background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.45); color: #fff;
+}
 
 /* KPI 卡：主题绿走顶边（shared.css 把 .kpi-value 锁为中性色，不覆写） */
 .kpi-card {

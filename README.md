@@ -253,10 +253,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release Downloads
 
-The current release is **v1.26.0**. Download source bundles from GitHub Releases:
+The current release is **v1.26.1**. Download source bundles from GitHub Releases:
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.26.0
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.26.0.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.26.1
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.26.1.zip
 
 ---
 
@@ -641,6 +641,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 ---
 
 ## Version History
+
+**v1.26.1** — forest-editorial anchor-block fix: the theme's deep forest-green header block was scoped to `.report-wrapper > h1:first-of-type`, but the standard shell wraps h1 in `.title-row` to seat the summary-card button, so every generated forest-editorial report rendered a plain title with no anchor and no gold eyebrow — only the older hand-built preview decks still looked right; the anchor now matches both structures and the summary-card button switches to a light outline when it sits on the dark anchor. Both forest-editorial preview decks get the shell they were missing: the `⊞ Summary` card overlay, a real `export-print` binding with prepared print mode so the paper-green background survives PDF export, screenshots re-shot at 1280×800, and `data-version` / JSON-LD `rendererVersion` brought into agreement. Adds `tests/test_forest_editorial_anchor.py`, four computed-style regression tests — the gate's fingerprint markers only prove declarations are present, not that they still match the shipped DOM.
 
 **v1.26.0** — Theme preview and doc-sync release: ship the `templates/{en,zh}/forest-editorial.html` and `templates/{en,zh}/radar-board.html` preview decks with 1280×800 screenshots and add both to the README demo grid; document `radar-board` in the Themes section as a `dark-board` preset (`theme_overrides.primary_color: "#5ee1b4"`) rather than a tenth built-in theme, matching the frozen-fixture finding in `themes/README.md`; fix the `SKILL_HEAD.md` drift left by v1.25.0, where the zh skill description and highlight list still claimed 8 themes and never mentioned animated render mode; give the zh radar-board deck the same `data-template` / `data-version` / `data-theme` markers its en sibling already carried.
 

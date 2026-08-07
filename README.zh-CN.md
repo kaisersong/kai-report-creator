@@ -187,10 +187,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release 下载
 
-当前发布版本是 **v1.26.0**。可以从 GitHub Releases 下载源码包：
+当前发布版本是 **v1.26.1**。可以从 GitHub Releases 下载源码包：
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.26.0
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.26.0.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.26.1
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.26.1.zip
 
 ---
 
@@ -564,6 +564,8 @@ OpenClaw 会自动：
 ---
 
 ## 版本日志
+
+**v1.26.1** — forest-editorial 锚区修复：主题的深林绿标题锚区此前只匹配 `.report-wrapper > h1:first-of-type`，但标准 shell 会把 h1 包进 `.title-row` 以安放摘要卡按钮，于是真实生成的每一份 forest-editorial 报告都只有一个普通标题，没有深色锚区也没有金色 eyebrow——只有早期手写的预览页还是好看的；现在两种结构都命中，摘要卡按钮落在深色锚区上时改为浅色描边。两份 forest-editorial 预览页补齐了此前缺失的 shell：`⊞ 摘要卡` 遮罩、真正绑定的 `export-print` 与 prepared print mode（让米绿纸感底色在 PDF 导出中保留）、1280×800 截图重拍、`data-version` 与 JSON-LD `rendererVersion` 对齐。新增 `tests/test_forest_editorial_anchor.py` 四个计算样式回归测试——门禁的指纹标记只能证明声明存在，不能证明它仍然匹配实际输出的 DOM。
 
 **v1.26.0** — 主题预览与文档同步发布：新增 `templates/{en,zh}/forest-editorial.html` 与 `templates/{en,zh}/radar-board.html` 预览页及 1280×800 截图，并加入 README 演示墙；主题章节明确 `radar-board` 是 `dark-board` 预设（`theme_overrides.primary_color: "#5ee1b4"`）而非第 10 个内置主题，与 `themes/README.md` 的冻结夹具结论一致；修正 v1.25.0 遗留的 `SKILL_HEAD.md` 漂移——中文 skill 描述与亮点列表仍写 8 套主题，也未提动效渲染模式；为 zh 版 radar-board 预览页补上 en 版早已具备的 `data-template` / `data-version` / `data-theme` 标记。
 

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<!-- kai-report-creator v1.25.0 -->
-<html lang="en" data-template="kai-report-creator" data-version="1.25.0" data-theme="forest-editorial">
+<!-- kai-report-creator v1.26.1 -->
+<html lang="en" data-template="kai-report-creator" data-version="1.26.1" data-theme="forest-editorial">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +30,7 @@
     {
       "@type": "PropertyValue",
       "propertyID": "https:\/\/kai.app\/ns#rendererVersion",
-      "value": "1.24.0"
+      "value": "1.26.1"
     }
   ]
 }
@@ -231,11 +231,101 @@ blockquote { border-left: 3px solid var(--accent); margin: .8rem 0; padding: .55
     }
     .export-item:last-child { border-bottom: none; }
     .export-item:hover { background: var(--primary-light, #e3edff); }
+
+    /* Summary card button — bottom-aligned with h1 */
+    .title-row { display: flex; align-items: flex-end; gap: 1rem; }
+    .title-row h1 { flex: 1; }
+    .card-mode-btn {
+      flex-shrink: 0; margin-bottom: .6rem;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+      padding: .28rem .65rem; font-size: .76rem; font-weight: 600;
+      color: var(--text-muted); cursor: pointer; transition: all .15s;
+      font-family: var(--font-sans, system-ui); white-space: nowrap;
+    }
+    .card-mode-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+    /* Summary card overlay */
+    .sc-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,.52); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 2rem;
+    }
+    body.card-mode .sc-overlay { display: flex; }
+    body.card-mode { overflow: hidden; height: 100vh; }
+    html:has(body.card-mode) { overflow: hidden; height: 100vh; }
+    body.card-mode .main-with-toc,
+    body.card-mode .toc-toggle,
+    body.card-mode .toc-sidebar { visibility: hidden; }
+    body.card-mode .sc-overlay { visibility: visible; }
+
+    /* Card — editorial two-column, high density */
+    .sc-card {
+      position: relative; display: flex; width: min(900px, 92vw);
+      background: var(--surface, #fff); border: 1px solid rgba(0,0,0,.12);
+      border-radius: var(--radius, 8px); overflow: hidden;
+      box-shadow: 0 24px 72px rgba(0,0,0,.3);
+    }
+    .sc-left {
+      flex: 0 0 46%; display: flex; flex-direction: column;
+      padding: 1.8rem 2rem 1.6rem;
+      background: linear-gradient(150deg, var(--fe-anchor), var(--fe-anchor-2)); color: #fff;
+    }
+    .sc-label {
+      font-size: .55rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+      opacity: .5; margin-bottom: .55rem; display: flex; align-items: center; gap: .45rem;
+    }
+    .sc-label::before { content: ''; display: inline-block; width: 20px; height: 1px; background: currentColor; }
+    .sc-title-main {
+      font-size: clamp(3.45rem, 6.9vw, 5.25rem);
+      font-weight: 900; line-height: .92; letter-spacing: -.05em;
+      margin-bottom: .35rem; word-break: break-word;
+    }
+    .sc-title-sub {
+      font-size: 1.08rem; line-height: 1.5;
+      color: rgba(255,255,255,.88); margin-bottom: .9rem; max-width: 82%;
+    }
+    .sc-note { margin-top: auto; padding-top: 1.4rem; width: 72%; font-size: .84rem; line-height: 1.68; opacity: .9; }
+    .sc-right {
+      flex: 1; display: flex; flex-direction: column;
+      padding: 1.8rem; border-left: 1px solid var(--border);
+    }
+    .sc-kpi-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 0 .6rem; margin-bottom: .5rem; }
+    .sc-kpi-row { padding: .32rem 0; border-bottom: 1px solid var(--border); }
+    .sc-kpi-row-l { font-size: .56rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+    .sc-kpi-row-v { font-size: 1.15rem; font-weight: 800; color: var(--primary); line-height: 1.15; }
+    .sc-kpi-row-t { font-size: .6rem; color: var(--success, #057A55); font-weight: 600; }
+    .sc-summaries { flex: 1; display: flex; flex-direction: column; }
+    .sc-sum-item { padding: .35rem 0; border-bottom: 1px solid var(--border); }
+    .sc-sum-item:last-child { border-bottom: none; }
+    .sc-sum-name { font-size: .56rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: .08em; }
+    .sc-sum-text { font-size: .74rem; color: var(--text); line-height: 1.45; margin-top: .06rem; opacity: .72; }
+    .sc-close {
+      position: absolute; top: .8rem; right: .8rem; z-index: 1;
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 3px;
+      width: 24px; height: 24px; cursor: pointer; color: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: .75rem;
+      transition: background .15s;
+    }
+    .sc-close:hover { background: rgba(255,255,255,.28); }
+    @media (max-width: 900px) {
+      .sc-card { flex-direction: column; width: min(92vw, 640px); }
+      .sc-right { border-left: none; border-top: 1px solid var(--border); }
+    }
+
+    /* Prepared print mode — keep entrance-animated blocks visible in PDF export */
+    .print-exporting .fade-in-up { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .print-exporting .kpi-grid .kpi-card { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .print-exporting .timeline .timeline-item { opacity: 1 !important; transform: none !important; transition: none !important; }
+
     @page { size: A4; margin: 1.5cm; }
     @media print {
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      html, body {
+        background: var(--print-bg-color, var(--report-bg, var(--bg, #ffffff))) !important;
+        color: var(--report-text, var(--text, #111111)) !important;
+      }
       .toc-toggle, .toc-sidebar, .edit-hotzone, .edit-toggle,
-      .export-btn, .export-menu { display: none !important; }
+      .export-btn, .export-menu, .sc-overlay, .card-mode-btn { display: none !important; }
       /* Granular page-break rules — avoid blank pages */
       h2 { break-after: avoid; }
       .kpi-grid { break-inside: avoid; }
@@ -259,8 +349,10 @@ blockquote { border-left: 3px solid var(--accent); margin: .8rem 0; padding: .55
 .report-wrapper { max-width: 960px; margin: 0 auto; padding: 2.4rem 2rem 3rem; }
 .report-meta { color: var(--text-muted); font-family: var(--font-mono); font-size: .78rem; letter-spacing: .04em; }
 
-/* 深林绿锚区 —— 本主题的识别特征。h1 所在的报告头整块深色。 */
+/* 深林绿锚区 —— 本主题的识别特征。h1 所在的报告头整块深色。
+   标准 shell 会把 h1 包进 .title-row 以放摘要卡按钮，所以两种结构都要命中。 */
 .report-wrapper > h1:first-of-type,
+.report-wrapper > .title-row:first-of-type,
 .fe-anchor {
   background: linear-gradient(150deg, var(--fe-anchor), var(--fe-anchor-2));
   color: #f3f7f3;
@@ -273,13 +365,25 @@ blockquote { border-left: 3px solid var(--accent); margin: .8rem 0; padding: .55
 }
 /* 锚区内的金色 eyebrow 细线 */
 .report-wrapper > h1:first-of-type::before,
+.report-wrapper > .title-row:first-of-type::before,
 .fe-anchor::before {
   content: "";
   position: absolute; left: 2rem; top: 1.35rem;
   width: 34px; height: 3px; border-radius: 2px;
   background: var(--accent);
 }
-.report-wrapper > h1:first-of-type { padding-top: 2.6rem; }
+.report-wrapper > h1:first-of-type,
+.report-wrapper > .title-row:first-of-type { padding-top: 2.6rem; }
+/* 包在锚区里的 h1 自己不再成块，摘要卡按钮改为深色底上的浅色描边 */
+.report-wrapper > .title-row:first-of-type > h1 {
+  background: none; box-shadow: none; padding: 0; margin: 0; color: inherit; border-radius: 0;
+}
+.report-wrapper > .title-row:first-of-type > .card-mode-btn {
+  background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.3); color: #e8efe9;
+}
+.report-wrapper > .title-row:first-of-type > .card-mode-btn:hover {
+  background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.45); color: #fff;
+}
 
 /* KPI 卡：主题绿走顶边（shared.css 把 .kpi-value 锁为中性色，不覆写） */
 .kpi-card {
@@ -322,7 +426,7 @@ blockquote { border-left: 3px solid var(--accent); margin: .8rem 0; padding: .55
   <button class="edit-toggle" id="edit-toggle" title="Edit mode (E)">✏ Edit</button>
 
     <div class="export-menu" id="export-menu">
-    <button class="export-item" onclick="window.print()">🖨 Print / PDF</button>
+    <button class="export-item" id="export-print">🖨 Print / PDF</button>
     <button class="export-item" id="export-png-desktop">🖥 Save PNG (Desktop)</button>
     <button class="export-item" id="export-png-mobile">📱 Save PNG (Mobile)</button>
     <button class="export-item" id="export-im-share">💬 IM Image</button>
@@ -377,13 +481,23 @@ blockquote { border-left: 3px solid var(--accent); margin: .8rem 0; padding: .55
   <div class="report-wrapper">
 
     <!-- ── Header ─────────────────────────────────────────────── -->
-    <h1>Q3 Product Launch Performance Report</h1>
+    <div class="title-row">
+      <h1>Q3 Product Launch Performance Report</h1>
+      <button class="card-mode-btn" id="card-mode-btn" title="Summary card">⊞ Summary</button>
+    </div>
     <p class="report-meta">
       Period: January 1, 2024 — June 30, 2024 &nbsp;·&nbsp;
       Owner: Product &amp; Engineering &nbsp;·&nbsp;
       Updated: March 16, 2026 &nbsp;·&nbsp;
       Version: v2.4.0
     </p>
+
+    <!-- Summary card overlay — .sc-left and .sc-right injected by buildCard() -->
+    <div class="sc-overlay" id="sc-overlay" aria-hidden="true">
+      <div class="sc-card" id="sc-card">
+        <button class="sc-close" id="sc-close" aria-label="Close">✕</button>
+      </div>
+    </div>
 
     <!-- ═══════════════════════════════════════════════════════ -->
     <!-- §1  Core Metrics                                         -->
@@ -1085,11 +1199,13 @@ window.addEventListener('load', () => {
         (function() {
       const exportBtn  = document.getElementById('export-btn');
       const exportMenu = document.getElementById('export-menu');
+      const printBtn   = document.getElementById('export-print');
       const pngDesktop = document.getElementById('export-png-desktop');
       const pngMobile  = document.getElementById('export-png-mobile');
       const pngIM      = document.getElementById('export-im-share');
       if (!exportBtn || !exportMenu) return;
       const LABEL = exportBtn.textContent;
+      const PRINT_MODE_CLASS = 'print-exporting';
 
       exportBtn.addEventListener('click', e => { e.stopPropagation(); exportMenu.classList.toggle('open'); });
       document.addEventListener('click', e => {
@@ -1112,6 +1228,18 @@ window.addEventListener('load', () => {
       loadLib(); /* start loading immediately */
 
       function restore() { exportBtn.style.visibility = ''; exportBtn.textContent = LABEL; }
+      function preparePrintExport() {
+        exportMenu.classList.remove('open');
+        exportBtn.style.visibility = 'hidden';
+        exportBtn.textContent = '…';
+        document.documentElement.classList.add(PRINT_MODE_CLASS);
+        document.documentElement.style.setProperty('--print-bg-color', exportBackgroundColor());
+      }
+      function cleanupPrintExport() {
+        document.documentElement.classList.remove(PRINT_MODE_CLASS);
+        document.documentElement.style.removeProperty('--print-bg-color');
+        restore();
+      }
       function filename(suffix, ext) {
         const d = new Date(), pad = n => String(n).padStart(2,'0');
         const date = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
@@ -1140,6 +1268,13 @@ window.addEventListener('load', () => {
         document.querySelectorAll('.fade-in-up').forEach(e => e.classList.add('visible'));
         loadLib().then(() => html2canvas(el, cfg).then(c => saveBlob(c, fname, jpeg)));
       }
+
+      /* Print / PDF: enter prepared print mode so animated blocks and the report background survive */
+      printBtn && printBtn.addEventListener('click', () => {
+        preparePrintExport();
+        requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+      });
+      window.addEventListener('afterprint', cleanupPrintExport);
 
       /* Desktop: full-page PNG — adaptive scale (2× short / 1.5× long pages) */
       pngDesktop && pngDesktop.addEventListener('click', () => {
@@ -1170,6 +1305,90 @@ window.addEventListener('load', () => {
           backgroundColor: exportBackgroundColor(),
           scrollX: 0, scrollY: 0, width: el.scrollWidth, height: el.scrollHeight
         }, filename('-im', 'jpg'), true);
+      });
+    })();
+  </script>
+
+  <script>
+    // Summary card — editorial two-column layout, built from #report-summary JSON + DOM data-summary
+    (function() {
+      const btn      = document.getElementById('card-mode-btn');
+      const overlay  = document.getElementById('sc-overlay');
+      const closeBtn = document.getElementById('sc-close');
+      if (!btn || !overlay) return;
+
+      function summaryCardLabel() {
+        const lang = (document.documentElement.lang || '').toLowerCase();
+        return lang.startsWith('zh') ? '报告摘要' : 'Report Summary';
+      }
+
+      function posterNoteText(d) {
+        const raw = (d.poster_note || d.abstract || '').trim();
+        if (!raw) return '';
+        const sentence = raw.match(/^(.{0,72}?[。！？!?]|.{0,120})/)?.[1]?.trim() || raw;
+        return sentence.length > 72 ? sentence.slice(0, 72).trim() + '…' : sentence;
+      }
+
+      function buildCard() {
+        const card = document.getElementById('sc-card');
+        try {
+          const d = JSON.parse(document.getElementById('report-summary').textContent);
+          const main = (d.poster_title || d.title || '').trim();
+          const sub  = (d.poster_subtitle || d.subtitle || '').trim();
+          const note = posterNoteText(d);
+
+          const leftHtml = `
+            <div class="sc-left">
+              <div class="sc-label">${summaryCardLabel()}</div>
+              <div class="sc-title-main">${main}</div>
+              ${sub ? `<div class="sc-title-sub">${sub}</div>` : ''}
+              ${note ? `<div class="sc-note">${note}</div>` : ''}
+            </div>`;
+
+          const kpiRowsHtml = (d.kpis || []).slice(0, 6).map(k => `
+            <div class="sc-kpi-row">
+              <div class="sc-kpi-row-l">${k.label || ''}</div>
+              <div class="sc-kpi-row-v">${k.value || ''}${k.trend ? ` <span class="sc-kpi-row-t">${k.trend}</span>` : ''}</div>
+            </div>`).join('');
+
+          const summariesHtml = Array.from(document.querySelectorAll('section[data-section]'))
+            .map(s => ({ name: s.dataset.section || '', text: s.dataset.summary || '' }))
+            .filter(s => s.name)
+            .slice(0, 3)
+            .map(s => `
+            <div class="sc-sum-item">
+              <div class="sc-sum-name">${s.name}</div>
+              ${s.text ? `<div class="sc-sum-text">${s.text}</div>` : ''}
+            </div>`).join('');
+
+          const rightHtml = `
+            <div class="sc-right">
+              ${kpiRowsHtml ? `<div class="sc-kpi-rows">${kpiRowsHtml}</div>` : ''}
+              ${summariesHtml ? `<div class="sc-summaries" style="margin-top:.5rem">${summariesHtml}</div>` : ''}
+            </div>`;
+
+          card.insertAdjacentHTML('beforeend', leftHtml + rightHtml);
+        } catch (e) {
+          card.insertAdjacentHTML('beforeend', '<div style="padding:2rem;color:#666">Summary unavailable.</div>');
+        }
+      }
+
+      let built = false;
+      function openCard() {
+        if (!built) { buildCard(); built = true; }
+        document.body.classList.add('card-mode');
+        overlay.setAttribute('aria-hidden', 'false');
+      }
+      function closeCard() {
+        document.body.classList.remove('card-mode');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+
+      btn.addEventListener('click', openCard);
+      closeBtn && closeBtn.addEventListener('click', closeCard);
+      overlay.addEventListener('click', e => { if (e.target === overlay) closeCard(); });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && document.body.classList.contains('card-mode')) closeCard();
       });
     })();
   </script>

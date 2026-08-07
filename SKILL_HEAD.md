@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
 description: 生成零依赖 HTML 报告 — 9 套主题，9 种组件，三层 AI 可读结构，支持动效渲染模式。适用于商业报告、数据看板、研究文档、KPI 仪表盘等。
-version: 1.26.0
+version: 1.26.1
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
