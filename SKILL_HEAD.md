@@ -1,7 +1,7 @@
 ---
 name: kai-report-creator
-description: 生成零依赖 HTML 报告 — 8 套主题，9 种组件，三层 AI 可读结构。适用于商业报告、数据看板、研究文档、KPI 仪表盘等。
-version: 1.25.0
+description: 生成零依赖 HTML 报告 — 9 套主题，9 种组件，三层 AI 可读结构，支持动效渲染模式。适用于商业报告、数据看板、研究文档、KPI 仪表盘等。
+version: 1.26.0
 user-invocable: true
 metadata: {"openclaw": {"emoji": "📊"}}
 ---
@@ -12,10 +12,11 @@ metadata: {"openclaw": {"emoji": "📊"}}
 
 ## 核心亮点
 
-- **8 套内置主题** — corporate-blue、minimal、dark-tech、dark-board、data-story、newspaper、regular-lumen、fangsong
+- **9 套内置主题** — corporate-blue、minimal、dark-tech、dark-board、data-story、newspaper、regular-lumen、fangsong、forest-editorial
 - **9 种组件类型** — KPI、图表、表格、时间线、流程图、代码块、标注、图片、列表
 - **Report Review 系统** — 13 项检查点自动优化
 - **AI 可读输出** — 三层机器可读结构
+- **动效渲染模式** — `animations: scrollytelling`（暗色 GSAP 滚动叙事）或 `animations: iridescence`（浅色 WebGL 虹彩首页、零 CDN）
 - **移动端自适应**
 
 ---

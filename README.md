@@ -253,10 +253,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release Downloads
 
-The current release is **v1.25.0**. Download source bundles from GitHub Releases:
+The current release is **v1.26.0**. Download source bundles from GitHub Releases:
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.25.0
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.25.0.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.26.0
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.26.0.zip
 
 ---
 
@@ -474,6 +474,8 @@ python scripts/html_quality_gate.py report.html
 | **fangsong** | Traditional Chinese, warm brown | Formal reports with FangSong typography (标题衬线仿宋 + 正文非衬线仿宋) |
 | **forest-editorial** | Paper-green, editorial | Light reports that still want one dark anchor block (深林绿锚区 + 金色 eyebrow + 大圆角) · explicit `--theme` only |
 
+**Presets, not themes:** `radar-board` in the demo grid above is `dark-board` plus one override — `theme_overrides.primary_color: "#5ee1b4"`. A frozen-fixture comparison showed the accent colour is the only real difference, so it stays a preset instead of a tenth theme. See [themes/README.md](themes/README.md) for what `theme_overrides` can and cannot reach.
+
 ### corporate-blue
 
 Warm business theme with subtle gradients. Default for executive-facing reports. Uses restrained primary color on key elements only — KPI values, section links, and one accent block per report.
@@ -639,6 +641,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 ---
 
 ## Version History
+
+**v1.26.0** — Theme preview and doc-sync release: ship the `templates/{en,zh}/forest-editorial.html` and `templates/{en,zh}/radar-board.html` preview decks with 1280×800 screenshots and add both to the README demo grid; document `radar-board` in the Themes section as a `dark-board` preset (`theme_overrides.primary_color: "#5ee1b4"`) rather than a tenth built-in theme, matching the frozen-fixture finding in `themes/README.md`; fix the `SKILL_HEAD.md` drift left by v1.25.0, where the zh skill description and highlight list still claimed 8 themes and never mentioned animated render mode; give the zh radar-board deck the same `data-template` / `data-version` / `data-theme` markers its en sibling already carried.
 
 **v1.25.0** — Animated render mode and forest-editorial theme: migrate the scrollytelling and iridescence recipes from lingee-gen-ppt into `references/animated-shell/` with `animations: scrollytelling|iridescence` routing; rebuild the quality gate's animated profile so it verifies real elements instead of substrings (HTMLParser-based mode detection and chrome IDs, an exact `(src, integrity)` allow-list for pinned CDNs, per-KPI summary checks, `data-theme == data-animation`, colour-agnostic WebGL fallback); strip comments before the standard-track id checks too; add `forest-editorial` as the 9th built-in theme with its fingerprint; add a frozen theme-skinning fixture (`tests/fixtures/skin_fixture.py`) so themes can be compared without AI rendering drift; add 20 playwright behaviour tests for animated paging and play mode; document that the gate catches generator omissions, not hand-crafted parsing ambiguity, and never judges whether a number is truthful.
 

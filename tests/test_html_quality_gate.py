@@ -130,7 +130,7 @@ def _animated_html(mode="iridescence", *, chrome=None, scripts="", body="",
              "if(!gl){canvas.style.background='linear-gradient(135deg,#cfe0ff,#f0f6ff)';}"
              if mode == "iridescence" else "")
     return f"""<!DOCTYPE html>
-<html lang="zh" data-template="kai-report-creator" data-version="1.25.0"
+<html lang="zh" data-template="kai-report-creator" data-version="1.26.0"
  data-theme="{theme or mode}" data-render-mode="animated" data-animation="{mode}">
 <head><title>T</title>{JSONLD.replace("__MODE__", theme or mode)}{scripts}</head>
 <body>
@@ -262,7 +262,7 @@ def test_animated_webgl_fallback_is_colour_agnostic():
 def test_standard_shell_ids_cannot_be_satisfied_from_a_comment():
     html = """
 <!DOCTYPE html>
-<html data-template="kai-report-creator" data-version="1.25.0" data-theme="minimal">
+<html data-template="kai-report-creator" data-version="1.26.0" data-theme="minimal">
 <head><style>/* Theme: minimal */ --font-sans: x; body { font-family: var(--font-sans) }</style></head>
 <body>
 <script type="application/json" id="report-summary">{"title":"T","sections":[],"kpis":[]}</script>
@@ -286,7 +286,7 @@ def test_forest_editorial_theme_fingerprint():
     theme_css = (ROOT / "templates" / "themes" / "forest-editorial.css").read_text(encoding="utf-8")
     html = f"""
 <!DOCTYPE html>
-<html data-template="kai-report-creator" data-version="1.25.0" data-theme="forest-editorial">
+<html data-template="kai-report-creator" data-version="1.26.0" data-theme="forest-editorial">
 <head><style>{theme_css}</style></head>
 <body>
 <script type="application/json" id="report-summary">{{"title":"T","sections":[],"kpis":[]}}</script>
@@ -300,7 +300,7 @@ def test_forest_editorial_theme_fingerprint():
 def test_forest_editorial_fingerprint_rejects_hand_rolled_css():
     html = """
 <!DOCTYPE html>
-<html data-template="kai-report-creator" data-version="1.25.0" data-theme="forest-editorial">
+<html data-template="kai-report-creator" data-version="1.26.0" data-theme="forest-editorial">
 <head><style>body { background: #f5f7f3; font-family: sans-serif; }</style></head>
 <body>
 <script type="application/json" id="report-summary">{"title":"T","sections":[],"kpis":[]}</script>

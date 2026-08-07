@@ -187,10 +187,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release 下载
 
-当前发布版本是 **v1.25.0**。可以从 GitHub Releases 下载源码包：
+当前发布版本是 **v1.26.0**。可以从 GitHub Releases 下载源码包：
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.25.0
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.25.0.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.26.0
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.26.0.zip
 
 ---
 
@@ -399,6 +399,8 @@ python scripts/html_quality_gate.py report.html
 | **fangsong** | 传统中文，暖棕调 | 正式公文报告 · 标题衬线仿宋 + 正文非衬线仿宋 |
 | **forest-editorial** | 米绿纸感，编辑风 | 整体浅色但需要一块深色锚点的报告 · 深林绿锚区 + 金色 eyebrow + 大圆角 · 仅显式 `--theme` 选择 |
 
+**预设不是主题：** 上方演示墙里的 `radar-board` 是 `dark-board` 加一个覆盖项——`theme_overrides.primary_color: "#5ee1b4"`。冻结夹具对比显示它与 `dark-board` 的实质差异只有强调色，因此保留为预设，而不是第 10 个内置主题。`theme_overrides` 能改与不能改的边界见 [themes/README.md](themes/README.md)。
+
 ### corporate-blue
 
 暖感商务主题，适用于面向高管的报告。主色克制地用于关键元素——KPI 数值、章节链接、每报告一个强调块。主色最多出现在 3 类元素上，形成清晰的视觉层次，避免"AI 把所有东西都染蓝"的效果。
@@ -562,6 +564,8 @@ OpenClaw 会自动：
 ---
 
 ## 版本日志
+
+**v1.26.0** — 主题预览与文档同步发布：新增 `templates/{en,zh}/forest-editorial.html` 与 `templates/{en,zh}/radar-board.html` 预览页及 1280×800 截图，并加入 README 演示墙；主题章节明确 `radar-board` 是 `dark-board` 预设（`theme_overrides.primary_color: "#5ee1b4"`）而非第 10 个内置主题，与 `themes/README.md` 的冻结夹具结论一致；修正 v1.25.0 遗留的 `SKILL_HEAD.md` 漂移——中文 skill 描述与亮点列表仍写 8 套主题，也未提动效渲染模式；为 zh 版 radar-board 预览页补上 en 版早已具备的 `data-template` / `data-version` / `data-theme` 标记。
 
 **v1.25.0** — 动效渲染模式与 forest-editorial 主题：把 scrollytelling / iridescence 配方从 lingee-gen-ppt 迁入 `references/animated-shell/`，由 `animations: scrollytelling|iridescence` 路由；重写 quality gate 的 animated 断言组，改为校验真实元素而非子串（HTMLParser 判定模式与 chrome ID、CDN 的 `(src, integrity)` 精确白名单、逐项 summary KPI 校验、`data-theme == data-animation`、与色值无关的 WebGL 降级检查）；标准轨的 id 检查同样先剥离注释；新增第 9 个内置主题 `forest-editorial` 及其指纹；新增冻结夹具 `tests/fixtures/skin_fixture.py`，让主题对比不受 AI 渲染漂移干扰；新增 20 个 playwright 行为测试覆盖动效翻页与播放模式；明确门禁的职责边界——抓生成器疏漏，不抓刻意构造的解析歧义，也不判断数字真假。
 
