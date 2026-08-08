@@ -253,10 +253,10 @@ git clone https://github.com/kaisersong/kai-report-creator ~/.openclaw/skills/ka
 
 ### Release Downloads
 
-The current release is **v1.26.1**. Download source bundles from GitHub Releases:
+The current release is **v1.27.0**. Download source bundles from GitHub Releases:
 
-- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.26.1
-- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.26.1.zip
+- https://github.com/kaisersong/kai-report-creator/releases/tag/v1.27.0
+- https://github.com/kaisersong/kai-report-creator/archive/refs/tags/v1.27.0.zip
 
 ---
 
@@ -641,6 +641,8 @@ For offline bundles with `--bundle`: internet connection needed once to inline C
 ---
 
 ## Version History
+
+**v1.27.0** — Theme routing for retrospectives, summaries and proposals: `forest-editorial` stops being explicit-selection only and gains a routing row for 复盘/回顾, the summary compounds (工作总结, 项目总结, 阶段总结, 年终总结, 总结报告), 方案/提案/建议书, plus `retrospective`/`post-mortem`/`proposal` and the style words 米绿/纸感/林绿/森林; `data-story` narrows to the data-shaped narrative it was meant to be (年度/故事/增长) with the retrospective keywords moved out; the `editorial` keyword moves from `minimal` to `forest-editorial`, which resolves a straight contradiction — `theme-routing.md` said the word selects `forest-editorial` while `context_isolation.py` routed it to `minimal`. The row sits below the sharper signals on purpose, so `7 月月报复盘` stays `regular-lumen`, `季度业绩总结报告` stays `corporate-blue`, and `支付网关技术方案` stays `dark-tech`. Summary keywords are compounds rather than a bare 总结: keyword matching runs over the whole IR, so a bare 总结 would be claimed by every report that merely has a 总结 section. Adds `tests/test_theme_routing.py` with 18 assertions — the keyword table had no test coverage at all, and its row order *is* the contract.
 
 **v1.26.1** — forest-editorial anchor-block fix: the theme's deep forest-green header block was scoped to `.report-wrapper > h1:first-of-type`, but the standard shell wraps h1 in `.title-row` to seat the summary-card button, so every generated forest-editorial report rendered a plain title with no anchor and no gold eyebrow — only the older hand-built preview decks still looked right; the anchor now matches both structures and the summary-card button switches to a light outline when it sits on the dark anchor. Both forest-editorial preview decks get the shell they were missing: the `⊞ Summary` card overlay, a real `export-print` binding with prepared print mode so the paper-green background survives PDF export, screenshots re-shot at 1280×800, and `data-version` / JSON-LD `rendererVersion` brought into agreement. Adds `tests/test_forest_editorial_anchor.py`, four computed-style regression tests — the gate's fingerprint markers only prove declarations are present, not that they still match the shipped DOM.
 
